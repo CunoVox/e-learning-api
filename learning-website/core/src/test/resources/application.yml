@@ -1,0 +1,16 @@
+spring:
+  profiles:
+    group:
+      "local-dev": "local-dev"
+      "dev": "dev"
+      "prod": "prod"
+  main:
+    allow-circular-references: true
+  data:
+    mongodb:
+#      uri: mongodb://lvdev:lv2o22Dev@45.119.212.77:20117/portal-testing?authSource=admin
+      uri: mongodb://root:5I8juzfcFu76zmH2@103.2.229.22:30210/portal-testing?authSource=admin
+
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} [PRODUCT-CORE] %m%n%wEx"

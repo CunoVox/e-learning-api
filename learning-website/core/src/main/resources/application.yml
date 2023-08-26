@@ -1,0 +1,11 @@
+spring:
+  profiles:
+    group:
+      "local-dev": "local-dev"
+      "dev": "dev"
+      "prod": "prod"
+  main:
+    allow-circular-references: true
+  data:
+    mongodb:
+      uri: mongodb://lvdev:lv2o22Dev@45.119.212.77:20117/portal-testing?authSource=admin
