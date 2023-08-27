@@ -1,0 +1,11 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://hoanhao1512:PxbXXwA291URQLTI@learning-website.tmmqci5.mongodb.net/hao-hao?retryWrites=true&w=majority
+  # Thêm cấu hình SSL
+  ssl:
+    enabled: true  # Bật chế độ SSL
+    key-store: classpath:keystore.p12  # Đường dẫn đến tệp keystore
+    key-store-password: your-password  # Mật khẩu của keystore
+    key-store-type: PKCS12  # Loại keystore
+    key-alias: your-alias
