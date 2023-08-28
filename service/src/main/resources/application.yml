@@ -1,0 +1,5 @@
+spring:
+  data:
+    mongodb:
+#      uri: mongodb+srv://hoanhao1512:PxbXXwA291URQLTI@learning-website.tmmqci5.mongodb.net/hao-hao?retryWrites=true&w=majority
+      uri: mongodb+srv://hoanhao1512:PxbXXwA291URQLTI@learning-website.tmmqci5.mongodb.net/hao-hao
