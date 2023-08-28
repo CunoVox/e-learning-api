@@ -4,6 +4,7 @@ import com.elearning.controller.UserController;
 import com.elearning.dtos.UserDTO;
 import com.elearning.dtos.UserFormDTO;
 import com.elearning.handler.ServiceException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/auth")
+@Tag(name = "Auth", description = "Auth API")
 public class authController {
     @Autowired
     UserController userController;

@@ -4,10 +4,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 public class EnumConst {
-
-    public enum ProductOptionGroupSupTypeEnum {
-        PRIVATE,
-        PUBLIC
+    @AllArgsConstructor
+    public enum HostEnum {
+        LOCALHOST_SERVICE("http://localhost:8080");
+        @Getter
+        String description;
     }
 
     @AllArgsConstructor

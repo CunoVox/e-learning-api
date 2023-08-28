@@ -1,5 +1,10 @@
 package com.elearning.configs;
 
+import com.elearning.utils.Constants;
+import com.elearning.utils.EnumConst;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -9,10 +14,11 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-// http://localhost:8080/swagger-ui/
+import java.util.ArrayList;
+import java.util.List;
+
 @EnableWebMvc
 @Configuration
-//@Profile("dev")
 @EnableSwagger2
 public class SwaggerConfig {
     @Bean
@@ -22,5 +28,22 @@ public class SwaggerConfig {
                 .apis(RequestHandlerSelectors.basePackage("com.elearning.apis"))
                 .paths(PathSelectors.any())
                 .build();
+    }
+
+    @Bean
+    public OpenAPI springShopOpenAPI() {
+        List<Server> servers = new ArrayList<>();
+
+        Server server = new Server();
+        server.setUrl(Constants.SERVICE_URL);
+        server.setDescription("Swagger");
+
+        servers.add(server);
+
+        return new OpenAPI()
+                .info(new Info().title(" Swagger")
+                        .description("E Learning Swagger UI")
+                        .version("1.0"))
+                .servers(servers);
     }
 }

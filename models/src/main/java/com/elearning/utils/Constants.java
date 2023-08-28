@@ -7,12 +7,6 @@ package com.elearning.utils;
 
 public class Constants {
 
-    public static final String STORE_CHANNEL_ALL_KEY = "W5VYe7Az00Cer0vtG8DNpMBKhVqjCOu0";
-
-    public static final String STORE_PORTAL = "ALL";
-
-    public static final String HEADER_TOKEN_NAME = "X-Ecomos-Access-Token";
-
-    public static final String API_VERSION = "v1";
+    public static final String SERVICE_URL = "http://localhost:8080/e-learning";
 
 }
