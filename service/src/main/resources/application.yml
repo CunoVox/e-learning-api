@@ -11,4 +11,3 @@ spring:
       password:
 security:
   basic:
-    enabled: false
