@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class authController {
     @Autowired
     IUserController userController;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserFormDTO userFormDTO){
+    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserFormDTO userFormDTO) throws Exception {
         UserDTO dto = userController.register(userFormDTO);
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }

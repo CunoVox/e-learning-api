@@ -5,13 +5,12 @@ import com.elearning.dtos.UserDTO;
 import com.elearning.dtos.UserFormDTO;
 import com.elearning.entities.Role;
 import com.elearning.entities.User;
-import com.elearning.reprositories.UserRepository;
+import com.elearning.reprositories.IUserRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -20,7 +19,7 @@ public class UserController implements IUserController {
     @Autowired
     ModelMapper modelMapper;
     @Autowired
-    UserRepository userRepository;
+    IUserRepository userRepository;
     @Override
     public UserDTO create(UserDTO dto) {
         dto.id = UUID.randomUUID().toString();
@@ -33,10 +32,16 @@ public class UserController implements IUserController {
         return dto;
     }
     @Override
-    public UserDTO register(UserFormDTO formDto) {
-        UserDTO dto = modelMapper.map(formDto, UserDTO.class);
-        dto = create(dto);
-        return dto;
+    public UserDTO register(UserFormDTO formDto) throws Exception {
+        User entity = userRepository.findByEmail(formDto.email);
+        if(entity == null){
+            if(formDto.password.length() < 8)
+                throw new Exception(new Exception("Mật khẩu phải có 8 kí tự trở lên"));
+            UserDTO dto = modelMapper.map(formDto, UserDTO.class);
+            dto = create(dto);
+            return dto;
+        }
+        throw new Exception(new Exception("Email đã tồn tại"));
     }
 
     @Override

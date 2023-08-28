@@ -6,11 +6,11 @@ import javax.validation.constraints.NotNull;
 
 @Data
 public class UserFormDTO {
-    @NotNull
+    @NotNull(message = "Email chưa được nhập")
     public String email;
     public String fullName;
     public String address;
-    @NotNull
+    @NotNull(message = "Mật khẩu chưa được nhập")
     public String password;
 
 }
