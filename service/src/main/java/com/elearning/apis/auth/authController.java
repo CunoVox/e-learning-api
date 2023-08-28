@@ -1,11 +1,10 @@
 package com.elearning.apis.auth;
 
-import com.elearning.controller.IUserController;
+import com.elearning.controller.UserController;
 import com.elearning.dtos.UserDTO;
 import com.elearning.dtos.UserFormDTO;
+import com.elearning.handler.ServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -14,11 +13,11 @@ import javax.validation.Valid;
 @RequestMapping("/api/auth")
 public class authController {
     @Autowired
-    IUserController userController;
+    UserController userController;
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@Valid @RequestBody UserFormDTO userFormDTO) throws Exception {
+    public UserDTO register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
         UserDTO dto = userController.register(userFormDTO);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+        return dto;
     }
 }
