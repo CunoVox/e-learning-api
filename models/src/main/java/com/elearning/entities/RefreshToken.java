@@ -1,20 +1,16 @@
 package com.elearning.entities;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import nonapi.io.github.classgraph.json.Id;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Document(collection = "refresh-token")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@Document(collection = "product")
-public class Product {
-    @Id
-    private String id;
-    private String title;
-    private String name;
+@SuperBuilder
+public class RefreshToken extends IBaseEntity{
+    public String createdFrom;
 }
