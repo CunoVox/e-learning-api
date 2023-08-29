@@ -19,9 +19,7 @@ public class authController {
 
     @PostMapping("/register")
     public UserDTO register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
-//        return UserDTO.builder().address("Thủ Đức").email("Hao@gmail.com").id("1").build();
-        throw new ServiceException("Lỗi");
-//        UserDTO dto = userController.register(userFormDTO);
-//        return dto;
+        UserDTO dto = userController.register(userFormDTO);
+        return dto;
     }
 }
