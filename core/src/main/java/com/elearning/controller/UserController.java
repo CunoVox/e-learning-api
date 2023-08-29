@@ -1,7 +1,7 @@
 package com.elearning.controller;
 
-import com.elearning.dtos.UserDTO;
-import com.elearning.dtos.UserFormDTO;
+import com.elearning.models.dtos.UserDTO;
+import com.elearning.models.dtos.UserFormDTO;
 import com.elearning.entities.Role;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;

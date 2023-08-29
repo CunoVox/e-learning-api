@@ -1,8 +1,8 @@
 package com.elearning.apis.auth;
 
 import com.elearning.controller.UserController;
-import com.elearning.dtos.UserDTO;
-import com.elearning.dtos.UserFormDTO;
+import com.elearning.models.dtos.UserDTO;
+import com.elearning.models.dtos.UserFormDTO;
 import com.elearning.handler.ServiceException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,9 @@ public class authController {
 
     @PostMapping("/register")
     public UserDTO register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
-        UserDTO dto = userController.register(userFormDTO);
-        return dto;
+//        return UserDTO.builder().address("Thủ Đức").email("Hao@gmail.com").id("1").build();
+        throw new ServiceException("Lỗi");
+//        UserDTO dto = userController.register(userFormDTO);
+//        return dto;
     }
 }

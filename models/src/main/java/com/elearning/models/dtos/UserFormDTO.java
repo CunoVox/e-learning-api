@@ -1,4 +1,4 @@
-package com.elearning.dtos;
+package com.elearning.models.dtos;
 
 import lombok.Data;
 
