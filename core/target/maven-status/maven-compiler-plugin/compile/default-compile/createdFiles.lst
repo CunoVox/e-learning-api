@@ -1,0 +1,5 @@
+com\elearning\config\AppConfig.class
+com\elearning\handler\ServiceException.class
+com\elearning\reprositories\IUserRepository.class
+com\elearning\CoreApplication.class
+com\elearning\controller\UserController.class
