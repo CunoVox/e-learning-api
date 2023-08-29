@@ -26,6 +26,8 @@
         <core.version>1.0.0</core.version>
         <models.version>1.0.0</models.version>
         <service.version>1.0.0</service.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
 
@@ -49,5 +51,12 @@
         </dependencies>
     </dependencyManagement>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/CunoVox/e-learning-api</url>
+        </repository>
+    </distributionManagement>
 
 </project>
