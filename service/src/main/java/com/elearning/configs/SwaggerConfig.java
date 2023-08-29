@@ -1,7 +1,6 @@
 package com.elearning.configs;
 
 import com.elearning.utils.Constants;
-import com.elearning.utils.EnumConst;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.servers.Server;

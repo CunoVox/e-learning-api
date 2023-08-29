@@ -1,10 +1,8 @@
 package com.elearning;
 
 import com.elearning.utils.Constants;
-import com.elearning.utils.EnumConst;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
 //@SpringBootApplication(scanBasePackages = {"com.elearning"}, exclude = { SecurityAutoConfiguration.class })
 @SpringBootApplication
