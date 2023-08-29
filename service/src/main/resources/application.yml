@@ -3,15 +3,7 @@ spring:
     allow-circular-references: true
   data:
     mongodb:
-      #      uri: mongodb://atlas-sql-64e589398cbc7275dfe30853-2tolm.a.query.mongodb.net/hao-hao?ssl=true&authSource=admin
-      #      uri: mongodb+srv://hoanhao1512:PxbXXwA291URQLTI@learning-website.tmmqci5.mongodb.net/hao-hao?retryWrites=true&w=majority
       uri: mongodb+srv://root:root@cluster0.dzjqyet.mongodb.net/e-learning
-#      uri: mongodb+srv://hoanhao1512:PxbXXwA291URQLTI@learning-website.tmmqci5.mongodb.net/e-learning
-  security:
-    user:
-      password:
-security:
-  basic:
 
 springdoc:
   packagesToScan: com.elearning.apis

@@ -26,5 +26,10 @@
       <option name="name" value="longvan-libs-release" />
       <option name="url" value="https://artifacts.longvan.vn/artifactory/longvan-libs-release" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="ossrh" />
+      <option name="name" value="ossrh" />
+      <option name="url" value="https://oss.sonatype.org/content/repositories/snapshots" />
+    </remote-repository>
   </component>
 </project>
