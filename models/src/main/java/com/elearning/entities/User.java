@@ -1,5 +1,6 @@
 package com.elearning.entities;
 
+import com.elearning.utils.EnumRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +22,5 @@ public class User extends IBaseEntity{
     public String password;
     public String email;
     public String address;
-    public List<Role> roles = new ArrayList<>();
-    public List<RefreshToken> refreshTokens = new ArrayList<>();
+    public List<EnumRole> roles = new ArrayList<>();
 }
