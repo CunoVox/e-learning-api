@@ -9,7 +9,8 @@ public class Constants {
 
     public static final String SERVICE_URL = "http://localhost:8080/e-learning";
 
-    public static final int TOKEN_EXPIRE_TIME_MILLIS = 10 * 60 * 1000;
+    public static final int ACCESS_TOKEN_EXPIRE_TIME_MILLIS = 10 * 60 * 1000; // ( 10'
+    public static final int REFRESH_TOKEN_EXPIRE_TIME_MILLIS = 24 * 60 * 60 * 7 * 1000; // 7 days
     public static final String SECRET_KEY = "KJHUIknjkNIOASpASouFaoiDFsfhnIOUUIvaJKJkasjAASD";
 
 }

@@ -36,7 +36,7 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     public UserDTO createDTO(UserDTO dto) {
-        dto.id = UUID.randomUUID().toString();
+        dto.setId(UUID.randomUUID().toString());
 
         User user = dtoToUser(dto);
         user.roles.add(EnumRole.User);
@@ -47,7 +47,7 @@ public class UserController {
         return dto;
     }
     public User create(UserDTO dto) {
-        dto.id = UUID.randomUUID().toString();
+        dto.setId(UUID.randomUUID().toString());
         User user = dtoToUser(dto);
         user.roles.add(EnumRole.User);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -62,10 +62,10 @@ public class UserController {
             if (entity != null) {
                 throw new ServiceException("Email đã tồn tại");
             }
-            if (!isValidEmail(userFormDTO.email)) {
+            if (!isValidEmail(userFormDTO.getEmail())) {
                 throw new ServiceException("Email không hợp lệ");
             }
-            if (userFormDTO.password.length() < 8)
+            if (userFormDTO.getPassword().length() < 8)
                 throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
 
             dto = modelMapper.map(userFormDTO, UserDTO.class);
@@ -73,8 +73,10 @@ public class UserController {
             dto = userToDto(entity);
             UserDetails userDetail =  userDetailsService.loadUserByUsername(entity.email);
             var jwtToken = jwtController.generateToken(userDetail);
+            var refreshToken = jwtController.generateRefreshToken(userDetail);
             return AuthResponse.builder()
                     .token(jwtToken)
+                    .refreshToken(refreshToken)
                     .user(dto)
                     .build();
         }
@@ -89,12 +91,14 @@ public class UserController {
                             formDTO.getPassword()
                     )
             );
-            var user = userRepository.findByEmail(formDTO.email);
+            var user = userRepository.findByEmail(formDTO.getEmail());
             dto = userToDto(user);
             UserDetails userDetail =  userDetailsService.loadUserByUsername(user.email);
             var jwtToken = jwtController.generateToken(userDetail);
+            var refreshToken = jwtController.generateRefreshToken(userDetail);
             return AuthResponse.builder()
                     .token(jwtToken)
+                    .refreshToken(refreshToken)
                     .user(dto)
                     .build();
         }
@@ -129,13 +133,11 @@ public class UserController {
     }
 
     public User dtoToUser(UserDTO dto) {
-        User user = modelMapper.map(dto, User.class);
-        return user;
+        return modelMapper.map(dto, User.class);
     }
 
     public UserDTO userToDto(User user) {
-        UserDTO dto = modelMapper.map(user, UserDTO.class);
-        return dto;
+        return modelMapper.map(user, UserDTO.class);
     }
 
 }

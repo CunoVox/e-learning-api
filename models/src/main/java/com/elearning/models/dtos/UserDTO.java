@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class UserDTO {
-    public String id;
-    public String fullName;
+    private String id;
+    private String fullName;
     @JsonIgnore
-    public String password;
-    public String email;
-    public String address;
-    public Boolean isDeleted;
+    private String password;
+    private String email;
+    private String address;
+    private Boolean isDeleted;
 
 }
