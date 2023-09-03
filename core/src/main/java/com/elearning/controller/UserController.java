@@ -14,11 +14,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -40,7 +40,7 @@ public class UserController {
         dto.setId(UUID.randomUUID().toString());
 
         User user = dtoToUser(dto);
-        user.roles.add(EnumRole.User);
+        user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
 
@@ -51,7 +51,7 @@ public class UserController {
     public User create(UserDTO dto) {
         dto.setId(UUID.randomUUID().toString());
         User user = dtoToUser(dto);
-        user.roles.add(EnumRole.User);
+        user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
 
@@ -73,15 +73,7 @@ public class UserController {
 
             dto = modelMapper.map(userFormDTO, UserDTO.class);
             entity = create(dto);
-            dto = userToDto(entity);
-            SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(entity.getEmail());
-            var jwtToken = jwtController.generateToken(userDetail);
-            var refreshToken = jwtController.generateRefreshToken(userDetail);
-            return AuthResponse.builder()
-                    .token(jwtToken)
-                    .refreshToken(refreshToken)
-                    .user(dto)
-                    .build();
+            return getAuthResponse(entity);
         }
         return new AuthResponse();
     }
@@ -89,26 +81,44 @@ public class UserController {
     public AuthResponse login(UserFormDTO formDTO) throws ServiceException {
         UserDTO dto;
         if (formDTO != null) {
+            User entity = userRepository.findByEmail(formDTO.getEmail());
+            if(entity == null){
+                throw new ServiceException("Email không tồn tại");
+            }
+            if(!passwordEncoder.matches(formDTO.getPassword(), entity.getPassword())){
+                throw new ServiceException("Mật khẩu không đúng");
+            }
+            if(entity.getIsDeleted()){
+                throw new ServiceException("Tài khoản bị tạm khóa");
+            }
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             formDTO.getEmail(),
                             formDTO.getPassword()
                     )
             );
-            var user = userRepository.findByEmail(formDTO.getEmail());
-            dto = userToDto(user);
-            SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(user.getEmail());
-            var jwtToken = jwtController.generateToken(userDetail);
-            var refreshToken = jwtController.generateRefreshToken(userDetail);
-            return AuthResponse.builder()
-                    .token(jwtToken)
-                    .refreshToken(refreshToken)
-                    .user(dto)
-                    .build();
+//            var user = entity;
+            return getAuthResponse(entity);
         }
         return new AuthResponse();
     }
 
+    private AuthResponse getAuthResponse(User entity) {
+        UserDTO dto;
+        dto = userToDto(entity);
+        SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(entity.getEmail());
+        var jwtToken = jwtController.generateToken(userDetail);
+        var refreshToken = jwtController.generateRefreshToken(userDetail);
+        return AuthResponse.builder()
+                .token(jwtToken)
+                .refreshToken(refreshToken)
+                .user(dto)
+                .build();
+    }
+
+    public List<User> findAllUser(){
+        return userRepository.findAll();
+    }
     //    public UserDTO login(UserFormDTO formDto) throws ServiceException {
 //        UserDTO dto = new UserDTO();
 //        if(formDto != null){

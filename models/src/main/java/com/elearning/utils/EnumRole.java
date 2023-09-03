@@ -1,7 +1,7 @@
 package com.elearning.utils;
 
 public enum EnumRole {
-    Admin,
-    Controller,
-    User
+    ROLE_ADMIN,
+    ROLE_MANAGER,
+    ROLE_USER
 }

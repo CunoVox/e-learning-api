@@ -17,7 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @Document(collection = "user")
-public class User extends IBaseEntity{
+public class User extends IBaseEntity {
     private String fullName;
     private String password;
     private String email;

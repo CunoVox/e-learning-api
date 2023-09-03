@@ -11,6 +11,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static com.elearning.utils.EnumRole.*;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class WebSecurityConfiguration {
                         "/webjars/**",
                         "/swagger-ui.html"
                 ).permitAll()
+//                .antMatchers("/test/users").hasAnyRole(ROLE_ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()

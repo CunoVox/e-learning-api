@@ -1,8 +1,11 @@
 package com.elearning.configs;
 
 import com.elearning.utils.Constants;
+import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +31,11 @@ public class SwaggerConfig {
                 .paths(PathSelectors.any())
                 .build();
     }
-
+    private SecurityScheme createAPIKeyScheme() {
+        return new SecurityScheme().type(SecurityScheme.Type.HTTP)
+                .bearerFormat("JWT")
+                .scheme("bearer");
+    }
     @Bean
     public OpenAPI springShopOpenAPI() {
         List<Server> servers = new ArrayList<>();
@@ -40,6 +47,10 @@ public class SwaggerConfig {
         servers.add(server);
 
         return new OpenAPI()
+                .addSecurityItem(new SecurityRequirement().
+                        addList("Bearer Authentication"))
+                .components(new Components().addSecuritySchemes
+                        ("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title(" Swagger")
                         .description("E Learning Swagger UI")
                         .version("1.0"))
