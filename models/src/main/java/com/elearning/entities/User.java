@@ -18,9 +18,9 @@ import java.util.List;
 @SuperBuilder
 @Document(collection = "user")
 public class User extends IBaseEntity{
-    public String fullName;
-    public String password;
-    public String email;
+    private String fullName;
+    private String password;
+    private String email;
     public String address;
     public List<EnumRole> roles = new ArrayList<>();
 }

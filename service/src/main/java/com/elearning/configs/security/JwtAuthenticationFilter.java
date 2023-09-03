@@ -2,6 +2,7 @@ package com.elearning.configs.security;
 
 
 import com.elearning.controller.JwtController;
+import com.elearning.security.SecurityUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.NonNull;
@@ -45,7 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         userEmail = jwtController.extractUsername(jwt);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            SecurityUserDetail userDetails = (SecurityUserDetail) this.userDetailsService.loadUserByUsername(userEmail);
             if (jwtController.isValidToken(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(

@@ -1,8 +1,6 @@
 package com.elearning.security;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +12,7 @@ import java.util.Collection;
 @Getter
 @SuperBuilder
 public class SecurityUserDetail implements UserDetails {
+    private final String id;
     private final String fullName;
 
     private final String email;
@@ -24,13 +23,18 @@ public class SecurityUserDetail implements UserDetails {
 
     private final boolean isDeleted;
 
-    public SecurityUserDetail(String fullName, String email,
+    public SecurityUserDetail(String id, String fullName, String email,
                               String password, Collection<? extends GrantedAuthority> authorities, boolean isDeleted) {
+        this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.isDeleted = isDeleted;
+    }
+
+    public String getId() {
+        return id;
     }
 
     @Override

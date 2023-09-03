@@ -1,13 +1,13 @@
 package com.elearning.controller;
 
-import com.elearning.models.dtos.auth.AuthResponse;
-import com.elearning.security.SecurityUserDetail;
-import com.elearning.utils.EnumRole;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.UserFormDTO;
+import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
+import com.elearning.security.SecurityUserDetail;
+import com.elearning.utils.EnumRole;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
@@ -25,13 +25,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
     @Autowired
-    private final ModelMapper modelMapper;
+    private ModelMapper modelMapper;
     @Autowired
-    private final IUserRepository userRepository;
+    private IUserRepository userRepository;
     @Autowired
-    private final JwtController jwtController;
+    private JwtController jwtController;
     @Autowired
-    private final UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
+
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
 
@@ -46,6 +47,7 @@ public class UserController {
         dto = userToDto(user);
         return dto;
     }
+
     public User create(UserDTO dto) {
         dto.setId(UUID.randomUUID().toString());
         User user = dtoToUser(dto);
@@ -55,9 +57,10 @@ public class UserController {
 
         return user;
     }
-    public AuthResponse register(UserFormDTO userFormDTO) throws ServiceException{
-        UserDTO dto = new UserDTO();
-        if(userFormDTO != null){
+
+    public AuthResponse register(UserFormDTO userFormDTO) throws ServiceException {
+        UserDTO dto;
+        if (userFormDTO != null) {
             User entity = userRepository.findByEmail(userFormDTO.getEmail());
             if (entity != null) {
                 throw new ServiceException("Email đã tồn tại");
@@ -71,7 +74,7 @@ public class UserController {
             dto = modelMapper.map(userFormDTO, UserDTO.class);
             entity = create(dto);
             dto = userToDto(entity);
-            UserDetails userDetail =  userDetailsService.loadUserByUsername(entity.email);
+            SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(entity.getEmail());
             var jwtToken = jwtController.generateToken(userDetail);
             var refreshToken = jwtController.generateRefreshToken(userDetail);
             return AuthResponse.builder()
@@ -82,9 +85,10 @@ public class UserController {
         }
         return new AuthResponse();
     }
-    public AuthResponse login(UserFormDTO formDTO) throws ServiceException{
-        UserDTO dto = new UserDTO();
-        if(formDTO != null){
+
+    public AuthResponse login(UserFormDTO formDTO) throws ServiceException {
+        UserDTO dto;
+        if (formDTO != null) {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             formDTO.getEmail(),
@@ -93,7 +97,7 @@ public class UserController {
             );
             var user = userRepository.findByEmail(formDTO.getEmail());
             dto = userToDto(user);
-            UserDetails userDetail =  userDetailsService.loadUserByUsername(user.email);
+            SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(user.getEmail());
             var jwtToken = jwtController.generateToken(userDetail);
             var refreshToken = jwtController.generateRefreshToken(userDetail);
             return AuthResponse.builder()
@@ -104,7 +108,8 @@ public class UserController {
         }
         return new AuthResponse();
     }
-//    public UserDTO login(UserFormDTO formDto) throws ServiceException {
+
+    //    public UserDTO login(UserFormDTO formDto) throws ServiceException {
 //        UserDTO dto = new UserDTO();
 //        if(formDto != null){
 //            User entity = userRepository.findByEmail(formDto.getEmail());
@@ -121,12 +126,13 @@ public class UserController {
 //        }
 //        return dto;
 //    }
-    public UserDTO findByEmail(String email){
+    public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
         return userToDto(user);
     }
+
     public boolean isValidEmail(String email) {
-        boolean result = true;
+        boolean result;
         result = EmailValidator.getInstance()
                 .isValid(email);
         return result;

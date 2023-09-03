@@ -14,8 +14,8 @@ import java.util.Date;
 @SuperBuilder
 public class IBaseEntity {
     @Id
-    public String id;
-    public Date createdAt = new Date(new Date().getTime());
-    public Date updatedAt = new Date(new Date().getTime());
-    public Boolean isDeleted = false;
+    private String id;
+    private Date createdAt = new Date(new Date().getTime());
+    private Date updatedAt = new Date(new Date().getTime());
+    private Boolean isDeleted = false;
 }

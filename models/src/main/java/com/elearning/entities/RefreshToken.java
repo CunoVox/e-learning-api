@@ -14,7 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 @SuperBuilder
 public class RefreshToken extends IBaseEntity{
-    public String createdFrom;
-    public String userId;
-    public Date expiredAt;
+    private String createdFrom;
+    private String userId;
+    private Date expiredAt;
 }
