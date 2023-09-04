@@ -4,12 +4,6 @@ import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Minh Tuấn
- * 16:19 30/11/2021
- */
-
-
 public class ServiceException extends ResponseStatusException {
 
     @Getter

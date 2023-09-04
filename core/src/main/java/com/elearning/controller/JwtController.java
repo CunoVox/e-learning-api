@@ -89,9 +89,11 @@ public class JwtController {
             throw new ServiceException("Không có quyền truy cập 1");
         }
         if(storedToken.get().getIsDeleted()){
+            refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
             throw new ServiceException("Không có quyền truy cập 2");
         }
         if(storedToken.get().getExpiredAt().before(new Date())){
+            refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
             throw new ServiceException("Không có quyền truy cập 3");
         }
         storedToken.get().setIsDeleted(true);
@@ -104,7 +106,7 @@ public class JwtController {
         var refreshToken = jwtController.generateRefreshToken(userDetail);
 
         var savedRefreshToken = refreshTokenController.findById(refreshToken).get();
-        if(savedRefreshToken.getCreatedFrom() == null){
+        if(storedToken.get().getCreatedFrom() == null){
             savedRefreshToken.setCreatedFrom(storedToken.get().getId());
         }else{
             savedRefreshToken.setCreatedFrom(storedToken.get().getCreatedFrom());

@@ -8,7 +8,9 @@ import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.EnumRole;
+import com.elearning.utils.Extensions;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.ExtensionMethod;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
+
+import static com.elearning.utils.Extensions.toList;
 
 @Service
 @RequiredArgsConstructor
+@ExtensionMethod(Extensions.class)
 public class UserController {
     @Autowired
     private ModelMapper modelMapper;
@@ -51,6 +57,7 @@ public class UserController {
     public User create(UserDTO dto) {
         dto.setId(UUID.randomUUID().toString());
         User user = dtoToUser(dto);
+        user.setEmail(user.getEmail().trim().toLowerCase(Locale.ROOT));
         user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);

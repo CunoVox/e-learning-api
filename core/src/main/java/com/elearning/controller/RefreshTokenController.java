@@ -1,12 +1,13 @@
 package com.elearning.controller;
 
 import com.elearning.entities.RefreshToken;
+import com.elearning.handler.ServiceException;
 import com.elearning.reprositories.IRefreshTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class RefreshTokenController {
@@ -15,6 +16,7 @@ public class RefreshTokenController {
 
     @Autowired
     private JwtController jwtController;
+
     public String create(String token, String userId) {
         RefreshToken rfToken = RefreshToken
                 .builder()
@@ -32,10 +34,47 @@ public class RefreshTokenController {
         save(rfToken);
         return rfToken.getId();
     }
-    public void save(RefreshToken token){
+
+    public void save(RefreshToken token) {
         refreshTokenRepository.save(token);
     }
-    public Optional<RefreshToken> findById(String token){
+
+    public Optional<RefreshToken> findById(String token) {
         return refreshTokenRepository.findById(token);
+    }
+
+    private void deleteRefreshToken(String token) {
+        List<RefreshToken> refreshTokenList = refreshTokenRepository.findAll();
+        List<RefreshToken> toDeleteList = new ArrayList<>();
+//        for (RefreshToken refreshToken : refreshTokenList) {
+//            if (refreshToken.getId().equals(token) || (refreshToken.getCreatedFrom() != null
+//                    && refreshToken.getCreatedFrom().equals(token))) {
+//                toDeleteList.add(refreshToken);
+//            }
+//        }
+        toDeleteList = refreshTokenList.stream().filter(refreshToken->refreshToken.getId().equals(token) || (refreshToken.getCreatedFrom() != null
+                && refreshToken.getCreatedFrom().equals(token))).collect(Collectors.toList());
+        refreshTokenRepository.deleteAll(toDeleteList);
+    }
+
+    public void deleteRefreshTokenBranch(String token) {
+        var refreshToken = refreshTokenRepository.findById(token);
+
+        if (refreshToken.isEmpty()) {
+            throw new ServiceException("Lỗi");
+        } else {
+            if (refreshToken.get().getCreatedFrom() == null) {
+                deleteRefreshToken(refreshToken.get().getId());
+            } else {
+                deleteRefreshToken(refreshToken.get().getCreatedFrom());
+            }
+        }
+    }
+    public void deleteExpiredToken(){
+        var refreshTokens = refreshTokenRepository.findAll();
+        List<RefreshToken> toDeleteList = refreshTokens.stream().filter(refreshToken ->
+            refreshToken.getExpiredAt().before(new Date())
+        ).collect(Collectors.toList());
+        refreshTokenRepository.deleteAll(toDeleteList);
     }
 }
