@@ -69,15 +69,17 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout(HttpServletRequest request){
-//        Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
-//        refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
-//        ResponseCookie delete = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, null).maxAge(0).httpOnly(true).build();
-//        return ResponseEntity.ok()
-//                .header(HttpHeaders.SET_COOKIE, delete.toString())
-//                .body(null);
-//    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request){
+        Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
+        refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+        ResponseCookie delete = ResponseCookie
+                .from(REFRESH_TOKEN_COOKIE_NAME, null)
+                .maxAge(0).httpOnly(true).build();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, delete.toString())
+                .body(null);
+    }
 
     private ResponseCookie createRefreshCookie(String refreshToken) {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)

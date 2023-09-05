@@ -12,7 +12,7 @@ import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 
 @Component
 @Slf4j
-public class DeteleTokenSchedule {
+public class DeleteTokenSchedule {
     @Autowired
     private RefreshTokenController refreshTokenController;
     @Scheduled(fixedRate = REFRESH_TOKEN_EXPIRE_TIME_MILLIS)
