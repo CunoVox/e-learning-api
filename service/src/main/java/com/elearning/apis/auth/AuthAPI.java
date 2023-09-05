@@ -1,11 +1,13 @@
 package com.elearning.apis.auth;
 
 import com.elearning.controller.JwtController;
+import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.UserFormDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +31,8 @@ import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 public class AuthAPI {
     private final UserController userController;
     private final JwtController jwtController;
+    @Autowired
+    private RefreshTokenController refreshTokenController;
 
     public AuthAPI(UserController userController, JwtController jwtController) {
         this.userController = userController;
@@ -36,14 +40,13 @@ public class AuthAPI {
     }
 
     @PostMapping("/register")
-    public AuthResponse register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
+    public ResponseEntity<?> register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
-//        var cookie = createRefreshCookie(authResponse.getRefreshToken());
-//        ResponseEntity
-//                .ok()
-//                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-//                .build();
-        return authResponse;
+        var cookie = createRefreshCookie(authResponse.getRefreshToken());
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
+                .body(authResponse);
     }
 
     @PostMapping("/login")
@@ -66,12 +69,19 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
-
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout(HttpServletRequest request){
+//        Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
+//        refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+//        ResponseCookie delete = ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, null).maxAge(0).httpOnly(true).build();
+//        return ResponseEntity.ok()
+//                .header(HttpHeaders.SET_COOKIE, delete.toString())
+//                .body(null);
+//    }
 
     private ResponseCookie createRefreshCookie(String refreshToken) {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
                 .maxAge(REFRESH_TOKEN_EXPIRE_TIME_MILLIS / 1000)
-                .httpOnly(true)
                 .path("/")
                 .httpOnly(true).build();
     }

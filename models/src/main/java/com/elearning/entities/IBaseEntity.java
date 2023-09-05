@@ -15,7 +15,7 @@ import java.util.Date;
 public class IBaseEntity {
     @Id
     private String id;
-    private Date createdAt = new Date(new Date().getTime());
-    private Date updatedAt = new Date(new Date().getTime());
+    private Date createdAt = new Date();
+    private Date updatedAt = new Date();
     private Boolean isDeleted = false;
 }

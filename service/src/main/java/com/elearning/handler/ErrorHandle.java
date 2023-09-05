@@ -1,11 +1,14 @@
 package com.elearning.handler;
 
 import com.elearning.models.wrapper.ObjectResponseWrapper;
+import com.sun.jdi.InternalException;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -22,11 +25,19 @@ import java.util.List;
 public class ErrorHandle extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    protected ObjectResponseWrapper handleInternalException(Exception e) {
-        printLogException(e);
-        return ObjectResponseWrapper.builder().status(0).message(e.getMessage()).build();
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ObjectResponseWrapper handleInternalException(Exception ex) {
+        if (ex instanceof BadCredentialsException){
+            return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
+        }
+        printLogException(ex);
+        return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
     }
-
+    @ExceptionHandler(SignatureException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    protected ObjectResponseWrapper handleSignatureException(SignatureException ex){
+            return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
+    }
     @ExceptionHandler(ServiceException.class)
     protected ObjectResponseWrapper handleServiceException(ServiceException e) {
         printLogException(e);

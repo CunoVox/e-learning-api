@@ -4,6 +4,7 @@ import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
+import com.elearning.utils.EnumRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +17,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.PushBuilder;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,6 +42,14 @@ public class JwtController {
     public String extractUsername(String jwt){
         return extractClaim(jwt, Claims::getSubject);
     }
+    public String extractUserId(String jwt){
+        Claims claims = extractAllClaims(jwt);
+        var id = claims.get("uId");
+        if(id == null){
+            return null;
+        }
+        return id.toString();
+    }
     public <T> T extractClaim(String jwt, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(jwt);
         return claimsResolver.apply(claims);
@@ -60,7 +70,7 @@ public class JwtController {
         String token = buildToken(new HashMap<>(), userDetails, REFRESH_TOKEN_EXPIRE_TIME_MILLIS);
         String userId = userRepository.findByEmail(userDetails.getUsername()).getId();
         token = refreshTokenController.create(token, userId);
-        System.out.println("---------"+token);
+//        System.out.println("---------"+token);
         return token;
     }
     public String buildToken(Map<String, Object> extraClaims, SecurityUserDetail userDetails, long expiration){

@@ -22,8 +22,8 @@ public class RefreshTokenController {
                 .builder()
                 .id(token)
                 .userId(userId)
-                .createdAt(new Date(new java.util.Date().getTime()))
-                .updatedAt(new Date(new java.util.Date().getTime()))
+                .createdAt(new Date())
+                .updatedAt(new Date())
                 .isDeleted(false)
                 .expiredAt(jwtController.extractExpiration(token))
                 .build();
@@ -45,7 +45,7 @@ public class RefreshTokenController {
 
     private void deleteRefreshToken(String token) {
         List<RefreshToken> refreshTokenList = refreshTokenRepository.findAll();
-        List<RefreshToken> toDeleteList = new ArrayList<>();
+        List<RefreshToken> toDeleteList;
 //        for (RefreshToken refreshToken : refreshTokenList) {
 //            if (refreshToken.getId().equals(token) || (refreshToken.getCreatedFrom() != null
 //                    && refreshToken.getCreatedFrom().equals(token))) {
