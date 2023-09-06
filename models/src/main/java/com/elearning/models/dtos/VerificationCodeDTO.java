@@ -1,0 +1,28 @@
+package com.elearning.models.dtos;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class VerificationCodeDTO {
+
+    private String id;
+
+    private String code;
+
+    private String type;
+
+    @JsonProperty(value = "parent_id")
+    private String parentId;
+
+    @JsonProperty(value = "expired_at")
+    private Date expiredAt;
+}
