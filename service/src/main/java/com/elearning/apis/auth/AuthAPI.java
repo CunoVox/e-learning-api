@@ -70,14 +70,15 @@ public class AuthAPI {
                 .body(authResponse);
     }
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request){
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
         refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
-        ResponseCookie delete = ResponseCookie
-                .from(REFRESH_TOKEN_COOKIE_NAME, null)
-                .maxAge(0).httpOnly(true).build();
+        Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
+        delete.setHttpOnly(true);
+        delete.setPath("/");
+        delete.setMaxAge(0);
+        response.addCookie(delete);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, delete.toString())
                 .body(null);
     }
 

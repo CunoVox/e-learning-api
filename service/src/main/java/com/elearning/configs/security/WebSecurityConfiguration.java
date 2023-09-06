@@ -10,9 +10,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
+
+import java.security.Security;
 
 @Configuration
 @EnableWebSecurity
@@ -29,6 +33,7 @@ public class WebSecurityConfiguration {
         return new JwtAuthenticationFilter(exceptionResolver);
     }
     private final AuthenticationProvider authenticationProvider;
+    private final LogoutHandler logoutHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -51,14 +56,26 @@ public class WebSecurityConfiguration {
                         "/swagger-ui.html"
                 ).permitAll()
 //                .antMatchers("/test/users").hasAnyRole(ROLE_ADMIN.name())
+
                 .anyRequest()
                 .authenticated()
+
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+
                 .and()
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(jwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+
+
+//                .logout()
+//                .logoutUrl("/api/auth/logout")
+//                .addLogoutHandler(logoutHandler)
+//                .logoutSuccessHandler((
+//                        request, response, authentication) ->
+//                        SecurityContextHolder.clearContext()
+//                );
         return http.build();
     }
 }
