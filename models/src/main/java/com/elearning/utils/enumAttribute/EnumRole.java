@@ -1,4 +1,4 @@
-package com.elearning.utils;
+package com.elearning.utils.enumAttribute;
 
 public enum EnumRole {
     ROLE_ADMIN,

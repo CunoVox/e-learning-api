@@ -4,7 +4,8 @@ import com.elearning.controller.JwtController;
 import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.handler.ServiceException;
-import com.elearning.models.dtos.UserFormDTO;
+import com.elearning.models.dtos.auth.UserLoginDTO;
+import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
@@ -40,7 +38,7 @@ public class AuthAPI {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
+    public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
         var cookie = createRefreshCookie(authResponse.getRefreshToken());
         return ResponseEntity
@@ -50,7 +48,7 @@ public class AuthAPI {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserFormDTO userFormDTO) throws ServiceException {
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
         var cookie = createRefreshCookie(rs.getRefreshToken());
         return ResponseEntity
@@ -73,11 +71,15 @@ public class AuthAPI {
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
         refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+
+
         Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
         delete.setHttpOnly(true);
         delete.setPath("/");
         delete.setMaxAge(0);
         response.addCookie(delete);
+
+
         return ResponseEntity.ok()
                 .body(null);
     }

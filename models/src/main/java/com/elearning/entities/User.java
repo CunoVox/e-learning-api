@@ -1,6 +1,6 @@
 package com.elearning.entities;
 
-import com.elearning.utils.EnumRole;
+import com.elearning.utils.enumAttribute.EnumRole;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -12,7 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class IBaseEntity {
+public abstract class IBaseEntity {
     @Id
     private String id;
     private Date createdAt = new Date();

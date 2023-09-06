@@ -4,7 +4,6 @@ import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
-import com.elearning.utils.EnumRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.PushBuilder;
 import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;

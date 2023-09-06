@@ -1,4 +1,4 @@
-package com.elearning.models.dtos;
+package com.elearning.models.dtos.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -12,12 +12,11 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserFormDTO {
+public class UserLoginDTO {
     @NotNull(message = "Email chưa được nhập")
     @NotBlank(message = "Email chưa được nhập")
     private String email;
-    private String fullName;
-    private String address;
+
     @NotNull(message = "Mật khẩu chưa được nhập")
     @NotBlank(message = "Mật khẩu chưa được nhập")
     private String password;

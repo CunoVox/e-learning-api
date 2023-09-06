@@ -3,11 +3,12 @@ package com.elearning.controller;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.UserDTO;
-import com.elearning.models.dtos.UserFormDTO;
+import com.elearning.models.dtos.auth.UserLoginDTO;
+import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
-import com.elearning.utils.EnumRole;
+import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.Extensions;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
@@ -65,7 +66,7 @@ public class UserController {
         return user;
     }
 
-    public AuthResponse register(UserFormDTO userFormDTO) throws ServiceException {
+    public AuthResponse register(UserRegisterDTO userFormDTO) throws ServiceException {
         UserDTO dto;
         if (userFormDTO != null) {
             User entity = userRepository.findByEmail(userFormDTO.getEmail());
@@ -85,7 +86,7 @@ public class UserController {
         return new AuthResponse();
     }
 
-    public AuthResponse login(UserFormDTO formDTO) throws ServiceException {
+    public AuthResponse login(UserLoginDTO formDTO) throws ServiceException {
         UserDTO dto;
         if (formDTO != null) {
             User entity = userRepository.findByEmail(formDTO.getEmail());
