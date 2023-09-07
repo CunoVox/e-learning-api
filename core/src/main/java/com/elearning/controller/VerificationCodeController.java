@@ -1,5 +1,6 @@
 package com.elearning.controller;
 
+import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
 import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
@@ -22,6 +23,8 @@ import static com.elearning.utils.Constants.EMAIL_VERIFICATION_CODE_EXPIRE_TIME_
 public class VerificationCodeController {
     private final IVerificationCodeRepository verificationCodeRepository;
     private final UserController userController;
+    private final EmailSender emailSender;
+
     public void create(VerificationCode code){
         if(code.getCode() == null){
             code.setCode(code.getId());
@@ -82,6 +85,7 @@ public class VerificationCodeController {
 
         VerificationCode code = build(userId,null, EnumVerificationCode.EMAIL_CONFIRM);
         create(code);
+        emailSender.send(dto.getEmail(), code.getCode());
         return toDTO(code);
     }
     public void reCreateResetPasswordCode(){}

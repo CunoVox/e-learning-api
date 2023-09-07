@@ -1,5 +1,6 @@
 package com.elearning.controller;
 
+import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
 import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
@@ -42,7 +43,7 @@ public class UserController {
     private UserDetailsService userDetailsService;
     @Autowired
     private VerificationCodeController verificationCodeController;
-
+    private final EmailSender emailSender;
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
 
@@ -68,7 +69,7 @@ public class UserController {
 
         return user;
     }
-
+    @Transactional(rollbackFor = {Exception.class, ServiceException.class})
     public AuthResponse register(UserRegisterDTO userFormDTO) throws ServiceException {
         UserDTO dto;
         if (userFormDTO != null) {
@@ -87,6 +88,7 @@ public class UserController {
 
             verificationCodeController.revokeAllUserVerificationCode(entity.getId());
             VerificationCode code = verificationCodeController.build(entity.getId(),null, EnumVerificationCode.EMAIL_CONFIRM);
+            emailSender.send(entity.getEmail(), code.getId());
             verificationCodeController.create(code);
 
             return getAuthResponse(entity);

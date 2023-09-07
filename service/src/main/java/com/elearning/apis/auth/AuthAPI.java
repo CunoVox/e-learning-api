@@ -52,7 +52,7 @@ public class AuthAPI {
     @GetMapping("/email-confirm")
     public ResponseEntity<?> emailConfirm(@RequestParam("token") String token) {
         verificationCodeController.EmailConfirmCode(token);
-        return ResponseEntity.ok().body("Xác nhận thành công");
+        return ResponseEntity.ok().build();
     }
     @GetMapping("/resend-email/{userId}")
     public ResponseEntity<?> resendEmail(@PathVariable("userId") String userId){
