@@ -22,5 +22,6 @@ public class User extends IBaseEntity {
     private String password;
     private String email;
     public String address;
+    public Boolean isEmailConfirmed = false;
     public List<EnumRole> roles = new ArrayList<>();
 }

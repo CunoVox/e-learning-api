@@ -3,6 +3,7 @@ package com.elearning.apis.auth;
 import com.elearning.controller.JwtController;
 import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
+import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
@@ -30,6 +31,8 @@ public class AuthAPI {
     private final UserController userController;
     private final JwtController jwtController;
     @Autowired
+    private VerificationCodeController verificationCodeController;
+    @Autowired
     private RefreshTokenController refreshTokenController;
 
     public AuthAPI(UserController userController, JwtController jwtController) {
@@ -46,7 +49,15 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
-
+    @GetMapping("/email-confirm")
+    public ResponseEntity<?> emailConfirm(@RequestParam("token") String token) {
+        verificationCodeController.EmailConfirmCode(token);
+        return ResponseEntity.ok().body("Xác nhận thành công");
+    }
+    @GetMapping("/resend-email/{userId}")
+    public ResponseEntity<?> resendEmail(@PathVariable("userId") String userId){
+        return ResponseEntity.ok().body(verificationCodeController.reCreateEmailCode(userId));
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
@@ -67,6 +78,7 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
@@ -83,6 +95,8 @@ public class AuthAPI {
         return ResponseEntity.ok()
                 .body(null);
     }
+
+
 
     private ResponseCookie createRefreshCookie(String refreshToken) {
         return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)

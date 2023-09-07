@@ -18,5 +18,5 @@ public class UserDTO {
     private String email;
     private String address;
     private Boolean isDeleted;
-
+    private Boolean isEmailConfirmed;
 }

@@ -1,9 +1,9 @@
 package com.elearning.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.elearning.utils.enumAttribute.EnumVerificationCode;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
@@ -11,13 +11,14 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
+@Document(collection = "verification-code")
+
 public class VerificationCode extends IBaseEntity{
 
     private String code;
-
-    private String type;
-
+    private EnumVerificationCode type;
+    private Boolean isConfirmed;
     private String parentId;
-
     private Date expiredAt;
+    private Date confirmedAt;
 }

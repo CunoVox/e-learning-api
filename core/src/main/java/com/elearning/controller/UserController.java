@@ -1,6 +1,7 @@
 package com.elearning.controller;
 
 import com.elearning.entities.User;
+import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.auth.UserLoginDTO;
@@ -10,6 +11,7 @@ import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.Extensions;
+import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.validator.EmailValidator;
@@ -20,10 +22,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 import static com.elearning.utils.Extensions.toList;
 
@@ -39,6 +40,8 @@ public class UserController {
     private JwtController jwtController;
     @Autowired
     private UserDetailsService userDetailsService;
+    @Autowired
+    private VerificationCodeController verificationCodeController;
 
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
@@ -81,13 +84,17 @@ public class UserController {
 
             dto = modelMapper.map(userFormDTO, UserDTO.class);
             entity = create(dto);
+
+            verificationCodeController.revokeAllUserVerificationCode(entity.getId());
+            VerificationCode code = verificationCodeController.build(entity.getId(),null, EnumVerificationCode.EMAIL_CONFIRM);
+            verificationCodeController.create(code);
+
             return getAuthResponse(entity);
         }
         return new AuthResponse();
     }
 
     public AuthResponse login(UserLoginDTO formDTO) throws ServiceException {
-        UserDTO dto;
         if (formDTO != null) {
             User entity = userRepository.findByEmail(formDTO.getEmail());
             if(entity == null){
@@ -127,28 +134,17 @@ public class UserController {
     public List<User> findAllUser(){
         return userRepository.findAll();
     }
-    //    public UserDTO login(UserFormDTO formDto) throws ServiceException {
-//        UserDTO dto = new UserDTO();
-//        if(formDto != null){
-//            User entity = userRepository.findByEmail(formDto.getEmail());
-//            if(entity == null){
-//                throw new ServiceException("Email không tồn tại");
-//            }
-//            if(!passwordEncoder.matches(formDto.password, entity.password)){
-//                throw new ServiceException("Mật khẩu không đúng");
-//            }
-//            if(entity.isDeleted){
-//                throw new ServiceException("Tài khoản bị tạm khóa");
-//            }
-//            dto = userToDto(entity);
-//        }
-//        return dto;
-//    }
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
         return userToDto(user);
     }
-
+    public UserDTO findById(String id) {
+        Optional<User> user = userRepository.findById(id);
+        if(user.isEmpty()){
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        return userToDto(user.get());
+    }
     public boolean isValidEmail(String email) {
         boolean result;
         result = EmailValidator.getInstance()
@@ -156,6 +152,15 @@ public class UserController {
         return result;
     }
 
+    @Transactional
+    public void userEmailConfirmed(String id){
+        Optional<User> user = userRepository.findById(id);
+        if(user.isPresent()){
+            user.get().setIsEmailConfirmed(true);
+            user.get().setUpdatedAt(new Date());
+            userRepository.save(user.get());
+        }
+    }
     public User dtoToUser(UserDTO dto) {
         return modelMapper.map(dto, User.class);
     }
