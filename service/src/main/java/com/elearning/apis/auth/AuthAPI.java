@@ -51,12 +51,16 @@ public class AuthAPI {
     }
     @GetMapping("/email-confirm")
     public ResponseEntity<?> emailConfirm(@RequestParam("token") String token) {
-        verificationCodeController.EmailConfirmCode(token);
+        verificationCodeController.emailConfirmCode(token);
         return ResponseEntity.ok().build();
     }
     @GetMapping("/resend-email/{userId}")
     public ResponseEntity<?> resendEmail(@PathVariable("userId") String userId){
-        return ResponseEntity.ok().body(verificationCodeController.reCreateEmailCode(userId));
+        return ResponseEntity.ok().body(verificationCodeController.reCreateEmailConfirmCode(userId));
+    }
+    @GetMapping("/reset-password/{userId}")
+    public ResponseEntity<?> resetPassword(@PathVariable("userId") String userId){
+        return ResponseEntity.ok().body(verificationCodeController.reCreateResetPasswordCode(userId));
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
