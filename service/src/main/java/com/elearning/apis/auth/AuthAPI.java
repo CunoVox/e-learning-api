@@ -5,9 +5,13 @@ import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
+import com.elearning.manager.CourseManager;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
+import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
+import com.elearning.utils.enumAttribute.EnumRelatedObjectsWeight;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +39,9 @@ public class AuthAPI {
     @Autowired
     private RefreshTokenController refreshTokenController;
 
+    @Autowired
+    CourseManager courseManager;
+
     public AuthAPI(UserController userController, JwtController jwtController) {
         this.userController = userController;
         this.jwtController = jwtController;
@@ -51,7 +58,18 @@ public class AuthAPI {
     }
     @GetMapping("/email-confirm")
     public ResponseEntity<?> emailConfirm(@RequestParam("token") String token) {
-        verificationCodeController.EmailConfirmCode(token);
+//        verificationCodeController.EmailConfirmCode(token);
+
+        courseManager.addRelatedObjectById(
+                "product_option",
+                "1234",
+                "product_combo_arise",
+                "1111",
+                EnumRelatedObjectsWeight.MEDIUM.getValue(),
+                EnumRelatedObjectsStatus.ACTIVE.getValue(),
+                EnumConnectorType.COURSE_TO_TAG.name(),
+                "haohao");
+        courseManager.getIdRelatedObjectsById("1234", "product_combo_arise", EnumConnectorType.COURSE_TO_TAG.name());
         return ResponseEntity.ok().build();
     }
     @GetMapping("/resend-email/{userId}")
