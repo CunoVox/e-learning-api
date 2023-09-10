@@ -48,8 +48,8 @@ public class VerificationCodeController {
     }
 
     @Transactional
-    public void emailConfirmCode(String verifyCode) {
-        Optional<VerificationCode> code = verificationCodeRepository.findById(verifyCode);
+    public void emailConfirmCode(String userId, String verifyCode) {
+        Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, verifyCode);
         if (code.isEmpty()) {
             throw new ServiceException("Mã xác nhận Email không hợp lệ 1.");
         } else {
@@ -72,7 +72,7 @@ public class VerificationCodeController {
                 vCode.setConfirmedAt(new Date());
                 vCode.setUpdatedAt(new Date());
 
-                userController.userEmailConfirmed(vCode.getParentId());
+                userController.userEmailConfirm(vCode.getParentId());
                 verificationCodeRepository.save(vCode);
             }
         }
@@ -96,16 +96,29 @@ public class VerificationCodeController {
                     throw new ServiceException("Mã xác nhận đã hết hạn.");
                 }
 
-                vCode.setIsConfirmed(true);
-                vCode.setIsDeleted(true);
-                vCode.setConfirmedAt(new Date());
-                vCode.setUpdatedAt(new Date());
-
-                verificationCodeRepository.save(vCode);
+//                vCode.setIsConfirmed(true);
+//                vCode.setIsDeleted(true);
+//                vCode.setConfirmedAt(new Date());
+//                vCode.setUpdatedAt(new Date());
+//
+//                verificationCodeRepository.save(vCode);
             }
         }
     }
-    public VerificationCodeDTO reCreateEmailConfirmCode(String userId) {
+    public void confirmCode(String userId, String resetCode){
+        Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
+        if(code.isPresent()){
+            VerificationCode vCode = code.get();
+
+            vCode.setIsConfirmed(true);
+            vCode.setIsDeleted(true);
+            vCode.setConfirmedAt(new Date());
+            vCode.setUpdatedAt(new Date());
+
+            verificationCodeRepository.save(vCode);
+        }
+    }
+    public VerificationCodeDTO createEmailConfirmCode(String userId) {
         UserDTO dto = userController.findById(userId);
         if (dto.getIsEmailConfirmed()) {
             throw new ServiceException("Email đã được xác nhận");
@@ -118,15 +131,15 @@ public class VerificationCodeController {
         return toDTO(code);
     }
 
-    public VerificationCodeDTO reCreateResetPasswordCode(String userId) {
+    public VerificationCodeDTO createResetPasswordCode(String email) {
         String digit = getRandomNumberString();
-        UserDTO dto = userController.findById(userId);
+        UserDTO dto = userController.findByEmail(email);
 //        if (!dto.getIsEmailConfirmed()) {
 //            throw new ServiceException("Email chưa được xác nhận");
 //        }
-        revokeAllUserResetPasswordCode(userId);
+        revokeAllUserResetPasswordCode(dto.getId());
 
-        VerificationCode code = build(userId, digit, EnumVerificationCode.RESET_PASSWORD_CONFIRM);
+        VerificationCode code = build(dto.getId(), digit, EnumVerificationCode.RESET_PASSWORD_CONFIRM);
         create(code);
         emailSender.sendMail(dto.getEmail(), code);
         return toDTO(code);

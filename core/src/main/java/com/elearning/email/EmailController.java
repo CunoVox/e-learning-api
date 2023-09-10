@@ -1,12 +1,10 @@
 package com.elearning.email;
 
+import com.elearning.controller.UserController;
 import com.elearning.entities.VerificationCode;
+import com.elearning.models.dtos.UserDTO;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
@@ -21,19 +19,22 @@ import static com.elearning.utils.Constants.SERVICE_URL;
 @RequiredArgsConstructor
 public class EmailController implements EmailSender {
 
-    private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
     private final JavaMailSender mailSender;
+    private final UserController userController;
+    private final String emailConfirmLink = SERVICE_URL + "/api/user/email/verify/";
+    private final String emailConfirmSubject = "[E-Learning WISDOM] Xác nhận Email của bạn";
+
 
     @Override
     @Async
-    public void send(String to, String email) {
+    public void send(String to, String subject, String email) {
         try {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper =
                     new MimeMessageHelper(mimeMessage, "utf-8");
             helper.setText(email, true);
             helper.setTo(to);
-            helper.setSubject("[E-Learning WISDOM] Xác nhận Email của bạn");
+            helper.setSubject(subject);
             helper.setFrom("thomsonbel12@gmail.com");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
@@ -57,14 +58,15 @@ public class EmailController implements EmailSender {
 
     }
 
-    public void sendUserEmailVerification(String to, VerificationCode code) {
-        String buildEmail = buildUserEmailVerification(to, api_link + code.getCode());
-        send(to, buildEmail);
+    private void sendUserEmailVerification(String to, VerificationCode code) {
+        UserDTO dto = userController.findByEmail(to);
+        String buildEmail = buildUserEmailVerification(to, emailConfirmLink + dto.getId() + "/"+ code.getCode());
+        send(to, emailConfirmSubject, buildEmail);
     }
 
-    public void sendResetPasswordEmail(String to, VerificationCode code) {
+    private void sendResetPasswordEmail(String to, VerificationCode code) {
         String buildEmail = buildResetPasswordEmail(to, code.getCode());
-        send(to, buildEmail);
+        send(to, emailConfirmSubject, buildEmail);
     }
 
     private String buildResetPasswordEmail(String to, String code) {
