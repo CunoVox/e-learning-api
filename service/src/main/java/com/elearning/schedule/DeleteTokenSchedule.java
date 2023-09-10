@@ -17,7 +17,7 @@ public class DeleteTokenSchedule {
     private RefreshTokenController refreshTokenController;
     @Scheduled(fixedRate = REFRESH_TOKEN_EXPIRE_TIME_MILLIS)
     public void deleteExpiredToken() {
-        log.error(String.valueOf(new Date().toString()));
+        log.info(String.valueOf(new Date().toString()));
         refreshTokenController.deleteExpiredToken();
     }
 }

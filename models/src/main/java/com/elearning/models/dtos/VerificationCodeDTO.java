@@ -27,7 +27,5 @@ public class VerificationCodeDTO {
     @JsonProperty(value = "expired_at")
     private Date expiredAt;
     @JsonProperty(value = "confirmed_at")
-
     private Date confirmedAt;
-
 }

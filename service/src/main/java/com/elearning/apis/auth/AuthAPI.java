@@ -49,15 +49,6 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
-    @GetMapping("/email-confirm")
-    public ResponseEntity<?> emailConfirm(@RequestParam("token") String token) {
-        verificationCodeController.EmailConfirmCode(token);
-        return ResponseEntity.ok().body("Xác nhận thành công");
-    }
-    @GetMapping("/resend-email/{userId}")
-    public ResponseEntity<?> resendEmail(@PathVariable("userId") String userId){
-        return ResponseEntity.ok().body(verificationCodeController.reCreateEmailCode(userId));
-    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
