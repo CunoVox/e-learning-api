@@ -5,13 +5,9 @@ import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
-import com.elearning.manager.CourseManager;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
-import com.elearning.utils.enumAttribute.EnumConnectorType;
-import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
-import com.elearning.utils.enumAttribute.EnumRelatedObjectsWeight;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -38,9 +34,6 @@ public class AuthAPI {
     private VerificationCodeController verificationCodeController;
     @Autowired
     private RefreshTokenController refreshTokenController;
-
-    @Autowired
-    CourseManager courseManager;
 
     public AuthAPI(UserController userController, JwtController jwtController) {
         this.userController = userController;
