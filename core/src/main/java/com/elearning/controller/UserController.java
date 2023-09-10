@@ -4,6 +4,7 @@ import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
 import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.ResetPasswordDTO;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
@@ -18,6 +19,7 @@ import lombok.experimental.ExtensionMethod;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -37,7 +39,8 @@ public class UserController {
     private final UserDetailsService userDetailsService;
     @Autowired
     private VerificationCodeController verificationCodeController;
-    private final EmailSender emailSender;
+    @Autowired
+    private EmailSender emailSender;
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
 
@@ -128,12 +131,40 @@ public class UserController {
                 .build();
     }
 
+    @Transactional
+    public void userEmailConfirm(String id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            user.get().setIsEmailConfirmed(true);
+            user.get().setUpdatedAt(new Date());
+            userRepository.save(user.get());
+        }
+    }
+    @Transactional
+    public void userResetPassword(String userId, ResetPasswordDTO dto){
+        verificationCodeController.resetPasswordConfirmCode(userId, dto.getCode());
+        if(dto.getNewPassword().length() < 8){
+            throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
+        }
+        if(!dto.getNewPassword().equals(dto.getConfirmPassword())){
+            throw new ServiceException("Mật khẩu xác nhận không chính xác");
+        }
+        verificationCodeController.confirmCode(userId, dto.getCode());
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isPresent()){
+            user.get().setUpdatedAt(new Date());
+            user.get().setPassword(passwordEncoder.encode(user.get().getPassword()));
+        }
+    }
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
+        if(user == null){
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
         return userToDto(user);
     }
 
@@ -144,7 +175,13 @@ public class UserController {
         }
         return userToDto(user.get());
     }
-
+    protected User findUserById(String id){
+        Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        return user.get();
+    }
     public boolean isValidEmail(String email) {
         boolean result;
         result = EmailValidator.getInstance()
@@ -152,15 +189,6 @@ public class UserController {
         return result;
     }
 
-    @Transactional
-    public void userEmailConfirmed(String id) {
-        Optional<User> user = userRepository.findById(id);
-        if (user.isPresent()) {
-            user.get().setIsEmailConfirmed(true);
-            user.get().setUpdatedAt(new Date());
-            userRepository.save(user.get());
-        }
-    }
 
     public UserDTO userResetPassword(String id, String newPass, String confirmPass) {
         Optional<User> user = userRepository.findById(id);
@@ -187,6 +215,9 @@ public class UserController {
     }
 
     public UserDTO userToDto(User user) {
+        if(user == null){
+            return null;
+        }
         return modelMapper.map(user, UserDTO.class);
     }
 

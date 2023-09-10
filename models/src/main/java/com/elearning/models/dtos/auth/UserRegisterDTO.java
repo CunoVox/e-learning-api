@@ -1,5 +1,6 @@
 package com.elearning.models.dtos.auth;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,6 +17,7 @@ public class UserRegisterDTO {
     @NotNull(message = "Email chưa được nhập")
     @NotBlank(message = "Email chưa được nhập")
     private String email;
+    @JsonProperty("full_name")
     private String fullName;
     private String address;
     @NotNull(message = "Mật khẩu chưa được nhập")
