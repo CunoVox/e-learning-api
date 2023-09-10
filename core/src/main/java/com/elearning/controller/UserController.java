@@ -140,29 +140,32 @@ public class UserController {
             userRepository.save(user.get());
         }
     }
+
     @Transactional
-    public void userResetPassword(String userId, ResetPasswordDTO dto){
+    public void userResetPassword(String userId, ResetPasswordDTO dto) {
         verificationCodeController.resetPasswordConfirmCode(userId, dto.getCode());
-        if(dto.getNewPassword().length() < 8){
+        if (dto.getNewPassword().length() < 8) {
             throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
         }
-        if(!dto.getNewPassword().equals(dto.getConfirmPassword())){
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
             throw new ServiceException("Mật khẩu xác nhận không chính xác");
         }
         verificationCodeController.confirmCode(userId, dto.getCode());
         Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()){
+        if (user.isPresent()) {
             user.get().setUpdatedAt(new Date());
-            user.get().setPassword(passwordEncoder.encode(user.get().getPassword()));
+            user.get().setPassword(passwordEncoder.encode(dto.getConfirmPassword()));
+            userRepository.save(user.get());
         }
     }
+
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
-        if(user == null){
+        if (user == null) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
         return userToDto(user);
@@ -175,13 +178,15 @@ public class UserController {
         }
         return userToDto(user.get());
     }
-    protected User findUserById(String id){
+
+    protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
         return user.get();
     }
+
     public boolean isValidEmail(String email) {
         boolean result;
         result = EmailValidator.getInstance()
@@ -195,10 +200,10 @@ public class UserController {
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng");
         } else {
-            if(newPass.length() < 8){
+            if (newPass.length() < 8) {
                 throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
             }
-            if(!newPass.equals(confirmPass)){
+            if (!newPass.equals(confirmPass)) {
                 throw new ServiceException("Mật khẩu xác nhận không đúng");
             }
             User entity = user.get();
@@ -215,7 +220,7 @@ public class UserController {
     }
 
     public UserDTO userToDto(User user) {
-        if(user == null){
+        if (user == null) {
             return null;
         }
         return modelMapper.map(user, UserDTO.class);
