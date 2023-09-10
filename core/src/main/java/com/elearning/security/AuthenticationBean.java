@@ -1,8 +1,7 @@
-package com.elearning.configs.security;
+package com.elearning.security;
 
 import com.elearning.entities.User;
 import com.elearning.reprositories.IUserRepository;
-import com.elearning.security.SecurityUserDetail;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
