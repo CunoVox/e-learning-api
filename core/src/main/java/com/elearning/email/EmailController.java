@@ -3,6 +3,7 @@ package com.elearning.email;
 import com.elearning.entities.VerificationCode;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,11 @@ import javax.mail.internet.MimeMessage;
 import static com.elearning.utils.Constants.SERVICE_URL;
 
 @Service
-//@AllArgsConstructor
-public class EmailService implements EmailSender{
+@RequiredArgsConstructor
+public class EmailController implements EmailSender {
 
-//    private final static Logger LOGGER = LoggerFactory
-//            .getLogger(EmailService.class);
-private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
-    @Autowired
-    private JavaMailSender mailSender;
+    private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
+    private final JavaMailSender mailSender;
 
     @Override
     @Async
@@ -47,9 +45,9 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
     @Override
     @Async
     public void sendMail(String to, VerificationCode code) {
-        if(code.getType().equals(EnumVerificationCode.EMAIL_CONFIRM)){
+        if (code.getType().equals(EnumVerificationCode.EMAIL_CONFIRM)) {
             sendUserEmailVerification(to, code);
-        }else if(code.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)){
+        } else if (code.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)) {
             sendResetPasswordEmail(to, code);
         } else if (code.getType().equals(EnumVerificationCode.CHANGE_PASSWORD_CONFIRM)) {
             return;
@@ -63,11 +61,13 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
         String buildEmail = buildUserEmailVerification(to, api_link + code.getCode());
         send(to, buildEmail);
     }
-    public void sendResetPasswordEmail(String to, VerificationCode code){
+
+    public void sendResetPasswordEmail(String to, VerificationCode code) {
         String buildEmail = buildResetPasswordEmail(to, code.getCode());
         send(to, buildEmail);
     }
-    private String buildResetPasswordEmail(String to, String code){
+
+    private String buildResetPasswordEmail(String to, String code) {
         return "<!DOCTYPE html\n" +
                 "  PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
                 "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n" +
@@ -497,7 +497,7 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
                 "                                <td align=\"left\" style=\"padding:20px;Margin:0\">\n" +
                 "                                  <h3\n" +
                 "                                    style=\"Margin:0;font-family:Imprima, Arial, sans-serif;mso-line-height-rule:exactly;letter-spacing:0;font-size:28px;font-style:normal;font-weight:bold;line-height:34px;color:#2D3142\">\n" +
-                "                                    Xin chào, " +to +"</h3>\n" +
+                "                                    Xin chào, " + to + "</h3>\n" +
                 "                                  <p\n" +
                 "                                    style=\"Margin:0;mso-line-height-rule:exactly;font-family:Imprima, Arial, sans-serif;line-height:27px;letter-spacing:0;color:#2D3142;font-size:18px\">\n" +
                 "                                    <br></p>\n" +
@@ -545,7 +545,7 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
                 "                                <td align=\"center\" style=\"padding:0;Margin:0\"><span class=\"es-button-border msohide\"\n" +
                 "                                    style=\"border-style:solid;border-color:#2CB543;background:#7630f3;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all\"><a\n" +
                 "                                      href=\"\" class=\"es-button msohide\" target=\"_blank\"\n" +
-                "                                      style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26px !important;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid  #7630f3;mso-hide:all;padding-left:5px;padding-right:5px\">"+code+"</a></span><!--<![endif]-->\n" +
+                "                                      style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26px !important;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid  #7630f3;mso-hide:all;padding-left:5px;padding-right:5px\">" + code + "</a></span><!--<![endif]-->\n" +
                 "                                </td>\n" +
                 "                              </tr>\n" +
                 "                            </table>\n" +
@@ -738,7 +738,8 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
                 "\n" +
                 "</html>";
     }
-    private String buildUserEmailVerification(String to, String link){
+
+    private String buildUserEmailVerification(String to, String link) {
         return "<!DOCTYPE html\n" +
                 "  PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
                 "<html xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\n" +
@@ -1215,7 +1216,7 @@ private final String api_link = SERVICE_URL + "/api/auth/email-confirm?token=";
                 "                              <tr>\n" +
                 "                                <td align=\"center\" style=\"padding:0;Margin:0\"><span class=\"es-button-border msohide\"\n" +
                 "                                    style=\"border-style:solid;border-color:#2CB543;background:#7630f3;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all\"><a\n" +
-                "                                      href=\""+link+"\" class=\"es-button msohide\" target=\"_blank\"\n" +
+                "                                      href=\"" + link + "\" class=\"es-button msohide\" target=\"_blank\"\n" +
                 "                                      style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26px !important;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid  #7630f3;mso-hide:all;padding-left:5px;padding-right:5px\">Xác\n" +
                 "                                      nhận</a></span><!--<![endif]--></td>\n" +
                 "                              </tr>\n" +
