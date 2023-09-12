@@ -57,13 +57,13 @@ public class EmailController implements EmailSender {
         }
 
     }
-
+    @Async
     private void sendUserEmailVerification(String to, VerificationCode code) {
         UserDTO dto = userController.findByEmail(to);
         String buildEmail = buildUserEmailVerification(to, emailConfirmLink + dto.getId() + "/"+ code.getCode());
         send(to, emailConfirmSubject, buildEmail);
     }
-
+    @Async
     private void sendResetPasswordEmail(String to, VerificationCode code) {
         String buildEmail = buildResetPasswordEmail(to, code.getCode());
         send(to, emailConfirmSubject, buildEmail);
