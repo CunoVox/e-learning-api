@@ -31,8 +31,6 @@ public class AuthAPI {
     private final UserController userController;
     private final JwtController jwtController;
     @Autowired
-    private VerificationCodeController verificationCodeController;
-    @Autowired
     private RefreshTokenController refreshTokenController;
 
     public AuthAPI(UserController userController, JwtController jwtController) {
