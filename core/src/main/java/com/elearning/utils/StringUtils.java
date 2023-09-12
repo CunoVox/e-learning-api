@@ -1,16 +1,13 @@
 package com.elearning.utils;
 
 
+import lombok.experimental.ExtensionMethod;
+
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.Normalizer;
-import java.text.Normalizer.Form;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -20,7 +17,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+@ExtensionMethod(Extensions.class)
 public class StringUtils {
     private static final char[] CHARS_LOW = "zxcvbnmasdfghjklqwertyuiop".toCharArray();
     private static final char[] CHARS_UP = "ZXCVBNMASDFGHJKLQWERTYUIOP".toCharArray();
@@ -95,6 +92,19 @@ public class StringUtils {
         return result.toString();
     }
 
+    public static String stripAccents(String str) {
+        if (null == str || str.length() == 0) return "";
+        String temp = Normalizer.normalize(str, Normalizer.Form.NFD);
+        Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+        str = pattern.matcher(temp).replaceAll("")
+                .replaceAll("Đ", "D")
+                .replace("đ", "d");
+        str = str.toLowerCase();
+        str = URLEncoder.encode(str, StandardCharsets.UTF_8);
+        str = str.replace("+", " ");
+        return str.trim();
+    }
+
     public static String randomString(int countChar) {
         return randomString(countChar, new ArrayList(Arrays.asList(CHARS_LOW, CHARS_UP, CHARS_NUM)));
     }
@@ -147,6 +157,23 @@ public class StringUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String getSlug(String s) {
+        s = s.trim();
+        s = StringUtils.removeSpecialCharacter(s, " ");
+        s = UnicodeUtils.unicode2NoSignOriginalToLowerCase(s);
+        String[] arr = s.split(" ");
+        StringBuilder result = new StringBuilder();
+        for (String item : arr) {
+            if (!item.isBlankOrNull()) {
+                if (result.length() > 0) {
+                    result.append("-");
+                }
+                result.append(item.trim());
+            }
+        }
+        return result.toString();
     }
 
     public static boolean checkExistCharacterSpecial(String str) {
