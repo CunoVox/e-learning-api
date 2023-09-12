@@ -16,7 +16,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @SuperBuilder
 public class Course extends IBaseEntity{
-    private String title;
+    private String name;
+    private String nameMode;
     private String slug;
     private EnumCourseType type;
     private String parentId;
@@ -28,7 +29,4 @@ public class Course extends IBaseEntity{
     private Long subscription;
     private String createdBy;
     private EnumCourseStatus status;
-
-
-
 }
