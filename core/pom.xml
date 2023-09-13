@@ -11,7 +11,19 @@
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
     </properties>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version> <!-- Phiên bản của Maven Compiler Plugin -->
+                <configuration>
+                    <source>17</source> <!-- Phiên bản của Java bạn muốn sử dụng -->
+                    <target>17</target> <!-- Phiên bản của Java mục tiêu -->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
     <name>core</name>
     <description>core</description>
     <parent>
