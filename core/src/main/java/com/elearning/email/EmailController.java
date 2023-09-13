@@ -22,7 +22,8 @@ public class EmailController implements EmailSender {
     private final JavaMailSender mailSender;
     private final UserController userController;
     private final String emailConfirmLink = SERVICE_URL + "/api/user/email/verify/";
-    private final String emailConfirmSubject = "[E-Learning WISDOM] Xác nhận Email của bạn";
+    private final String SUBJECT_RESET_PASSWORD_EMAIL = "[E-Learning WISDOM] Reset Password của bạn";
+    private final String SUBJECT_EMAIL_VERIFY = "[E-Learning WISDOM] Xác nhận Email của bạn";
 
 
     @Override
@@ -38,7 +39,6 @@ public class EmailController implements EmailSender {
             helper.setFrom("thomsonbel12@gmail.com");
             mailSender.send(mimeMessage);
         } catch (MessagingException e) {
-//            LOGGER.error("failed to send email", e);
             throw new IllegalStateException("failed to send email");
         }
     }
@@ -55,18 +55,17 @@ public class EmailController implements EmailSender {
         } else if (code.getType().equals(EnumVerificationCode.CHANGE_EMAIL_CONFIRM)) {
             return;
         }
-
     }
-
-    private void sendUserEmailVerification(String to, VerificationCode code) {
+    @Async
+    protected void sendUserEmailVerification(String to, VerificationCode code) {
         UserDTO dto = userController.findByEmail(to);
         String buildEmail = buildUserEmailVerification(to, emailConfirmLink + dto.getId() + "/"+ code.getCode());
-        send(to, emailConfirmSubject, buildEmail);
+        send(to, SUBJECT_EMAIL_VERIFY, buildEmail);
     }
-
-    private void sendResetPasswordEmail(String to, VerificationCode code) {
+    @Async
+    protected void sendResetPasswordEmail(String to, VerificationCode code) {
         String buildEmail = buildResetPasswordEmail(to, code.getCode());
-        send(to, emailConfirmSubject, buildEmail);
+        send(to, SUBJECT_RESET_PASSWORD_EMAIL, buildEmail);
     }
 
     private String buildResetPasswordEmail(String to, String code) {

@@ -1,23 +1,24 @@
 package com.elearning.entities;
 
+import com.elearning.utils.enumAttribute.EnumPriceType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 
-@Document(collection = "category")
+@Document(collection = "price")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Category extends IBaseEntity implements Serializable {
-    private String name;
-    private String nameMode;
-    private String slug;
-    private int level;
+public class Price extends IBaseEntity{
+    private EnumPriceType type;
+    private BigDecimal price;
     private String parentId;
-    private String createdBy;
+    private Date fromDate;
+    private Date toDate;
 }

@@ -22,14 +22,14 @@ public class UserAPI {
     private final VerificationCodeController verificationCodeController;
 
     @Operation(summary = "Xin gửi lại mail xác nhận bằng UserId")
-    @GetMapping("/email/verify/{userId}")
-    public ResponseEntity<?> sendEmailVerification(@PathVariable("userId") String userId) {
+    @GetMapping("/email/verify/{user_id}")
+    public ResponseEntity<?> sendEmailVerification(@PathVariable("user_id") String userId) {
         return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(userId));
     }
 
     @Operation(summary = "Xác nhận email")
-    @GetMapping("/email/verify/{userId}/{token}")
-    public void emailConfirm(@PathVariable("userId") String userId,
+    @GetMapping("/email/verify/{user_id}/{token}")
+    public void emailConfirm(@PathVariable("user_id") String userId,
                              @PathVariable("token") String token) {
         verificationCodeController.emailConfirmCode(userId, token);
     }

@@ -21,14 +21,14 @@ public class Connector {
 
     public Map<String, List<String>> getIdRelatedObjectsById(String fromCollection, List<String> fromIds, String toCollection, String type) {
         Map<String, List<String>> rs = new HashMap<>();
-        List<Map> rsMap = this.getConnector(fromCollection, fromIds, toCollection, "", type);
+        List<Map> rsMap = this.getConnector(fromCollection, fromIds, toCollection, type);
 
         for (Map map : rsMap) {
             if (!ObjectUtils.isEmpty(map.get(toCollection + "_id"))) {
                 if (rs.containsKey(map.get(fromCollection + "_id"))) {
-                    ((List) rs.get(map.get(fromCollection + "_id"))).add((String) map.get(toCollection + "_id"));
+                    rs.get(map.get(fromCollection + "_id")).add((String) map.get(toCollection + "_id"));
                 } else {
-                    rs.put((String) map.get(fromCollection + "_id"), new ArrayList(Arrays.asList((String) map.get(toCollection + "_id"))));
+                    rs.put((String) map.get(fromCollection + "_id"), new ArrayList(Collections.singletonList((String) map.get(toCollection + "_id"))));
                 }
             }
         }
@@ -36,7 +36,7 @@ public class Connector {
     }
 
     public List<String> getIdRelatedObjectsById(String fromCollection, String fromId, String toCollection, String type) {
-        List<Map> rsMap = this.getConnector(fromCollection, fromId, toCollection, "", type);
+        List<Map> rsMap = this.getConnector(fromCollection, fromId, toCollection, type);
         if (!ObjectUtils.isEmpty(rsMap)) {
             List<String> rs = new ArrayList<>();
 
@@ -51,13 +51,13 @@ public class Connector {
         }
     }
 
-    private List<Map> getConnector(String fromCollection, String fromId, String toCollection, String toId, String type) {
-        Query query = Query.query(this.buildQuery(fromCollection, (List)(ObjectUtils.isEmpty(fromId) ? new ArrayList() : Arrays.asList(fromId)), toCollection, toId, type, EnumRelatedObjectsStatus.ACTIVE.getValue()));
+    private List<Map> getConnector(String fromCollection, String fromId, String toCollection, String type) {
+        Query query = Query.query(this.buildQuery(fromCollection, ObjectUtils.isEmpty(fromId) ? new ArrayList() : Collections.singletonList(fromId), toCollection, "", type, EnumRelatedObjectsStatus.ACTIVE.getValue()));
         return this.mongoTemplate.find(query, Map.class, "connector");
     }
 
-    private List<Map> getConnector(String fromCollection, List<String> fromIds, String toCollection, String toId, String type) {
-        Query query = Query.query(this.buildQuery(fromCollection, fromIds, toCollection, toId, type, EnumRelatedObjectsStatus.ACTIVE.getValue()));
+    private List<Map> getConnector(String fromCollection, List<String> fromIds, String toCollection, String type) {
+        Query query = Query.query(this.buildQuery(fromCollection, fromIds, toCollection, "", type, EnumRelatedObjectsStatus.ACTIVE.getValue()));
         return this.mongoTemplate.find(query, Map.class, "connector");
     }
 
@@ -114,7 +114,7 @@ public class Connector {
         update.set("updatedStamp", new Date());
         update.set("updatedBy", updateBy);
         update.set("status", status);
-        Query query = Query.query(this.buildQuery(fromCollection, Collections.singletonList(fromId), toCollection, toId, type, (Integer)null));
+        Query query = Query.query(this.buildQuery(fromCollection, Collections.singletonList(fromId), toCollection, toId, type, null));
         this.mongoTemplate.updateFirst(query, update, "connector");
     }
 
