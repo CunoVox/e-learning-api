@@ -86,10 +86,10 @@
 <!--            <artifactId>spring-boot-starter-security</artifactId>-->
 <!--        </dependency>-->
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-aop</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-aop</artifactId>-->
+<!--        </dependency>-->
 
 <!--        <dependency>-->
 <!--            <groupId>org.springdoc</groupId>-->
@@ -135,4 +135,12 @@
             <version>4.2.1</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/e-learning-team/e-learning-api</url>
+        </repository>
+    </distributionManagement>
 </project>
