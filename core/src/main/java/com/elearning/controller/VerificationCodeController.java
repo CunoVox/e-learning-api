@@ -8,11 +8,13 @@ import com.elearning.models.dtos.VerificationCodeDTO;
 import com.elearning.reprositories.IVerificationCodeRepository;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.AllArgsConstructor;
-import lombok.var;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Date;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 
 import static com.elearning.utils.Constants.EMAIL_VERIFICATION_CODE_EXPIRE_TIME_MILLIS;
 
@@ -48,7 +50,7 @@ public class VerificationCodeController {
     @Transactional
     public void emailConfirmCode(String userId, String verifyCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, verifyCode);
-        if (!code.isPresent()) {
+        if (code.isEmpty()) {
             throw new ServiceException("Mã xác nhận Email không hợp lệ 1.");
         } else {
             VerificationCode vCode = code.get();
@@ -75,17 +77,16 @@ public class VerificationCodeController {
             }
         }
     }
-
-    public void resetPasswordConfirmCode(String userId, String resetCode) {
+    public void resetPasswordConfirmCode(String userId, String resetCode){
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
-        if (!code.isPresent()) {
+        if(code.isEmpty()){
             throw new ServiceException("Mã xác nhận không hợp lệ 1.");
-        } else {
+        }else{
             VerificationCode vCode = code.get();
-            if (!vCode.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)) {
+            if(!vCode.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)){
                 throw new ServiceException("Mã xác nhận không hợp lệ 2.");
-            } else {
-                if (vCode.getIsDeleted()) {
+            }else{
+                if(vCode.getIsDeleted()){
                     throw new ServiceException("Mã xác nhận không hợp lệ 3.");
                 }
                 if (vCode.getIsConfirmed() || vCode.getConfirmedAt() != null) {
@@ -104,10 +105,9 @@ public class VerificationCodeController {
             }
         }
     }
-
-    public void confirmCode(String userId, String resetCode) {
+    public void confirmCode(String userId, String resetCode){
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
-        if (code.isPresent()) {
+        if(code.isPresent()){
             VerificationCode vCode = code.get();
 
             vCode.setIsConfirmed(true);
@@ -118,7 +118,6 @@ public class VerificationCodeController {
             verificationCodeRepository.save(vCode);
         }
     }
-
     public VerificationCodeDTO createEmailConfirmCode(String userId) {
         UserDTO dto = userController.findById(userId);
         if (dto.getIsEmailConfirmed()) {
@@ -150,30 +149,28 @@ public class VerificationCodeController {
         var validUserTokens = verificationCodeRepository.findAllByParentIdAndIsConfirmedIsFalse(userId);
         if (validUserTokens.isEmpty())
             return;
-        for (VerificationCode token : validUserTokens) {
+        validUserTokens.forEach(token -> {
             if (token.getType().equals(EnumVerificationCode.EMAIL_CONFIRM)) {
                 token.setIsDeleted(true);
                 token.setUpdatedAt(new Date());
 
             }
-        }
+        });
         verificationCodeRepository.saveAll(validUserTokens);
     }
-
     public void revokeAllUserResetPasswordCode(String userId) { // thu hồi tất cả code xác nhận của người dùng
         var validUserTokens = verificationCodeRepository.findAllByParentIdAndIsConfirmedIsFalse(userId);
         if (validUserTokens.isEmpty())
             return;
-        for (VerificationCode token : validUserTokens) {
+        validUserTokens.forEach(token -> {
             if (token.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)) {
                 token.setIsDeleted(true);
                 token.setUpdatedAt(new Date());
 
             }
-        }
+        });
         verificationCodeRepository.saveAll(validUserTokens);
     }
-
     public VerificationCodeDTO toDTO(VerificationCode code) {
         return VerificationCodeDTO.builder()
                 .id(code.getId())

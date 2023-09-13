@@ -1,7 +1,5 @@
 package com.elearning.controller;
 
-import com.elearning.entities.RefreshToken;
-import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.reprositories.IUserRepository;
@@ -12,7 +10,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
-import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -23,7 +20,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -46,7 +42,7 @@ public class JwtController {
     }
     public String extractUserId(String jwt){
         Claims claims = extractAllClaims(jwt);
-        Object id = claims.get("uId");
+        var id = claims.get("uId");
         if(id == null){
             return null;
         }
@@ -97,7 +93,7 @@ public class JwtController {
 
     public AuthResponse refreshToken(String token) throws ServiceException {
         var storedToken = refreshTokenController.findById(token);
-        if(!storedToken.isPresent()){
+        if(storedToken.isEmpty()){
             throw new ServiceException("Không có quyền truy cập 1");
         }
         if(storedToken.get().getIsDeleted()){

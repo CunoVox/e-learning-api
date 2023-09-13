@@ -3,7 +3,6 @@ package com.elearning.controller;
 import com.elearning.entities.RefreshToken;
 import com.elearning.handler.ServiceException;
 import com.elearning.reprositories.IRefreshTokenRepository;
-import lombok.var;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -61,7 +60,7 @@ public class RefreshTokenController {
     public void deleteRefreshTokenBranch(String token) {
         var refreshToken = refreshTokenRepository.findById(token);
 
-        if (!refreshToken.isPresent()) {
+        if (refreshToken.isEmpty()) {
             throw new ServiceException("Lỗi");
         } else {
             if (refreshToken.get().getCreatedFrom() == null) {
