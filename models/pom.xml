@@ -78,8 +78,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version> <!-- Phiên bản của Maven Compiler Plugin -->
                 <configuration>
-                    <source>1.8</source> <!-- Phiên bản của Java bạn muốn sử dụng -->
-                    <target>1.8</target> <!-- Phiên bản của Java mục tiêu -->
+                    <source>11</source> <!-- Phiên bản của Java bạn muốn sử dụng -->
+                    <target>11</target> <!-- Phiên bản của Java mục tiêu -->
                 </configuration>
             </plugin>
         </plugins>

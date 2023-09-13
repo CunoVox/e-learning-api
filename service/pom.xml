@@ -8,8 +8,8 @@
 
     <properties>
         <core.version>1.0.0</core.version>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
     <build>
         <plugins>
@@ -18,8 +18,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version> <!-- Phiên bản của Maven Compiler Plugin -->
                 <configuration>
-                    <source>1.8</source> <!-- Phiên bản của Java bạn muốn sử dụng -->
-                    <target>1.8</target> <!-- Phiên bản của Java mục tiêu -->
+                    <source>11</source> <!-- Phiên bản của Java bạn muốn sử dụng -->
+                    <target>11</target> <!-- Phiên bản của Java mục tiêu -->
                 </configuration>
             </plugin>
         </plugins>
