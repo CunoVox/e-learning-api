@@ -2,6 +2,7 @@ package com.elearning.security;
 
 import com.elearning.entities.User;
 import com.elearning.reprositories.IUserRepository;
+import com.elearning.utils.enumAttribute.EnumRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -33,9 +34,9 @@ public class AuthenticationBean {
                 throw new UsernameNotFoundException("Email không tồn tại");
             }
             Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            entity.getRoles().forEach(role -> {
+            for (EnumRole role : entity.getRoles()) {
                 authorities.add(new SimpleGrantedAuthority(role.name()));
-            });
+            }
 
             SecurityUserDetail userDetail = new SecurityUserDetail(
                     entity.getId(),
