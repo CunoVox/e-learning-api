@@ -3,7 +3,8 @@ name: Heroku Deployment
 on:
   push:
     branches: [ "main" ]
-
+    paths:
+     - 'service/**'
 jobs:
   build:
 
