@@ -3,14 +3,17 @@ name: Heroku Deployment
 on:
   push:
     branches: [ "main" ]
-    paths:
-     - 'service/**'
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
+    - name: Checkout Module Service
+    - uses: actions/checkout@v3
+      with:
+        path: service
+        
     - uses: actions/checkout@v3
     - name: Deploy to Heroku
       uses: AkhileshNS/heroku-deploy@v3.12.14
