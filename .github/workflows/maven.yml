@@ -24,7 +24,7 @@ jobs:
     - name: Deploy to Heroku
       uses: AkhileshNS/heroku-deploy@v3.12.14
       with:
-        path: service
+        path: 'service/'
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
