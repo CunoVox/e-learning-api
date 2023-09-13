@@ -8,6 +8,7 @@ import com.elearning.models.dtos.VerificationCodeDTO;
 import com.elearning.reprositories.IVerificationCodeRepository;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.AllArgsConstructor;
+import lombok.var;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +48,7 @@ public class VerificationCodeController {
     @Transactional
     public void emailConfirmCode(String userId, String verifyCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, verifyCode);
-        if (code.isEmpty()) {
+        if (!code.isPresent()) {
             throw new ServiceException("Mã xác nhận Email không hợp lệ 1.");
         } else {
             VerificationCode vCode = code.get();
@@ -77,7 +78,7 @@ public class VerificationCodeController {
 
     public void resetPasswordConfirmCode(String userId, String resetCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
-        if (code.isEmpty()) {
+        if (!code.isPresent()) {
             throw new ServiceException("Mã xác nhận không hợp lệ 1.");
         } else {
             VerificationCode vCode = code.get();

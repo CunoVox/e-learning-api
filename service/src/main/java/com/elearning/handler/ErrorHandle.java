@@ -1,7 +1,6 @@
 package com.elearning.handler;
 
 import com.elearning.models.wrapper.ObjectResponseWrapper;
-import com.sun.jdi.InternalException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

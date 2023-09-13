@@ -231,7 +231,7 @@ public class StringUtils {
     }
 
     public static boolean isBlankOrNull(String text) {
-        return null == text || text.isBlank();
+        return null == text;
     }
 
     public static boolean isNullOrEmptyString(String input) {

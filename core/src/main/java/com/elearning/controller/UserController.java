@@ -16,6 +16,7 @@ import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
+import lombok.var;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -173,7 +174,7 @@ public class UserController {
 
     public UserDTO findById(String id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
+        if (!user.isPresent()) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
         return userToDto(user.get());
@@ -181,7 +182,7 @@ public class UserController {
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
+        if (!user.isPresent()) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
         return user.get();
@@ -197,7 +198,7 @@ public class UserController {
 
     public UserDTO userResetPassword(String id, String newPass, String confirmPass) {
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) {
+        if (!user.isPresent()) {
             throw new ServiceException("Không tìm thấy người dùng");
         } else {
             if (newPass.length() < 8) {
