@@ -77,16 +77,17 @@ public class VerificationCodeController {
             }
         }
     }
-    public void resetPasswordConfirmCode(String userId, String resetCode){
+
+    public void resetPasswordConfirmCode(String userId, String resetCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
-        if(code.isEmpty()){
+        if (code.isEmpty()) {
             throw new ServiceException("Mã xác nhận không hợp lệ 1.");
-        }else{
+        } else {
             VerificationCode vCode = code.get();
-            if(!vCode.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)){
+            if (!vCode.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)) {
                 throw new ServiceException("Mã xác nhận không hợp lệ 2.");
-            }else{
-                if(vCode.getIsDeleted()){
+            } else {
+                if (vCode.getIsDeleted()) {
                     throw new ServiceException("Mã xác nhận không hợp lệ 3.");
                 }
                 if (vCode.getIsConfirmed() || vCode.getConfirmedAt() != null) {
@@ -105,9 +106,10 @@ public class VerificationCodeController {
             }
         }
     }
-    public void confirmCode(String userId, String resetCode){
+
+    public void confirmCode(String userId, String resetCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
-        if(code.isPresent()){
+        if (code.isPresent()) {
             VerificationCode vCode = code.get();
 
             vCode.setIsConfirmed(true);
@@ -118,6 +120,7 @@ public class VerificationCodeController {
             verificationCodeRepository.save(vCode);
         }
     }
+
     public VerificationCodeDTO createEmailConfirmCode(String userId) {
         UserDTO dto = userController.findById(userId);
         if (dto.getIsEmailConfirmed()) {
@@ -158,6 +161,7 @@ public class VerificationCodeController {
         });
         verificationCodeRepository.saveAll(validUserTokens);
     }
+
     public void revokeAllUserResetPasswordCode(String userId) { // thu hồi tất cả code xác nhận của người dùng
         var validUserTokens = verificationCodeRepository.findAllByParentIdAndIsConfirmedIsFalse(userId);
         if (validUserTokens.isEmpty())
@@ -171,6 +175,7 @@ public class VerificationCodeController {
         });
         verificationCodeRepository.saveAll(validUserTokens);
     }
+
     public VerificationCodeDTO toDTO(VerificationCode code) {
         return VerificationCodeDTO.builder()
                 .id(code.getId())
