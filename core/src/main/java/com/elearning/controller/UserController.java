@@ -5,6 +5,7 @@ import com.elearning.entities.User;
 import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.ResetPasswordDTO;
+import com.elearning.models.dtos.UpdateUserDTO;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
@@ -117,7 +118,26 @@ public class UserController {
         }
         return new AuthResponse();
     }
-
+    public UserDTO update(String email, UpdateUserDTO dto){
+        User entity = userRepository.findByEmail(email);
+        if(entity == null){
+            throw new ServiceException("User not found");
+        }
+        int flag = 0;
+        if(!dto.getFullName().isEmpty()){
+            entity.setFullName(dto.getFullName());
+            flag = 1;
+        }
+        if(!dto.getAddress().isEmpty()){
+            entity.setAddress(dto.getAddress());
+            flag = 1;
+        }
+        if(flag != 0){
+            entity.setUpdatedAt(new Date());
+        }
+        userRepository.save(entity);
+        return userToDto(entity);
+    }
     private AuthResponse getAuthResponse(User entity) {
         UserDTO dto;
         dto = userToDto(entity);
