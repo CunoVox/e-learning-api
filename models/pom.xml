@@ -6,14 +6,14 @@
     <artifactId>models</artifactId>
 
     <properties>
-        <core.version>1.0.0</core.version>
+        <core.version>1.0.1</core.version>
     </properties>
 
     <name>models</name>
     <parent>
         <groupId>com.elearning</groupId>
         <artifactId>e-learning-api</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <dependencies>
@@ -68,7 +68,7 @@
         <repository>
             <id>github</id>
             <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/CunoVox/e-learning-api</url>
+            <url>https://maven.pkg.github.com/e-learning-team/e-learning-api</url>
         </repository>
     </distributionManagement>
     <build>

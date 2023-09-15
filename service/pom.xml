@@ -7,7 +7,7 @@
     <artifactId>service</artifactId>
 
     <properties>
-        <core.version>1.0.0</core.version>
+        <core.version>1.0.1</core.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
     </properties>
@@ -16,7 +16,7 @@
     <parent>
         <groupId>com.elearning</groupId>
         <artifactId>e-learning-api</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <dependencies>
@@ -24,7 +24,7 @@
         <dependency>
             <groupId>com.elearning</groupId>
             <artifactId>core</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
         <dependency>
@@ -123,4 +123,12 @@
             <version>4.2.1</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/e-learning-team/e-learning-api</url>
+        </repository>
+    </distributionManagement>
 </project>
