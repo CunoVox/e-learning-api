@@ -31,7 +31,7 @@ public class AuthenticationBean {
         return this::loadUserByUsername;
     }
     private UserDetails loadUserByUsername(String username) {
-        User entity = userRepository.findByEmailAndIsEmailConfirmedIsTrue(username);
+        User entity = userRepository.findByEmail(username);
         if (entity == null) {
             throw new UsernameNotFoundException("Email không tồn tại");
         }

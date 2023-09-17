@@ -65,10 +65,10 @@ public class VerificationCodeController {
 
     public VerificationCodeDTO createEmailConfirmCode(String email) {
 //        UserDTO dto = userController.findById(userId);
-//        UserDTO dto = userController.findByEmail(email);
-//        if (dto.getIsEmailConfirmed()) {
-//            throw new ServiceException("Email đã được xác nhận");
-//        }
+        UserDTO dto = userController.findByEmail(email);
+        if (dto != null) {
+            throw new ServiceException("Email đã tồn tại");
+        }
         revokeAllUserEmailVerificationCodeByEmail(email);
 
         String digit = getRandomNumberString();
