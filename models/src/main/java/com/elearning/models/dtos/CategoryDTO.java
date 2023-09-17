@@ -35,6 +35,12 @@ public class CategoryDTO {
     @JsonProperty("created_at")
     private Date createAt;
 
+    @JsonProperty("update_by")
+    private String updateBy;
+
+    @JsonProperty("update_at")
+    private Date updatedAt;
+
     @JsonProperty("is_deleted")
     private boolean isDeleted;
 }
