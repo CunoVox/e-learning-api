@@ -58,8 +58,7 @@ public class EmailController implements EmailSender {
     }
     @Async
     protected void sendUserEmailVerification(String to, VerificationCode code) {
-        UserDTO dto = userController.findByEmail(to);
-        String buildEmail = buildUserEmailVerification(to, emailConfirmLink + dto.getId() + "/"+ code.getCode());
+        String buildEmail = buildUserEmailVerification(to, code.getCode());
         send(to, SUBJECT_EMAIL_VERIFY, buildEmail);
     }
     @Async

@@ -21,4 +21,5 @@ public class VerificationCode extends IBaseEntity{
     private String parentId;
     private Date expiredAt;
     private Date confirmedAt;
+    private String sendTo;
 }

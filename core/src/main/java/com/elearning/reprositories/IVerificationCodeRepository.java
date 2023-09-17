@@ -12,5 +12,7 @@ import java.util.Optional;
 public interface IVerificationCodeRepository  extends MongoRepository<VerificationCode, String> {
     Optional<VerificationCode> findById(@NotNull String id);
     List<VerificationCode> findAllByParentIdAndIsConfirmedIsFalse(String id);
+    List<VerificationCode> findAllBySendTo(String email);
     Optional<VerificationCode> findByParentIdAndCode(String id, String code);
+    Optional<VerificationCode> findBySendToAndCode(String email, String code);
 }
