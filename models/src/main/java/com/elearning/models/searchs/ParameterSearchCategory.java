@@ -19,7 +19,7 @@ public class ParameterSearchCategory implements Serializable, Cloneable{
 
     private Boolean buildCourses;
 
-    private String typeBuild;
+    private String buildType;
 
     private List<String> categoriesIds;
 

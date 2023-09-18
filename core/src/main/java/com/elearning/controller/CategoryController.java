@@ -8,6 +8,7 @@ import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
+import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,8 +36,8 @@ public class CategoryController {
     }
 
     public List<CategoryDTO> searchCategoryDTOS(ParameterSearchCategory parameterSearchCategory) {
-        if (parameterSearchCategory.getLevel() == null && !parameterSearchCategory.getTypeBuild().isBlankOrNull()
-                && parameterSearchCategory.getTypeBuild().equals("tree")) {
+        if (parameterSearchCategory.getLevel() == null && !parameterSearchCategory.getBuildType().isBlankOrNull()
+                && parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
             parameterSearchCategory.setLevel(1);
         }
         List<Category> categoriesEntities = categoryRepository.searchCategories(parameterSearchCategory);
@@ -44,7 +45,8 @@ public class CategoryController {
         if(categories.isNullOrEmpty()){
             return new ArrayList<>();
         }
-        if (parameterSearchCategory.getTypeBuild() == null || parameterSearchCategory.getTypeBuild().equals("tree")) {
+        if (parameterSearchCategory.getBuildType() == null ||
+                parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
             return buildCategoryTree(categories, parameterSearchCategory);
         }
         return categories;
@@ -66,7 +68,20 @@ public class CategoryController {
         return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
     }
 
+    public void deleteCategory(String categoryId, String deleteBy){
+        Optional<Category> category = categoryRepository.findById(categoryId);
+        if (category.isEmpty()){
+            throw new ServiceException("Danh mục không tồn tại");
+        }
+        category.get().setUpdateBy(deleteBy);
+        category.get().setIsDeleted(true);
+        this.saveCategory(category.get());
+    }
+
     private Category saveCategory(Category category) {
+        if (category.getLevel()>3 || category.getLevel()<1){
+            throw new ServiceException("Cấp danh mục phải từ 1 đến 3");
+        }
         if (null == category.getId()) {
             category.setId(sequenceValueItemRepository.getSequence(Category.class));
         } else {
@@ -105,11 +120,11 @@ public class CategoryController {
                 .nameMode(StringUtils.stripAccents(inputDTO.getTitle()))
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
-                .updateBy(inputDTO.getUpdateBy() != null ? inputDTO.getUpdateBy() : null)
                 .build();
         if (!inputDTO.getId().isBlankOrNull()) {
             category.setId(inputDTO.getId());
             category.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
+            category.setUpdateBy(inputDTO.getUpdateBy() != null ? inputDTO.getUpdateBy() : null);
         }
         if (!inputDTO.getParentId().isBlankOrNull()) {
             Optional<Category> parent = categoryRepository.findById(inputDTO.getParentId());

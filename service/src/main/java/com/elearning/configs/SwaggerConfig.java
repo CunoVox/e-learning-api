@@ -51,7 +51,7 @@ public class SwaggerConfig {
                         addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes
                         ("Bearer Authentication", createAPIKeyScheme()))
-                .info(new Info().title(" Swagger")
+                .info(new Info().title("E Learning Swagger")
                         .description("E Learning Swagger UI")
                         .version("1.0"))
                 .servers(servers);

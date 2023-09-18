@@ -43,7 +43,7 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests()
                 .antMatchers(
                         "/api/auth/**",
-                        "/api/category",
+                        "/api/category/**",
                         "/api-docs/**",
                         "/v2/api-docs",
                         "/v3/api-docs",
