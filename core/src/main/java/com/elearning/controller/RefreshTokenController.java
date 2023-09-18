@@ -72,8 +72,8 @@ public class RefreshTokenController {
     }
     public void deleteExpiredToken(){
         var refreshTokens = refreshTokenRepository.findAll();
-        List<RefreshToken> toDeleteList = refreshTokens.stream().filter(refreshToken ->
-            refreshToken.getExpiredAt().before(new Date())
+        List<RefreshToken> toDeleteList = refreshTokens.stream().filter(refreshToken -> (
+            refreshToken.getExpiredAt().before(new Date()) || refreshToken.getIsDeleted())
         ).collect(Collectors.toList());
         refreshTokenRepository.deleteAll(toDeleteList);
     }

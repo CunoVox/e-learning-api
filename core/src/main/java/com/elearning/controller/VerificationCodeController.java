@@ -1,13 +1,16 @@
 package com.elearning.controller;
 
 import com.elearning.email.EmailSender;
+import com.elearning.entities.User;
 import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.VerificationCodeDTO;
+import com.elearning.reprositories.IUserRepository;
 import com.elearning.reprositories.IVerificationCodeRepository;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +27,8 @@ public class VerificationCodeController {
     private final IVerificationCodeRepository verificationCodeRepository;
     private final UserController userController;
     private final EmailSender emailSender;
-
+    @Autowired
+    private IUserRepository userRepository;
     public void create(VerificationCode code) {
         if (code.getCode() == null) {
             code.setCode(code.getId());
@@ -65,8 +69,9 @@ public class VerificationCodeController {
 
     public VerificationCodeDTO createEmailConfirmCode(String email) {
 //        UserDTO dto = userController.findById(userId);
-        UserDTO dto = userController.findByEmail(email);
-        if (dto != null) {
+//        UserDTO dto = userController.findByEmail(email);
+        User user = userRepository.findByEmail(email);
+        if (user != null) {
             throw new ServiceException("Email đã tồn tại");
         }
         revokeAllUserEmailVerificationCodeByEmail(email);

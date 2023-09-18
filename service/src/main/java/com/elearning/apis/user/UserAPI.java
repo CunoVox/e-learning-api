@@ -31,11 +31,7 @@ public class UserAPI {
 
         return userController.update(email, dto);
     }
-    @Operation(summary = "Xin gửi lại mã xác nhận email")
-    @PostMapping("/email/verify/")
-    public ResponseEntity<?> sendEmailVerification(@RequestBody UserEmailRequest request) {
-        return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(request.getEmail()));
-    }
+
 
 //    @Operation(summary = "Xác nhận email")
 //    @GetMapping("/email/verify/{user_id}/{token}")
