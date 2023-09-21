@@ -5,10 +5,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Minh Tuấn
- * 19:23 18/08/2021
- */
 
 public class Extensions {
 

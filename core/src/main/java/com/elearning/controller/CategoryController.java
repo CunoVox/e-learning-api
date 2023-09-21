@@ -95,10 +95,8 @@ public class CategoryController {
             List<Category> childs = new ArrayList<>();
             buildCategoryChild(category.getId(), categories, childs);
 
-            if (childs.size() > 0) {
-                childs.forEach(c -> {
-                    categoryRepository.save(c);
-                });
+            if (!childs.isEmpty()) {
+                categoryRepository.saveAll(childs);
             }
         }
         return category;
@@ -131,8 +129,12 @@ public class CategoryController {
             if (parent.isEmpty()) {
                 throw new ServiceException("Không tìm thấy danh mục cha trong hệ thống!");
             }
+            if(parent.get().getLevel() == 3){
+                throw new ServiceException("Cấp danh mục không được lớn hơn 3!");
+            }
             category.setParentId(inputDTO.getParentId());
             category.setLevel(parent.get().getLevel() + 1);
+
         } else {
             category.setLevel(1);
         }
@@ -160,7 +162,7 @@ public class CategoryController {
                                     cate.getLevel() == categoryParent.getLevel() + 1
                     )).collect(Collectors.toList());
                     if (categoryChild.size() > 0) {
-                        categoryParent.setChilds(categoryChild);
+                        categoryParent.setChildren(categoryChild);
                         categoryChild.forEach(stack::push);
                     }
                 }
@@ -179,7 +181,7 @@ public class CategoryController {
                 .title(entity.getName())
                 .parentId(entity.getParentId())
                 .level(entity.getLevel())
-                .childs(new ArrayList<>())
+                .children(new ArrayList<>())
                 .courses(new ArrayList<>())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())

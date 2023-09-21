@@ -78,7 +78,7 @@ public class UserController {
             if (!isValidEmail(userFormDTO.getEmail())) {
                 throw new ServiceException("Email không hợp lệ");
             }
-            if (userFormDTO.getPassword().length() < 8)
+            if (userFormDTO.getPassword().trim().length() < 8)
                 throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
 
             verificationCodeController.emailConfirmCode(userFormDTO.getEmail(), userFormDTO.getCode());

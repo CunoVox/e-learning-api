@@ -1,6 +1,6 @@
 package com.elearning.utils.enumAttribute;
 
-public enum EnumCourseType {
+public enum EnumCourseContentType {
     VIDEO,
     BLOG,
     TEST
