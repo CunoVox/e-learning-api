@@ -11,4 +11,7 @@ public class Constants {
     public static final String REFRESH_TOKEN_COOKIE_NAME = "X-REFRESH-TOKEN";
     public static final String SECRET_KEY = "KJHUIknjkNIOASpASouFaoiDFsfhnIOUUIvaJKJkasjAASD";
 
+    public static final String FOLDER_TO_UPLOAD ="1vZDxFhds8Q9Tq5KdUIf1SH4YDHSHuTc6";
+    public static final String SERVICE_ACCOUNT_ID = "e-learning@e-learning-399406.iam.gserviceaccount.com";
+
 }
