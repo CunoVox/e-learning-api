@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "verification-code")
+@Document(collection = "verification_code")
 
 public class VerificationCode extends IBaseEntity{
 
