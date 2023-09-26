@@ -1,5 +1,6 @@
 package com.elearning.models.dtos;
 
+import com.elearning.entities.CourseDraft;
 import com.elearning.utils.enumAttribute.EnumCourseContentType;
 import com.elearning.utils.enumAttribute.EnumCourseLevel;
 import com.elearning.utils.enumAttribute.EnumCourseStatus;
@@ -33,7 +34,7 @@ public class CourseDraftDTO {
     private Long totalLesson;
     private Long subscriptions;
     private EnumCourseStatus status;
-    private List<CourseDTO> children;
+    private List<CourseDraftDTO> children;
     private List<CategoryDTO> categories;
     @JsonProperty("created_by")
     private String createdBy;
