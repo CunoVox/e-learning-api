@@ -22,6 +22,7 @@ public class ParameterSearchCourseDraft implements Serializable, Cloneable {
     private String buildType;
 
     private List<String> categoriesIds;
+    private List<String> courseIds;
 
     private List<String> parentIds;
     @Override

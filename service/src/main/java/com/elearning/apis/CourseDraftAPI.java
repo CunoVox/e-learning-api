@@ -1,6 +1,8 @@
 package com.elearning.apis;
 
 import com.elearning.controller.CourseDraftController;
+import com.elearning.entities.Category;
+import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDraftDTO;
 import com.elearning.models.searchs.ParameterSearchCourseDraft;
 import com.elearning.utils.Extensions;
@@ -63,4 +65,10 @@ public class CourseDraftAPI {
     public CourseDraftDTO create(@RequestBody CourseDraftDTO dto){
         return courseDraftController.createCourseDraft(dto);
     }
+    @PostMapping("/add-category/{course_draft_id}")
+    public List<CategoryDTO> addCategory(@PathVariable("course_draft_id") String cdId,
+                                   @RequestParam(value = "category_ids", required = false) List<String> caIds){
+        return courseDraftController.addCategoryToCourseDraft(cdId, caIds);
+    }
+
 }

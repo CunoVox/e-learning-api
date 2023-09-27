@@ -35,7 +35,7 @@ public class CourseDraftDTO {
     private Long subscriptions;
     private EnumCourseStatus status;
     private List<CourseDraftDTO> children;
-    private List<CategoryDTO> categories;
+    private List<String> categoryIds;
     @JsonProperty("created_by")
     private String createdBy;
 

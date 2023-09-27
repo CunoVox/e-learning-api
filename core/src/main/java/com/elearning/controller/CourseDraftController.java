@@ -1,16 +1,24 @@
 package com.elearning.controller;
 
+import com.elearning.connector.Connector;
+import com.elearning.entities.Category;
 import com.elearning.entities.CourseDraft;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDraftDTO;
 import com.elearning.models.searchs.ParameterSearchCourseDraft;
+import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ICourseDraftRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
+import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
+import io.jsonwebtoken.JwtException;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,31 +28,69 @@ import java.util.stream.Collectors;
 @Service
 //@AllArgsConstructor
 @ExtensionMethod(Extensions.class)
-public class CourseDraftController extends BaseController{
+public class CourseDraftController extends BaseController {
     @Autowired
     private ICourseDraftRepository courseDraftRepository;
     @Autowired
     private ISequenceValueItemRepository sequenceValueItemRepository;
+    @Autowired
+    private ICategoryRepository categoryRepository;
+    @Autowired
+    private CategoryController categoryController;
+    @Autowired
+    Connector connector;
+
     @Transactional
-    public CourseDraftDTO createCourseDraft(CourseDraftDTO dto){
+    public CourseDraftDTO createCourseDraft(CourseDraftDTO dto) {
         String userId = this.getUserIdFromContext();
-        if (userId != null){
+        if (userId != null) {
             dto.setCreatedBy(userId);
         }
         dto.setId(null);
         CourseDraft courseDraft = buildEntity(dto);
 //        return this.toDTOs(Collections.singletonList(this.saveCategory(courseDraft))).get(0);
-        return this.toDTO(this.saveCategory(courseDraft));
+        return this.toDTO(this.saveCourseDraft(courseDraft));
     }
+
     public CourseDraftDTO getCourseDraftById(String courseDraftId) {
         Optional<CourseDraft> courseDraft = courseDraftRepository.findById(courseDraftId);
         if (courseDraft.isEmpty()) {
-            throw new ServiceException("Không tìm thấy danh mục");
+            throw new ServiceException("Không tìm thấy khóa học nháp");
         }
         CourseDraft cD = courseDraft.get();
         ParameterSearchCourseDraft searchCategory = ParameterSearchCourseDraft
                 .builder().level(cD.getLevel()).build();
         return buildCourseDraftTree(Collections.singletonList(toDTO(cD)), searchCategory).get(0);
+    }
+    public List<CategoryDTO> addCategoryToCourseDraft(String courseDraftId, List<String> categoryIds){
+        String userId = this.getUserIdFromContext();
+
+        Optional<CourseDraft> courseDraft = courseDraftRepository.findById(courseDraftId);
+        if (courseDraft.isEmpty()) {
+            throw new ServiceException("Không tìm thấy khóa học nháp");
+        }else {
+            if (courseDraft.get().getLevel() > 1){
+                throw new ServiceException("không thể thêm danh mục vào thành phần của khóa học");
+            }
+        }
+        List<CategoryDTO> categoryDTOS = new ArrayList<>();
+        if (categoryIds != null) {
+            for (String id : categoryIds) {
+                var category = categoryController.getCategoryById(id);
+                if (category != null) {
+                    connector.addRelatedObjectById(
+                            CourseDraft.class.getAnnotation(Document.class).collection(),
+                            courseDraft.get().getId(),
+                            Category.class.getAnnotation(Document.class).collection(),
+                            category.getId(),
+                            EnumRelatedObjectsStatus.ACTIVE.getValue(),
+                            EnumConnectorType.COURSE_DRAFT_TO_CATEGORY.name(),
+                            userId);
+                    categoryDTOS.add(category);
+                }
+            }
+        }
+        return  categoryDTOS;
     }
     public List<CourseDraftDTO> searchCourseDraftDTOS(ParameterSearchCourseDraft parameterSearchCourseDraft) {
         if (parameterSearchCourseDraft.getLevel() == null && !parameterSearchCourseDraft.getBuildType().isBlankOrNull()
@@ -53,7 +99,7 @@ public class CourseDraftController extends BaseController{
         }
         List<CourseDraft> courseDraftsEntities = courseDraftRepository.searchCourseDraft(parameterSearchCourseDraft);
         List<CourseDraftDTO> courseDraftDTOS = toDTOs(courseDraftsEntities);
-        if(courseDraftDTOS.isNullOrEmpty()){
+        if (courseDraftDTOS.isNullOrEmpty()) {
             return new ArrayList<>();
         }
         if (parameterSearchCourseDraft.getBuildType() == null ||
@@ -98,7 +144,7 @@ public class CourseDraftController extends BaseController{
     }
 
     private CourseDraft buildEntity(CourseDraftDTO inputDTO) {
-        if (inputDTO.getName().isBlankOrNull()){
+        if (inputDTO.getName().isBlankOrNull()) {
             throw new ServiceException("Tiêu đề không được để trống!");
         }
         CourseDraft courseDraft = CourseDraft.builder()
@@ -111,6 +157,8 @@ public class CourseDraftController extends BaseController{
             courseDraft.setId(inputDTO.getId());
             courseDraft.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
         }
+        int flag = 0;
+
         if (!inputDTO.getParentId().isBlankOrNull()) {
             Optional<CourseDraft> parent = courseDraftRepository.findById(inputDTO.getParentId());
             if (parent.isEmpty()) {
@@ -123,6 +171,7 @@ public class CourseDraftController extends BaseController{
         }
         return courseDraft;
     }
+
     public CourseDraftDTO toDTO(CourseDraft entity) {
         if (entity == null) return null;
         return CourseDraftDTO.builder()
@@ -148,9 +197,10 @@ public class CourseDraftController extends BaseController{
         }
         return categoryDTOS;
     }
+
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
-    public CourseDraft saveCategory(CourseDraft courseDraft) {
-        if (courseDraft.getLevel()>3 || courseDraft.getLevel()<1){
+    public CourseDraft saveCourseDraft(CourseDraft courseDraft) {
+        if (courseDraft.getLevel() > 3 || courseDraft.getLevel() < 1) {
             throw new ServiceException("Cấp khóa học phải từ 1 đến 3");
         }
         if (null == courseDraft.getId()) {
