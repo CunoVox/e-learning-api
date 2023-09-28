@@ -12,9 +12,11 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ParameterSearchCourseDraft implements Serializable, Cloneable {
+public class ParameterSearchCourse implements Serializable, Cloneable {
     private Integer level;
-
+    
+    private Boolean isDraft;
+    
     private Boolean isDeleted;
 
     private Boolean buildCourses;
@@ -26,7 +28,7 @@ public class ParameterSearchCourseDraft implements Serializable, Cloneable {
 
     private List<String> parentIds;
     @Override
-    public ParameterSearchCourseDraft clone() throws CloneNotSupportedException {
-        return (ParameterSearchCourseDraft) super.clone();
+    public ParameterSearchCourse clone() throws CloneNotSupportedException {
+        return (ParameterSearchCourse) super.clone();
     }
 }

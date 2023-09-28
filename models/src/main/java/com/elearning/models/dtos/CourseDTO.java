@@ -1,13 +1,20 @@
 package com.elearning.models.dtos;
 
-import com.elearning.utils.enumAttribute.EnumCourseLevel;
-import com.elearning.utils.enumAttribute.EnumCourseStatus;
 import com.elearning.utils.enumAttribute.EnumCourseContentType;
+import com.elearning.utils.enumAttribute.EnumCourseStatus;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 import java.util.List;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CourseDTO {
     private String id;
     private String name;
@@ -26,7 +33,7 @@ public class CourseDTO {
     private Long subscriptions;
     private EnumCourseStatus status;
     private List<CourseDTO> children;
-    private List<CategoryDTO> categories;
+    private List<String> categoryIds;
     @JsonProperty("created_by")
     private String createdBy;
 

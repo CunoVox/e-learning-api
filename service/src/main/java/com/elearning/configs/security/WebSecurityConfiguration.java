@@ -46,7 +46,7 @@ public class WebSecurityConfiguration {
                         "/api/user/password/reset",
                         "/api/auth/**",
                         "/api/category/**",
-                        "/api/course-draft/**",
+                        "/api/course/**",
                         "/api/file-relationship/**",
                         "/api-docs/**",
                         "/v2/api-docs",

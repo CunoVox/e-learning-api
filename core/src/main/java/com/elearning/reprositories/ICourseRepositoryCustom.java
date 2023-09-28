@@ -1,5 +1,10 @@
 package com.elearning.reprositories;
 
-public interface ICourseRepositoryCustom {
+import com.elearning.entities.Course;
+import com.elearning.models.searchs.ParameterSearchCourse;
 
+import java.util.List;
+
+public interface ICourseRepositoryCustom {
+    List<Course> searchCourse(ParameterSearchCourse parameterSearchCourse);
 }
