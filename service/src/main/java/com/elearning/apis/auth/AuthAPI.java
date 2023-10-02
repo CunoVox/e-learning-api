@@ -26,6 +26,7 @@ import javax.validation.Valid;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "Auth API")
