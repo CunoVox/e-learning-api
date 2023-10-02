@@ -37,7 +37,8 @@ public class CategoryController {
 
     public List<CategoryDTO> searchCategoryDTOS(ParameterSearchCategory parameterSearchCategory) {
         if (parameterSearchCategory.getLevel() == null && !parameterSearchCategory.getBuildType().isBlankOrNull()
-                && parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
+                && parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())
+                && parameterSearchCategory.getParentIds().isNullOrEmpty()) {
             parameterSearchCategory.setLevel(1);
         }
         List<Category> categoriesEntities = categoryRepository.searchCategories(parameterSearchCategory);
@@ -47,7 +48,8 @@ public class CategoryController {
         }
         if (parameterSearchCategory.getBuildType() == null ||
                 parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
-            return buildCategoryTree(categories, parameterSearchCategory);
+            ParameterSearchCategory searchCategory = ParameterSearchCategory.builder().level(parameterSearchCategory.getLevel()).build();
+            return buildCategoryTree(categories, searchCategory);
         }
         return categories;
     }
