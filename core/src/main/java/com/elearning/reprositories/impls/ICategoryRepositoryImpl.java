@@ -21,7 +21,6 @@ public class ICategoryRepositoryImpl extends BaseRepositoryCustom implements ICa
         if (parameterSearchCategory.getLevel() != null) {
             criteria.add(Criteria.where("level").is(parameterSearchCategory.getLevel()));
         }
-
         if (!parameterSearchCategory.getCategoriesIds().isNullOrEmpty()) {
             criteria.add(Criteria.where("_id").in(parameterSearchCategory.getCategoriesIds()));
         }

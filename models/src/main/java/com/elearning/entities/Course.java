@@ -1,9 +1,8 @@
 package com.elearning.entities;
 
-
-import com.elearning.utils.enumAttribute.EnumCourseLevel;
-import com.elearning.utils.enumAttribute.EnumCourseStatus;
 import com.elearning.utils.enumAttribute.EnumCourseContentType;
+import com.elearning.utils.enumAttribute.EnumCourseStatus;
+import com.elearning.utils.enumAttribute.EnumCourseType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,19 +14,26 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class Course extends CourseDraft{
-//    private String name;
-    private String courseDraftId;
-//    private String nameMode;
-//    private String slug;
-//    private EnumCourseContentType type;
-//    private String parentId;
-//    private EnumCourseLevel level;
-//    private String description;
-//    private String requirement;
-//    private Long duration;
-//    private Long totalLesson;
-//    private Long subscriptions;
-//    private String createdBy;
-//    private EnumCourseStatus status;
+public class Course extends IBaseEntity{
+    private String partnerId;
+    private EnumCourseType courseType;
+    private EnumCourseStatus status;
+
+
+
+    private String name;
+    private String nameMode;
+    private String slug;
+    private EnumCourseContentType contentType;
+    private String parentId;
+    private int level;
+    private String description;
+    private String requirement;
+    private Long duration;
+    private Long totalLesson;
+    private Long subscriptions;
+    private String createdBy;
+
+    private Boolean isPublished;
+
 }

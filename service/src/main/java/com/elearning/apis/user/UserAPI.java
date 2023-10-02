@@ -40,6 +40,7 @@ public class UserAPI {
 //        verificationCodeController.emailConfirmCode(userId, token);
 //    }
 
+    @CrossOrigin(origins = "http://localhost:8080")
     @Operation(summary = "Xin gửi mail reset password")
     @PostMapping(value = "/password/reset")
     public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {

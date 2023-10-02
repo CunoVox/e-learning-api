@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @Service
 @ExtensionMethod(Extensions.class)
-public class FileController {
+public class FileController extends BaseController{
     @Autowired
     Drive googleDrive;
 
@@ -65,7 +65,8 @@ public class FileController {
         fileRelationshipRepository.deleteById(id);
     }
 
-    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String fileType, String createBy) {
+    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String fileType) {
+        String userId = this.getUserIdFromContext();
         File fileDrive = sendFileToGoogleDrive(multipartFile);
         if (fileDrive == null) {
             throw new ServiceException("Tải file lên không thành công");
@@ -74,7 +75,7 @@ public class FileController {
         fileRelationship.setFileType(fileType);
         fileRelationship.setParentId(parentId);
         fileRelationship.setCreatedAt(new Date());
-        fileRelationship.setCreateBy(createBy);
+        fileRelationship.setCreateBy(userId);
         FileRelationship fileRelationshipSaved = fileRelationshipRepository.save(fileRelationship);
         return toDTO(fileRelationshipSaved);
     }

@@ -22,9 +22,8 @@ public class FileRelationshipAPI {
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public FileRelationshipDTO uploadFile(@RequestPart(value = "file") MultipartFile file,
                                           @RequestParam(value = "parent_id") String parentId,
-                                          @RequestParam(value = "file_type") String fileType,
-                                          @RequestParam(value = "create_by") String createBy) {
-        return fileController.saveFile(file, parentId, fileType, createBy);
+                                          @RequestParam(value = "file_type") String fileType) {
+        return fileController.saveFile(file, parentId, fileType);
     }
 
     @Operation(summary = "Xoá File")

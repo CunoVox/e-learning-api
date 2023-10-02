@@ -32,7 +32,7 @@ public class CategoryAPI {
 
     @Operation(summary = "Danh sách danh mục")
     @GetMapping
-    public List<CategoryDTO> getCategories(@RequestParam(value = "buildType") EnumCategoryBuildType buildType,
+    public List<CategoryDTO> getCategories(@RequestParam(value = "build_type") EnumCategoryBuildType buildType,
                                            @RequestParam(value = "level", required = false) Integer level,
                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                            @RequestParam(value = "build_courses", required = false) Boolean buildCourses,

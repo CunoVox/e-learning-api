@@ -30,10 +30,18 @@
 //                "haohao");
 //        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
 //                "course",
-//                List.of("1", "2"),
-//                "tag",
-//                EnumConnectorType.COURSE_TO_TAG.name());
-//        List<String> categories = connector.getIdRelatedObjectsById("category", "1", "course",EnumConnectorType.COURSE_TO_CATEGORY.name());
-//        System.out.println(mapTagIds);
+//                "2",
+//                "category",
+//                "3",
+//                EnumRelatedObjectsStatus.ACTIVE.getValue(),
+//                EnumConnectorType.COURSE_TO_TAG.name(),
+//                "haohao");
+////        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
+////                "course",
+////                List.of("1", "2"),
+////                "tag",
+////                EnumConnectorType.COURSE_TO_TAG.name());
+////        List<String> categories = connector.getIdRelatedObjectsById("category", "1", "course",EnumConnectorType.COURSE_TO_CATEGORY.name());
+////        System.out.println(mapTagIds);
 //    }
 //}
