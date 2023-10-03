@@ -6,14 +6,14 @@
     <artifactId>models</artifactId>
 
     <properties>
-        <core.version>1.0.1</core.version>
+        <core.version>1.0.2</core.version>
     </properties>
 
     <name>models</name>
     <parent>
         <groupId>com.elearning</groupId>
         <artifactId>e-learning-api</artifactId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
 
     <dependencies>

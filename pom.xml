@@ -6,7 +6,7 @@
 
     <groupId>com.elearning</groupId>
     <artifactId>e-learning-api</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -23,9 +23,9 @@
     </parent>
 
     <properties>
-        <core.version>1.0.1</core.version>
-        <models.version>1.0.1</models.version>
-        <service.version>1.0.1</service.version>
+        <core.version>1.0.2</core.version>
+        <models.version>1.0.2</models.version>
+        <service.version>1.0.2</service.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
     </properties>
@@ -53,7 +53,7 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub Packages</name>
+            <name>GitHub e-learning-team Apache Maven Packages</name>
             <url>https://maven.pkg.github.com/e-learning-team/e-learning-api</url>
         </repository>
     </distributionManagement>
