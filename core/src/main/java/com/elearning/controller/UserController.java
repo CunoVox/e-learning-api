@@ -64,7 +64,6 @@ public class UserController {
         user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user = userRepository.save(user);
-
         return user;
     }
 
@@ -79,16 +78,18 @@ public class UserController {
             if (!isValidEmail(userFormDTO.getEmail())) {
                 throw new ServiceException("Email không hợp lệ");
             }
-            if (userFormDTO.getPassword().length() < 8)
+            if (userFormDTO.getPassword().trim().length() < 8)
                 throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
+
+            verificationCodeController.emailConfirmCode(userFormDTO.getEmail(), userFormDTO.getCode());
 
             dto = modelMapper.map(userFormDTO, UserDTO.class);
             entity = create(dto);
-
+            this.userEmailConfirm(entity.getId());
             verificationCodeController.revokeAllUserEmailVerificationCode(entity.getId());
-            VerificationCode code = verificationCodeController.build(entity.getId(), null, EnumVerificationCode.EMAIL_CONFIRM);
-            emailSender.sendMail(entity.getEmail(), code);
-            verificationCodeController.create(code);
+//            VerificationCode code = verificationCodeController.build(null, userFormDTO.getEmail() , EnumVerificationCode.EMAIL_CONFIRM);
+//            emailSender.sendMail(entity.getEmail(), code);
+//            verificationCodeController.create(code);
 
             return getAuthResponse(entity);
         }

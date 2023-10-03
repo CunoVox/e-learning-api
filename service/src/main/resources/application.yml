@@ -19,6 +19,10 @@ spring:
           connection-timeout: 5000
           timeout: 5000
           write-timeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 150MB
+      max-request-size: 150MB
 
 springdoc:
   packagesToScan: com.elearning.apis

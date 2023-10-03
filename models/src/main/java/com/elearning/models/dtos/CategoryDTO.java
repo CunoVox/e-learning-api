@@ -25,7 +25,7 @@ public class CategoryDTO {
 
     private int level;
 
-    private List<CategoryDTO> childs;
+    private List<CategoryDTO> children;
 
     private List<CourseDTO> courses;
 
@@ -34,6 +34,12 @@ public class CategoryDTO {
 
     @JsonProperty("created_at")
     private Date createAt;
+
+    @JsonProperty("update_by")
+    private String updateBy;
+
+    @JsonProperty("update_at")
+    private Date updatedAt;
 
     @JsonProperty("is_deleted")
     private boolean isDeleted;

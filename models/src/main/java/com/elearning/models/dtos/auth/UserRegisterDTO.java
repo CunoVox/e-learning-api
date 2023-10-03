@@ -24,4 +24,7 @@ public class UserRegisterDTO {
     @NotBlank(message = "Mật khẩu chưa được nhập")
     private String password;
 
+    @NotNull(message = "Chưa nhập mã xác nhận")
+    @NotBlank(message = "Chưa nhập mã xác nhận")
+    private String code;
 }

@@ -35,6 +35,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        return path.contains("/password/reset");
+    }
+
+    @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws SignatureException, ServletException, IOException {
@@ -79,4 +85,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             exceptionResolver.resolveException(request, response, null, ex);
         }
     }
+
 }

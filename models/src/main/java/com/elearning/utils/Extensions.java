@@ -5,15 +5,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Minh Tuấn
- * 19:23 18/08/2021
- */
 
 public class Extensions {
 
     public static boolean isBlankOrNull(String str) {
-        return str == null || str.isEmpty();
+        return str == null || str.isEmpty() || str.isBlank();
     }
 
     public static <T> boolean isNullOrEmpty(Collection<T> collection) {

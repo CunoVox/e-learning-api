@@ -5,9 +5,11 @@ import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.UserEmailRequest;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -24,11 +26,14 @@ import javax.validation.Valid;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "Auth API")
 public class AuthAPI {
     private final UserController userController;
+    @Autowired
+    private VerificationCodeController verificationCodeController;
     private final JwtController jwtController;
     @Autowired
     private RefreshTokenController refreshTokenController;
@@ -38,6 +43,11 @@ public class AuthAPI {
         this.jwtController = jwtController;
     }
 
+    @Operation(summary = "Gửi mã xác nhận email")
+    @PostMapping("/email/verify")
+    public ResponseEntity<?> sendEmailVerification(@RequestBody UserEmailRequest request) {
+        return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(request.getEmail()));
+    }
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);

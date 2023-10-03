@@ -5,6 +5,7 @@ import com.elearning.controller.VerificationCodeController;
 import com.elearning.models.dtos.ResetPasswordDTO;
 import com.elearning.models.dtos.UpdateUserDTO;
 import com.elearning.models.dtos.UserDTO;
+import com.elearning.models.dtos.UserEmailRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -30,23 +31,20 @@ public class UserAPI {
 
         return userController.update(email, dto);
     }
-    @Operation(summary = "Xin gửi lại mail xác nhận bằng UserId")
-    @GetMapping("/email/verify/{user_id}")
-    public ResponseEntity<?> sendEmailVerification(@PathVariable("user_id") String userId) {
-        return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(userId));
-    }
 
-    @Operation(summary = "Xác nhận email")
-    @GetMapping("/email/verify/{user_id}/{token}")
-    public void emailConfirm(@PathVariable("user_id") String userId,
-                             @PathVariable("token") String token) {
-        verificationCodeController.emailConfirmCode(userId, token);
-    }
 
+//    @Operation(summary = "Xác nhận email")
+//    @GetMapping("/email/verify/{user_id}/{token}")
+//    public void emailConfirm(@PathVariable("user_id") String userId,
+//                             @PathVariable("token") String token) {
+//        verificationCodeController.emailConfirmCode(userId, token);
+//    }
+
+    @CrossOrigin(origins = "http://localhost:8080")
     @Operation(summary = "Xin gửi mail reset password")
     @PostMapping(value = "/password/reset")
-    public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid String email) {
-        return ResponseEntity.ok().body(verificationCodeController.createResetPasswordCode(email));
+    public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {
+        return ResponseEntity.ok().body(verificationCodeController.createResetPasswordCode(request.getEmail()));
     }
 
     @Operation(summary = "Kiểm tra reset password code")

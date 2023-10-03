@@ -20,4 +20,5 @@ public class Category extends IBaseEntity implements Serializable {
     private int level;
     private String parentId;
     private String createdBy;
+    private String updateBy;
 }
