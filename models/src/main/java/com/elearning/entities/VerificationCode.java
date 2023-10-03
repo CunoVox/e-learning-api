@@ -11,7 +11,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document(collection = "verification-code")
+@Document(collection = "verification_code")
 
 public class VerificationCode extends IBaseEntity{
 
@@ -21,4 +21,5 @@ public class VerificationCode extends IBaseEntity{
     private String parentId;
     private Date expiredAt;
     private Date confirmedAt;
+    private String sendTo;
 }

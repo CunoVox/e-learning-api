@@ -6,7 +6,7 @@
 
     <groupId>com.elearning</groupId>
     <artifactId>e-learning-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -23,9 +23,11 @@
     </parent>
 
     <properties>
-        <core.version>1.0.0</core.version>
-        <models.version>1.0.0</models.version>
-        <service.version>1.0.0</service.version>
+        <core.version>1.0.1</core.version>
+        <models.version>1.0.1</models.version>
+        <service.version>1.0.1</service.version>
+        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
     <dependencyManagement>

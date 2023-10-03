@@ -2,6 +2,7 @@ package com.elearning.utils;
 
 
 import lombok.experimental.ExtensionMethod;
+import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.net.URLEncoder;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 @ExtensionMethod(Extensions.class)
+@Component
 public class StringUtils {
     private static final char[] CHARS_LOW = "zxcvbnmasdfghjklqwertyuiop".toCharArray();
     private static final char[] CHARS_UP = "ZXCVBNMASDFGHJKLQWERTYUIOP".toCharArray();

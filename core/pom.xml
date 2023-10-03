@@ -7,7 +7,7 @@
     <artifactId>core</artifactId>
 
     <properties>
-        <core.version>1.0.0</core.version>
+        <core.version>1.0.1</core.version>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.source>11</maven.compiler.source>
     </properties>
@@ -16,14 +16,14 @@
     <parent>
         <groupId>com.elearning</groupId>
         <artifactId>e-learning-api</artifactId>
-        <version>1.0.0</version>
+        <version>1.0.1</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.elearning</groupId>
             <artifactId>models</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -107,6 +107,18 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-drive</artifactId>
+            <version>v3-rev136-1.25.0</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>com.google.oauth-client</groupId>-->
+<!--            <artifactId>google-oauth-client-jetty</artifactId>-->
+<!--            <version>1.34.1</version>-->
+<!--        </dependency>-->
     </dependencies>
 
     <distributionManagement>

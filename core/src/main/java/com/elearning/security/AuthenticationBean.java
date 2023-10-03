@@ -12,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -28,26 +29,26 @@ public class AuthenticationBean {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        return username -> {
-            User entity = userRepository.findByEmail(username);
-            if (entity == null) {
-                throw new UsernameNotFoundException("Email không tồn tại");
-            }
-            Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
-            for (EnumRole role : entity.getRoles()) {
-                authorities.add(new SimpleGrantedAuthority(role.name()));
-            }
+        return this::loadUserByUsername;
+    }
+    private UserDetails loadUserByUsername(String username) {
+        User entity = userRepository.findByEmail(username);
+        if (entity == null) {
+            throw new UsernameNotFoundException("Email không tồn tại");
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        entity.getRoles().forEach(role -> {
+            authorities.add(new SimpleGrantedAuthority(role.name()));
+        });
 
-            SecurityUserDetail userDetail = new SecurityUserDetail(
-                    entity.getId(),
-                    entity.getFullName(),
-                    entity.getEmail(),
-                    entity.getPassword(),
-                    authorities,
-                    entity.getIsDeleted()
-            );
-            return userDetail;
-        };
+        return new SecurityUserDetail(
+                entity.getId(),
+                entity.getFullName(),
+                entity.getEmail(),
+                entity.getPassword(),
+                authorities,
+                entity.getIsDeleted()
+        );
     }
 
     @Bean
@@ -65,4 +66,5 @@ public class AuthenticationBean {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }

@@ -58,8 +58,7 @@ public class EmailController implements EmailSender {
     }
     @Async
     protected void sendUserEmailVerification(String to, VerificationCode code) {
-        UserDTO dto = userController.findByEmail(to);
-        String buildEmail = buildUserEmailVerification(to, emailConfirmLink + dto.getId() + "/"+ code.getCode());
+        String buildEmail = buildUserEmailVerification(to, code.getCode());
         send(to, SUBJECT_EMAIL_VERIFY, buildEmail);
     }
     @Async
@@ -1217,9 +1216,9 @@ public class EmailController implements EmailSender {
                 "                              <tr>\n" +
                 "                                <td align=\"center\" style=\"padding:0;Margin:0\"><span class=\"es-button-border msohide\"\n" +
                 "                                    style=\"border-style:solid;border-color:#2CB543;background:#7630f3;border-width:0px;display:block;border-radius:30px;width:auto;mso-hide:all\"><a\n" +
-                "                                      href=\"" + link + "\" class=\"es-button msohide\" target=\"_blank\"\n" +
-                "                                      style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26px !important;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid  #7630f3;mso-hide:all;padding-left:5px;padding-right:5px\">Xác\n" +
-                "                                      nhận</a></span><!--<![endif]--></td>\n" +
+                "                                      href=\"\" class=\"es-button msohide\" target=\"_blank\"\n" +
+                "                                      style=\"mso-style-priority:100 !important;text-decoration:none !important;mso-line-height-rule:exactly;color:#FFFFFF;font-size:22px;padding:15px 20px 15px 20px;display:block;background:#7630f3;border-radius:30px;font-family:Imprima, Arial, sans-serif;font-weight:bold;font-style:normal;line-height:26px !important;width:auto;text-align:center;letter-spacing:0;mso-padding-alt:0;mso-border-alt:10px solid  #7630f3;mso-hide:all;padding-left:5px;padding-right:5px\">" + link + "</a></span><!--<![endif]-->\n" +
+                "                                </td>\n" +
                 "                              </tr>\n" +
                 "                            </table>\n" +
                 "                          </td>\n" +

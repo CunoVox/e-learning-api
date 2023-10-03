@@ -1,11 +1,14 @@
 //package com.elearning.controller;
 //
 //import com.elearning.connector.Connector;
+//import com.elearning.entities.Category;
 //import com.elearning.utils.enumAttribute.EnumConnectorType;
+//import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
 //import org.junit.jupiter.api.Test;
 //import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.context.SpringBootTest;
 //import org.springframework.context.annotation.ComponentScan;
+//import org.springframework.data.mongodb.core.mapping.Document;
 //
 //import java.util.List;
 //import java.util.Map;
@@ -17,20 +20,28 @@
 //    Connector connector;
 //    @Test
 //    public void testCreateConnector(){
-////        courseManager.addRelatedObjectById(
-////                "course",
-////                "2",
-////                "category",
-////                "3",
-////                EnumRelatedObjectsStatus.ACTIVE.getValue(),
-////                EnumConnectorType.COURSE_TO_TAG.name(),
-////                "haohao");
+//        connector.addRelatedObjectById(
+//                "course",
+//                "2",
+//                Category.class.getAnnotation(Document.class).collection(),
+//                "3",
+//                EnumRelatedObjectsStatus.ACTIVE.getValue(),
+//                EnumConnectorType.COURSE_TO_TAG.name(),
+//                "haohao");
 //        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
 //                "course",
-//                List.of("1", "2"),
-//                "tag",
-//                EnumConnectorType.COURSE_TO_TAG.name());
-//        List<String> categories = connector.getIdRelatedObjectsById("category", "1", "course",EnumConnectorType.COURSE_TO_CATEGORY.name());
-//        System.out.println(mapTagIds);
+//                "2",
+//                "category",
+//                "3",
+//                EnumRelatedObjectsStatus.ACTIVE.getValue(),
+//                EnumConnectorType.COURSE_TO_TAG.name(),
+//                "haohao");
+////        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
+////                "course",
+////                List.of("1", "2"),
+////                "tag",
+////                EnumConnectorType.COURSE_TO_TAG.name());
+////        List<String> categories = connector.getIdRelatedObjectsById("category", "1", "course",EnumConnectorType.COURSE_TO_CATEGORY.name());
+////        System.out.println(mapTagIds);
 //    }
 //}
