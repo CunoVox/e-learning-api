@@ -18,14 +18,15 @@ public class ServiceApplication {
         System.out.println("🚀 Api doc ready at : " +
                 Constants.SERVICE_URL + "/swagger-ui/index.html?configUrl=/e-learning/api-docs/swagger-config");
     }
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-//                registry.addMapping("/api/auth/**").allowedOrigins("http://localhost:5173");
-            }
-        };
-    }
+//    @Bean
+//    public WebMvcConfigurer corsConfigurer() {
+//        return new WebMvcConfigurer() {
+//            @Override
+//            public void addCorsMappings(CorsRegistry registry) {
+////                registry.addMapping("**").allowedOrigins("http://localhost:5173");
+//            }
+//        };
+//    }
+
 }
 
