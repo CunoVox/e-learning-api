@@ -27,6 +27,7 @@ import javax.validation.Valid;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 
+//@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Auth", description = "Auth API")
@@ -51,31 +52,56 @@ public class AuthAPI {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
+        var cookie = createRefreshCookie(authResponse.getRefreshToken());
         return ResponseEntity
                 .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
+        var cookie = createRefreshCookie(rs.getRefreshToken());
         return ResponseEntity
                 .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(rs);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(@RequestParam("refresh_token") String refreshToken, HttpServletRequest request) {
-        AuthResponse authResponse = jwtController.refreshToken(refreshToken);
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
+        AuthResponse authResponse = jwtController.refreshToken(requestCookie);
+        var cookie = createRefreshCookie(authResponse.getRefreshToken());
         return ResponseEntity
                 .ok()
+                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
+
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestParam("refresh_token") String refreshToken){
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
+        Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
+        refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+
+
+        Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
+        delete.setHttpOnly(true);
+        delete.setPath("/");
+        delete.setMaxAge(0);
+        response.addCookie(delete);
+
         SecurityContextHolder.clearContext();
-        refreshTokenController.deleteRefreshTokenBranch(refreshToken);
 
         return ResponseEntity.ok()
                 .body(null);
     }
+
+    private ResponseCookie createRefreshCookie(String refreshToken) {
+        return ResponseCookie.from(REFRESH_TOKEN_COOKIE_NAME, refreshToken)
+                .maxAge(REFRESH_TOKEN_EXPIRE_TIME_MILLIS / 1000)
+                .path("/")
+                .httpOnly(true).build();
+    }
+
 }
