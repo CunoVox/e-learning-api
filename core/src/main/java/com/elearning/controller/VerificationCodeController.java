@@ -141,14 +141,14 @@ public class VerificationCodeController {
     public void emailConfirmCode(String email, String verifyCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findBySendToAndCode(email, verifyCode);
         if (code.isEmpty()) {
-            throw new ServiceException("Mã xác nhận Email không hợp lệ 1.");
+            throw new ServiceException("Mã xác nhận Email không hợp lệ");
         } else {
             VerificationCode vCode = code.get();
             if (!vCode.getType().equals(EnumVerificationCode.EMAIL_CONFIRM)) {
-                throw new ServiceException("Mã xác nhận Email không hợp lệ 2.");
+                throw new ServiceException("Mã xác nhận Email không hợp lệ");
             } else {
                 if (vCode.getIsDeleted()) {
-                    throw new ServiceException("Mã xác nhận Email không hợp lệ 3.");
+                    throw new ServiceException("Mã xác nhận Email không hợp lệ");
                 }
                 if (vCode.getIsConfirmed() || vCode.getConfirmedAt() != null) {
                     throw new ServiceException("Email đã được xác nhận.");
