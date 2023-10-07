@@ -100,10 +100,10 @@ public class UserController {
         if (formDTO != null) {
             User entity = userRepository.findByEmail(formDTO.getEmail());
             if (entity == null) {
-                throw new ServiceException("Email không tồn tại");
+                throw new ServiceException("Email hoặc mật khẩu không chính xác!");
             }
             if (!passwordEncoder.matches(formDTO.getPassword(), entity.getPassword())) {
-                throw new ServiceException("Mật khẩu không đúng");
+                throw new ServiceException("Email hoặc mật khẩu không chính xác!");
             }
             if (entity.getIsDeleted()) {
                 throw new ServiceException("Tài khoản bị tạm khóa");
