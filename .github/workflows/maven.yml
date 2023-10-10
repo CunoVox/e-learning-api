@@ -28,4 +28,5 @@ jobs:
         heroku_email: ${{secrets.HEROKU_EMAIL}}
         heroku_app_name: ${{secrets.HEROKU_APP}}
     - name: Build and Test Service Module
-      run: mvn -f service/pom.xml clean install
+      working-directory: ./service
+      run: ./mvnw --batch-mode clean package
