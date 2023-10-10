@@ -39,10 +39,13 @@ public class WebSecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors()
+                .and()
                 .csrf()
                 .disable()
                 .authorizeHttpRequests()
                 .antMatchers(
+                        "/**",
                         "/api/user/password/reset",
                         "/api/auth/**",
                         "/api/category/**",

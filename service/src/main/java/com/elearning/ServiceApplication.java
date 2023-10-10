@@ -23,7 +23,11 @@ public class ServiceApplication {
 //        return new WebMvcConfigurer() {
 //            @Override
 //            public void addCorsMappings(CorsRegistry registry) {
-////                registry.addMapping("**").allowedOrigins("http://localhost:5173");
+//                registry.addMapping("/**")
+//                        .allowedOriginPatterns("http://localhost:5173")
+//                        .allowCredentials(true)
+//                        .allowedHeaders("*")
+//                        .allowedMethods("*");
 //            }
 //        };
 //    }
