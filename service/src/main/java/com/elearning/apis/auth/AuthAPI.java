@@ -24,6 +24,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import java.security.SignatureException;
+
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
 import static com.elearning.utils.Constants.REFRESH_TOKEN_EXPIRE_TIME_MILLIS;
 
@@ -69,7 +71,7 @@ public class AuthAPI {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) throws SignatureException {
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
         AuthResponse authResponse = jwtController.refreshToken(requestCookie);
         var cookie = createRefreshCookie(authResponse.getRefreshToken());
@@ -80,10 +82,9 @@ public class AuthAPI {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response){
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SignatureException {
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
         refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
-
 
         Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
         delete.setHttpOnly(true);
