@@ -163,20 +163,26 @@ public class UserController {
     }
 
     @Transactional
-    public void userResetPassword(String userId, ResetPasswordDTO dto) {
-        verificationCodeController.resetPasswordConfirmCode(userId, dto.getCode());
-        if (dto.getNewPassword().length() < 8) {
-            throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
-        }
-        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
-            throw new ServiceException("Mật khẩu xác nhận không chính xác");
-        }
-        verificationCodeController.confirmCode(userId, dto.getCode());
-        Optional<User> user = userRepository.findById(userId);
-        if (user.isPresent()) {
-            user.get().setUpdatedAt(new Date());
-            user.get().setPassword(passwordEncoder.encode(dto.getConfirmPassword()));
-            userRepository.save(user.get());
+    public void userResetPassword(String email, ResetPasswordDTO dto) {
+        User u = userRepository.findByEmail(email);
+        if(u != null) {
+            String userId = u.getId();
+            verificationCodeController.resetPasswordConfirmCode(userId, dto.getCode());
+            if (dto.getNewPassword().length() < 8) {
+                throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
+            }
+            if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+                throw new ServiceException("Mật khẩu xác nhận không chính xác");
+            }
+            verificationCodeController.confirmCode(userId, dto.getCode());
+            Optional<User> user = userRepository.findById(userId);
+            if (user.isPresent()) {
+                user.get().setUpdatedAt(new Date());
+                user.get().setPassword(passwordEncoder.encode(dto.getConfirmPassword()));
+                userRepository.save(user.get());
+            }
+        }else{
+            throw new ServiceException("Không tìm thấy người dùng");
         }
     }
 
