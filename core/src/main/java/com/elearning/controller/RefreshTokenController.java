@@ -60,9 +60,7 @@ public class RefreshTokenController {
     public void deleteRefreshTokenBranch(String token) {
         var refreshToken = refreshTokenRepository.findById(token);
 
-        if (refreshToken.isEmpty()) {
-            throw new ServiceException("Lỗi");
-        } else {
+        if (refreshToken.isPresent()) {
             if (refreshToken.get().getCreatedFrom() == null) {
                 deleteRefreshToken(refreshToken.get().getId());
             } else {

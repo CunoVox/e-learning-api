@@ -40,24 +40,23 @@ public class UserAPI {
 //        verificationCodeController.emailConfirmCode(userId, token);
 //    }
 
-    @CrossOrigin(origins = "http://localhost:8080")
+//    @CrossOrigin(origins = "http://localhost:8080")
     @Operation(summary = "Xin gửi mail reset password")
     @PostMapping(value = "/password/reset")
     public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {
         return ResponseEntity.ok().body(verificationCodeController.createResetPasswordCode(request.getEmail()));
     }
 
-    @Operation(summary = "Kiểm tra reset password code")
-    @PostMapping("/password/reset/{user_id}")
-    public void resetPasswordCodeConfirm(@PathVariable("user_id") String user_id,
-                                         @RequestBody String code) {
-        verificationCodeController.resetPasswordConfirmCode(user_id, code);
-    }
+//    @Operation(summary = "Kiểm tra reset password code")
+//    @PostMapping("/password/reset/{user_id}")
+//    public void resetPasswordCodeConfirm(@PathVariable("user_id") String user_id,
+//                                         @RequestBody String code) {
+//        verificationCodeController.resetPasswordConfirmCode(user_id, code);
+//    }
 
-    @PatchMapping(value = "/password/reset/{user_id}")
-    public void resetPassword(@PathVariable("user_id") String user_id,
-                              @RequestBody ResetPasswordDTO dto) {
-        userController.userResetPassword(user_id, dto);
+    @PatchMapping(value = "/password/reset")
+    public void resetPassword(@RequestBody ResetPasswordDTO dto) {
+        userController.userResetPassword(dto.getEmail(), dto);
     }
 
 }

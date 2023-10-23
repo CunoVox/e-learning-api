@@ -6,11 +6,13 @@ import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
+import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -43,7 +45,7 @@ public class CategoryController extends BaseController{
         }
         List<Category> categoriesEntities = categoryRepository.searchCategories(parameterSearchCategory);
         List<CategoryDTO> categories = toDTOs(categoriesEntities);
-        if(categories.isNullOrEmpty()){
+        if (categories.isNullOrEmpty()) {
             return new ArrayList<>();
         }
         if (parameterSearchCategory.getBuildType() == null ||
@@ -55,14 +57,20 @@ public class CategoryController extends BaseController{
     }
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-        Category category = buildEntity(categoryDTO);
-        //TODO: chưa có lưu image
-        return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
+        SecurityUserDetail userDetails = this.getUserDetailFromContext();
+        if (userDetails != null) {
+            categoryDTO.setCreatedBy(userDetails.getFullName());
+            categoryDTO.setUpdateBy(userDetails.getFullName());
+            Category category = buildEntity(categoryDTO);
+            //TODO: chưa có lưu image
+            return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
+        }
+        return null;
     }
 
-    public CategoryDTO updateCategory(CategoryDTO categoryDTO){
+    public CategoryDTO updateCategory(CategoryDTO categoryDTO) {
         Optional<Category> validateCate = categoryRepository.findById(categoryDTO.getId());
-        if (validateCate.isEmpty()){
+        if (validateCate.isEmpty()) {
             throw new ServiceException("Danh mục không tồn tại");
         }
         Category category = buildEntity(categoryDTO);
@@ -70,9 +78,9 @@ public class CategoryController extends BaseController{
         return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
     }
 
-    public void deleteCategory(String categoryId, String deleteBy){
+    public void deleteCategory(String categoryId, String deleteBy) {
         Optional<Category> category = categoryRepository.findById(categoryId);
-        if (category.isEmpty()){
+        if (category.isEmpty()) {
             throw new ServiceException("Danh mục không tồn tại");
         }
         category.get().setUpdatedBy(deleteBy);
@@ -81,7 +89,7 @@ public class CategoryController extends BaseController{
     }
 
     private Category saveCategory(Category category) {
-        if (category.getLevel()>3 || category.getLevel()<1){
+        if (category.getLevel() > 3 || category.getLevel() < 1) {
             throw new ServiceException("Cấp danh mục phải từ 1 đến 3");
         }
         if (null == category.getId()) {
@@ -131,7 +139,7 @@ public class CategoryController extends BaseController{
             if (parent.isEmpty()) {
                 throw new ServiceException("Không tìm thấy danh mục cha trong hệ thống!");
             }
-            if(parent.get().getLevel() == 3){
+            if (parent.get().getLevel() == 3) {
                 throw new ServiceException("Cấp danh mục không được lớn hơn 3!");
             }
             category.setParentId(inputDTO.getParentId());

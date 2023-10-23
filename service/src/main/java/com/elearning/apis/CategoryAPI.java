@@ -32,6 +32,7 @@ public class CategoryAPI {
 
     @Operation(summary = "Danh sách danh mục")
     @GetMapping
+//    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public List<CategoryDTO> getCategories(@RequestParam(value = "build_type") EnumCategoryBuildType buildType,
                                            @RequestParam(value = "level", required = false) Integer level,
                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
