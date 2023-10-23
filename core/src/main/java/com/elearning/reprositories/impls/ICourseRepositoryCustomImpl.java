@@ -4,13 +4,14 @@ import com.elearning.entities.Course;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.reprositories.ICourseRepositoryCustom;
 import com.elearning.utils.Extensions;
-import com.elearning.utils.enumAttribute.EnumCourseType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @ExtensionMethod(Extensions.class)
 public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements ICourseRepositoryCustom {
@@ -25,14 +26,12 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             criteria.add(Criteria.where("parentId").in(parameterSearchCourse.getParentIds()));
         }
 
-        if (!parameterSearchCourse.getCategoriesIds().isNullOrEmpty()) {
-            criteria.add(Criteria.where("_id").in(parameterSearchCourse.getCategoriesIds()));
+        if (!parameterSearchCourse.getIds().isNullOrEmpty()) {
+            criteria.add(Criteria.where("_id").in(parameterSearchCourse.getIds()));
         }
 
-        if (parameterSearchCourse.getIsDraft() != null && parameterSearchCourse.getIsDraft()) {
-            criteria.add(Criteria.where("courseType").is(EnumCourseType.DRAFT.name()));
-        } else {
-            criteria.add(Criteria.where("courseType").is(EnumCourseType.OFFICIAL.name()));
+        if (parameterSearchCourse.getSearchType() != null) {
+            criteria.add(Criteria.where("courseType").is(parameterSearchCourse.getSearchType()));
         }
         if (parameterSearchCourse.getIsDeleted() != null) {
             criteria.add(Criteria.where("isDeleted").is(parameterSearchCourse.getIsDeleted()));
@@ -43,5 +42,12 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         Query query = new Query();
         query.addCriteria(new Criteria().andOperator(criteria));
         return mongoTemplate.find(query, Course.class);
+    }
+
+    @Override
+    public void updateCourseType(String courseId, String courseType, String updateBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("courseType", courseType);
+        updateAttribute(courseId, map, updateBy, Course.class);
     }
 }

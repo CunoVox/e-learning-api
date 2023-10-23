@@ -6,22 +6,21 @@ import com.elearning.entities.Course;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
+import com.elearning.models.dtos.FileRelationshipDTO;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
-import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
-import com.elearning.utils.enumAttribute.EnumConnectorType;
-import com.elearning.utils.enumAttribute.EnumCourseType;
-import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
+import com.elearning.utils.enumAttribute.*;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +37,10 @@ public class CourseController extends BaseController {
     @Autowired
     private CategoryController categoryController;
     @Autowired
+    private FileRelationshipController fileRelationshipController;
+    @Autowired
+    private PriceController priceController;
+    @Autowired
     Connector connector;
 
     @Transactional
@@ -49,7 +52,27 @@ public class CourseController extends BaseController {
         dto.setId(null);
         Course course = buildEntity(dto);
 //        return this.toDTOs(Collections.singletonList(this.saveCategory(course))).get(0);
-        return this.toDTO(this.saveCourse(course));
+        Course courseSaved = this.saveCourse(course);
+
+        //Price
+        priceController.updatePriceSell(courseSaved.getId(), dto.getPriceSell());
+        if (dto.getPricePromotion() != null && dto.getPricePromotion().getPrice() != null)
+            priceController.createPrice(dto.getPricePromotion());
+        return getCourseById(course.getId());
+    }
+
+    public void acceptCourse(String courseId) {
+        CourseDTO courseDTO = getCourseById(courseId);
+        if (courseDTO != null) {
+            if (courseDTO.getCourseType().equals(EnumCourseType.DRAFT)) {
+                courseRepository.updateCourseType(courseId, EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+            }
+            if (!courseDTO.getChildren().isNullOrEmpty()) {
+                for (CourseDTO children : courseDTO.getChildren()) {
+                    courseRepository.updateCourseType(children.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+                }
+            }
+        }
     }
 
     public CourseDTO getCourseById(String courseId) {
@@ -62,14 +85,15 @@ public class CourseController extends BaseController {
                 .builder().level(cD.getLevel()).build();
         return buildCourseTree(Collections.singletonList(toDTO(cD)), searchCategory).get(0);
     }
-    public List<CategoryDTO> addCategoryToCourse(String courseId, List<String> categoryIds){
+
+    public List<CategoryDTO> addCategoryToCourse(String courseId, List<String> categoryIds) {
         String userId = this.getUserIdFromContext();
 
         Optional<Course> course = courseRepository.findById(courseId);
         if (course.isEmpty()) {
             throw new ServiceException("Không tìm thấy khóa học");
-        }else {
-            if (course.get().getLevel() > 1){
+        } else {
+            if (course.get().getLevel() > 1) {
                 throw new ServiceException("không thể thêm danh mục vào thành phần của khóa học");
             }
         }
@@ -90,8 +114,9 @@ public class CourseController extends BaseController {
                 }
             }
         }
-        return  categoryDTOS;
+        return categoryDTOS;
     }
+
     public List<CourseDTO> searchCourseDTOS(ParameterSearchCourse parameterSearchCourse) {
         if (parameterSearchCourse.getLevel() == null && !parameterSearchCourse.getBuildType().isBlankOrNull()
                 && parameterSearchCourse.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
@@ -110,7 +135,7 @@ public class CourseController extends BaseController {
     }
 
     private List<CourseDTO> buildCourseTree(List<CourseDTO> courseDTOS,
-                                                 ParameterSearchCourse parameterSearchCourse) {
+                                            ParameterSearchCourse parameterSearchCourse) {
         if (courseDTOS.isEmpty()) return new ArrayList<>();
         List<CourseDTO> list = new ArrayList<>();
         if (parameterSearchCourse.getLevel() == null) {
@@ -124,15 +149,15 @@ public class CourseController extends BaseController {
             for (CourseDTO courseDTO : courseDTOS) {
                 stack.push(courseDTO);
                 while (!stack.empty()) {
-                    CourseDTO categoryParent = stack.pop();
-                    List<CourseDTO> categoryChild = courseGT.stream().filter(cate -> (
-                            null != cate.getParentId() &&
-                                    cate.getParentId().equals(categoryParent.getId()) &&
-                                    cate.getLevel() == categoryParent.getLevel() + 1
+                    CourseDTO courseParent = stack.pop();
+                    List<CourseDTO> courseChild = courseGT.stream().filter(course -> (
+                            null != course.getParentId() &&
+                                    course.getParentId().equals(courseParent.getId()) &&
+                                    course.getLevel() == courseParent.getLevel() + 1
                     )).collect(Collectors.toList());
-                    if (!categoryChild.isEmpty()) {
-                        categoryParent.setChildren(categoryChild);
-                        categoryChild.forEach(stack::push);
+                    if (!courseChild.isEmpty()) {
+                        courseParent.setChildren(courseChild);
+                        courseChild.forEach(stack::push);
                     }
                 }
                 list.add(courseDTO);
@@ -150,6 +175,7 @@ public class CourseController extends BaseController {
         Course course = Course.builder()
                 .name(inputDTO.getName())
                 .nameMode(StringUtils.stripAccents(inputDTO.getName()))
+                .contentType(inputDTO.getType())
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
                 .build();
@@ -174,14 +200,22 @@ public class CourseController extends BaseController {
 
     public CourseDTO toDTO(Course entity) {
         if (entity == null) return null;
+        String videoPath = fileRelationshipController.getPathFile(entity.getId(),
+                EnumParentFileType.COURSE.name(), EnumFileType.VIDEO.name());
+        String imagePath = fileRelationshipController.getPathFile(entity.getId(),
+                EnumParentFileType.COURSE.name(), EnumFileType.IMAGE.name());
         return CourseDTO.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .slug(entity.getSlug())
                 .nameMode(entity.getNameMode())
+                .videoPath(videoPath)
+                .imagePath(imagePath)
                 .parentId(entity.getParentId())
                 .level(entity.getLevel())
                 .children(new ArrayList<>())
+                .type(entity.getContentType())
+                .courseType(entity.getCourseType())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
@@ -191,11 +225,11 @@ public class CourseController extends BaseController {
 
     public List<CourseDTO> toDTOs(List<Course> entities) {
         if (entities.isNullOrEmpty()) return null;
-        List<CourseDTO> categoryDTOS = new ArrayList<>();
+        List<CourseDTO> courseDTOS = new ArrayList<>();
         for (Course entity : entities) {
-            categoryDTOS.add(toDTO(entity));
+            courseDTOS.add(toDTO(entity));
         }
-        return categoryDTOS;
+        return courseDTOS;
     }
 
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})

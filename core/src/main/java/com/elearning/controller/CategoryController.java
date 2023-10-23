@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Service
 @ExtensionMethod(Extensions.class)
-public class CategoryController {
+public class CategoryController extends BaseController{
     @Autowired
     private ICategoryRepository categoryRepository;
 
@@ -75,7 +75,7 @@ public class CategoryController {
         if (category.isEmpty()){
             throw new ServiceException("Danh mục không tồn tại");
         }
-        category.get().setUpdateBy(deleteBy);
+        category.get().setUpdatedBy(deleteBy);
         category.get().setIsDeleted(true);
         this.saveCategory(category.get());
     }
@@ -118,13 +118,13 @@ public class CategoryController {
         Category category = Category.builder()
                 .name(inputDTO.getTitle())
                 .nameMode(StringUtils.stripAccents(inputDTO.getTitle()))
-                .createdBy(inputDTO.getCreatedBy())
+                .createdBy(getUserIdFromContext())
                 .createdAt(new Date())
                 .build();
         if (!inputDTO.getId().isBlankOrNull()) {
             category.setId(inputDTO.getId());
             category.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
-            category.setUpdateBy(inputDTO.getUpdateBy() != null ? inputDTO.getUpdateBy() : null);
+            category.setUpdatedBy(inputDTO.getUpdateBy() != null ? inputDTO.getUpdateBy() : null);
         }
         if (!inputDTO.getParentId().isBlankOrNull()) {
             Optional<Category> parent = categoryRepository.findById(inputDTO.getParentId());
@@ -188,7 +188,7 @@ public class CategoryController {
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
-                .updateBy(entity.getUpdateBy() != null ? entity.getUpdateBy() : null)
+                .updateBy(entity.getUpdatedBy() != null ? entity.getUpdatedBy() : null)
                 .isDeleted(entity.getIsDeleted() != null ? entity.getIsDeleted() : false)
                 .build();
     }

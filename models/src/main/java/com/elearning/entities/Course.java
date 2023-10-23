@@ -18,9 +18,6 @@ public class Course extends IBaseEntity{
     private String partnerId;
     private EnumCourseType courseType;
     private EnumCourseStatus status;
-
-
-
     private String name;
     private String nameMode;
     private String slug;
@@ -32,8 +29,6 @@ public class Course extends IBaseEntity{
     private Long duration;
     private Long totalLesson;
     private Long subscriptions;
-    private String createdBy;
-
+//    private String createdBy;
     private Boolean isPublished;
-
 }

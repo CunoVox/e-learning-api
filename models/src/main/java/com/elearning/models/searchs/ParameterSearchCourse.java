@@ -14,8 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ParameterSearchCourse implements Serializable, Cloneable {
     private Integer level;
-    
-    private Boolean isDraft;
+
+    private String searchType;
     
     private Boolean isDeleted;
 
@@ -23,7 +23,7 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private String buildType;
 
-    private List<String> categoriesIds;
+    private List<String> ids;
     private List<String> courseIds;
 
     private List<String> parentIds;

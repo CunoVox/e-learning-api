@@ -6,6 +6,7 @@ import com.elearning.models.dtos.FileRelationshipDTO;
 import com.elearning.reprositories.IFileRelationshipRepository;
 import com.elearning.utils.Constants;
 import com.elearning.utils.Extensions;
+import com.elearning.utils.enumAttribute.EnumFileType;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -23,7 +24,7 @@ import java.util.Optional;
 
 @Service
 @ExtensionMethod(Extensions.class)
-public class FileController extends BaseController{
+public class FileRelationshipController extends BaseController {
     @Autowired
     Drive googleDrive;
 
@@ -52,20 +53,32 @@ public class FileController extends BaseController{
         return null;
     }
 
+    public String getPathFile(String parentId, String parentType, String fileType){
+        FileRelationship fileRelationship = fileRelationshipRepository.findByParentIdAndParentTypeAndFileType(parentId, parentType, fileType);
+        if (fileRelationship !=null){
+            if (fileType.equals(EnumFileType.VIDEO.name())){
+                return Constants.BASE_VIDEO_URL + fileRelationship.getFileId() + "/preview";
+            } else if (fileType.equals(EnumFileType.IMAGE.name())){
+                return Constants.BASE_IMAGE_URL + fileRelationship.getFileId();
+            }
+        }
+        return null;
+    }
+
     public void deleteFileToGoogleDrive(String fileId) throws Exception {
         googleDrive.files().delete(fileId).execute();
     }
 
     public void deleteFile(String id) throws Exception {
         Optional<FileRelationship> fileRelationship = fileRelationshipRepository.findById(id);
-        if (fileRelationship.isEmpty()){
+        if (fileRelationship.isEmpty()) {
             throw new ServiceException("Không tìm thấy file trong hệ thống");
         }
         deleteFileToGoogleDrive(fileRelationship.get().getFileId());
         fileRelationshipRepository.deleteById(id);
     }
 
-    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String fileType) {
+    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String parentType, String fileType) {
         String userId = this.getUserIdFromContext();
         File fileDrive = sendFileToGoogleDrive(multipartFile);
         if (fileDrive == null) {
@@ -74,8 +87,10 @@ public class FileController extends BaseController{
         FileRelationship fileRelationship = buildFileDriveToFileRelationship(fileDrive);
         fileRelationship.setFileType(fileType);
         fileRelationship.setParentId(parentId);
+        fileRelationship.setParentType(parentType);
+        fileRelationship.setName(multipartFile.getOriginalFilename());
         fileRelationship.setCreatedAt(new Date());
-        fileRelationship.setCreateBy(userId);
+        fileRelationship.setCreatedBy(userId);
         FileRelationship fileRelationshipSaved = fileRelationshipRepository.save(fileRelationship);
         return toDTO(fileRelationshipSaved);
     }
@@ -105,6 +120,7 @@ public class FileController extends BaseController{
         return FileRelationshipDTO.builder()
                 .id(entity.getId())
                 .parentId(entity.getParentId())
+                .parentType(entity.getParentType())
                 .fileId(entity.getFileId())
                 .mimeType(entity.getMimeType())
                 .fileType(entity.getFileType())
