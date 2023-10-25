@@ -1,6 +1,7 @@
 package com.elearning.utils.enumAttribute;
 
 public enum EnumParentFileType {
-    COURSE,
-    CATEGORY,
+    COURSE_VIDEO,
+    COURSE_IMAGE,
+    CATEGORY_IMAGE,
 }

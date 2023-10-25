@@ -17,7 +17,6 @@ public class FileRelationship extends IBaseEntity{
     private String parentId;
     private String parentType;
     private String fileId;
-    private String fileType;
     private String mimeType;
     private String name;
     private Long size;

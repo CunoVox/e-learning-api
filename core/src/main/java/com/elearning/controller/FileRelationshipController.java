@@ -6,7 +6,7 @@ import com.elearning.models.dtos.FileRelationshipDTO;
 import com.elearning.reprositories.IFileRelationshipRepository;
 import com.elearning.utils.Constants;
 import com.elearning.utils.Extensions;
-import com.elearning.utils.enumAttribute.EnumFileType;
+import com.elearning.utils.enumAttribute.EnumParentFileType;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -18,9 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @ExtensionMethod(Extensions.class)
@@ -53,16 +51,39 @@ public class FileRelationshipController extends BaseController {
         return null;
     }
 
-    public String getPathFile(String parentId, String parentType, String fileType){
-        FileRelationship fileRelationship = fileRelationshipRepository.findByParentIdAndParentTypeAndFileType(parentId, parentType, fileType);
-        if (fileRelationship !=null){
-            if (fileType.equals(EnumFileType.VIDEO.name())){
-                return Constants.BASE_VIDEO_URL + fileRelationship.getFileId() + "/preview";
-            } else if (fileType.equals(EnumFileType.IMAGE.name())){
-                return Constants.BASE_IMAGE_URL + fileRelationship.getFileId();
+    public String getPathFile(FileRelationshipDTO fileRelationshipDTO){
+        if (fileRelationshipDTO !=null){
+            switch (EnumParentFileType.valueOf(fileRelationshipDTO.getParentType())) {
+                // Case 1
+                case COURSE_VIDEO:
+                    return Constants.BASE_VIDEO_URL + fileRelationshipDTO.getFileId() + "/preview";
+                // Case 2
+                case COURSE_IMAGE:
+                    // Case 3
+                case CATEGORY_IMAGE:
+                    return Constants.BASE_IMAGE_URL + fileRelationshipDTO.getFileId();
+
+                default:
+                    return null;
             }
         }
         return null;
+    }
+
+    public List<FileRelationshipDTO> getFileRelationships(List<String> parentIds, String type){
+        List<FileRelationship> fileRelationships = fileRelationshipRepository.findAllByParentIdInAndParentType(parentIds, type);
+        return toDTOS(fileRelationships);
+    }
+
+    public Map<String, String> getUrlOfFile(List<FileRelationshipDTO> fileRelationshipDTOS){
+        Map<String, String> map = new HashMap<>();
+        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS){
+            String url = getPathFile(fileRelationshipDTO);
+            if (!url.isBlankOrNull()){
+                map.put(fileRelationshipDTO.getParentId(), url);
+            }
+        }
+        return map;
     }
 
     public void deleteFileToGoogleDrive(String fileId) throws Exception {
@@ -78,14 +99,13 @@ public class FileRelationshipController extends BaseController {
         fileRelationshipRepository.deleteById(id);
     }
 
-    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String parentType, String fileType) {
+    public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String parentType) {
         String userId = this.getUserIdFromContext();
         File fileDrive = sendFileToGoogleDrive(multipartFile);
         if (fileDrive == null) {
             throw new ServiceException("Tải file lên không thành công");
         }
         FileRelationship fileRelationship = buildFileDriveToFileRelationship(fileDrive);
-        fileRelationship.setFileType(fileType);
         fileRelationship.setParentId(parentId);
         fileRelationship.setParentType(parentType);
         fileRelationship.setName(multipartFile.getOriginalFilename());
@@ -115,6 +135,15 @@ public class FileRelationshipController extends BaseController {
         return permission;
     }
 
+    public List<FileRelationshipDTO> toDTOS(List<FileRelationship> entities){
+        if (entities.isNullOrEmpty()) return new ArrayList<>();
+        List<FileRelationshipDTO> dtos = new ArrayList<>();
+        for (FileRelationship entity : entities){
+            dtos.add(toDTO(entity));
+        }
+        return dtos;
+    }
+
     public FileRelationshipDTO toDTO(FileRelationship entity) {
         if (entity == null) return new FileRelationshipDTO();
         return FileRelationshipDTO.builder()
@@ -123,7 +152,6 @@ public class FileRelationshipController extends BaseController {
                 .parentType(entity.getParentType())
                 .fileId(entity.getFileId())
                 .mimeType(entity.getMimeType())
-                .fileType(entity.getFileType())
                 .name(entity.getName())
                 .size(entity.getSize())
                 .duration(entity.getDuration())

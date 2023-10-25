@@ -12,13 +12,12 @@ import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Service
+@Component
 @ExtensionMethod(Extensions.class)
 public class CategoryController extends BaseController{
     @Autowired

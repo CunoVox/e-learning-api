@@ -4,16 +4,23 @@ import com.elearning.controller.CourseController;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.searchs.ParameterSearchCourse;
+import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.enumAttribute.EnumCourseType;
 import com.elearning.utils.enumAttribute.EnumListBuildType;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/course")
@@ -22,70 +29,70 @@ public class CourseAPI {
     @Autowired
     private CourseController courseController;
 
-    private ParameterSearchCourse buildParameterSearch(
-            @RequestParam(value = "build_type") EnumListBuildType buildType,
-            @RequestParam(value = "search_type") EnumCourseType searchType,
-            @RequestParam(value = "level", required = false) Integer level,
-            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
-            @RequestParam(value = "build_courses", required = false) Boolean buildCourses,
-            @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds,
-            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
-
+    @GetMapping("/")
+    @Operation(summary = "Danh sách khoá học")
+    public ListWrapper<CourseDTO> getCourse(@RequestParam(value = "level", required = false) Integer level,
+                                            @RequestParam(value = "multi_value", required = false) String multiValue,
+                                            @RequestParam(value = "name", required = false) String name,
+                                            @RequestParam(value = "slug", required = false) String slug,
+                                            @RequestParam(value = "from_date", required = false) Date fromDate,
+                                            @RequestParam(value = "to_date", required = false) Date toDate,
+                                            @RequestParam(value = "price_from", required = false) BigDecimal priceFrom,
+                                            @RequestParam(value = "price_to", required = false) BigDecimal priceTo,
+                                            @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
+                                            @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
+                                            @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
+                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
+                                            @RequestParam(value = "ids", required = false) List<String> ids,
+                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
+        if (currentPage == null || currentPage == 0) {
+            currentPage = 1;
+        }
+        if (maxResult == null || maxResult == 0) {
+            maxResult = 20;
+        }
+        Long startIndex = ((long) (currentPage - 1) * maxResult);
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
-
-        if (buildType != null) {
-            parameterSearchCourse.setBuildType(buildType.name());
+        parameterSearchCourse.setSlug(slug);
+        parameterSearchCourse.setLevel(level);
+        parameterSearchCourse.setMultiValue(multiValue);
+        parameterSearchCourse.setName(name);
+        parameterSearchCourse.setSlug(slug);
+        parameterSearchCourse.setFromDate(fromDate);
+        parameterSearchCourse.setToDate(toDate);
+        parameterSearchCourse.setIsDeleted(isDeleted);
+        parameterSearchCourse.setIds(ids);
+        parameterSearchCourse.setParentIds(parentIds);
+        parameterSearchCourse.setStartIndex(startIndex);
+        if (priceFrom != null) {
+            parameterSearchCourse.setPriceFrom(priceFrom);
+        }
+        if (priceTo != null) {
+            parameterSearchCourse.setPriceTo(priceTo);
         }
         if (searchType != null) {
             parameterSearchCourse.setSearchType(searchType.name());
         }
-        if (level != null) {
-            parameterSearchCourse.setLevel(level);
-        }
-        if (isDeleted != null) {
-            parameterSearchCourse.setIsDeleted(isDeleted);
-        }
-        if (buildCourses != null) {
-            parameterSearchCourse.setBuildCourses(buildCourses);
-        }
-        if (!categoriesIds.isNullOrEmpty()) {
-            parameterSearchCourse.setIds(categoriesIds);
-        }
-        if (!parentIds.isNullOrEmpty()) {
-            parameterSearchCourse.setParentIds(parentIds);
-        }
-        return parameterSearchCourse;
-    }
+        parameterSearchCourse.setMaxResult(Objects.requireNonNullElse(maxResult, 20));
 
-    @GetMapping("/")
-    @Operation(description = "Danh sách khoá học")
-    public List<CourseDTO> getCourse(@RequestParam(value = "build_type") EnumListBuildType buildType,
-                                     @RequestParam(value = "level", required = false) Integer level,
-                                     @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
-                                     @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
-                                     @RequestParam(value = "build_courses", required = false) Boolean buildCourses,
-                                     @RequestParam(value = "ids", required = false) List<String> ids,
-                                     @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
-        ParameterSearchCourse parameterSearchCourse =
-                this.buildParameterSearch(buildType, searchType, level, isDeleted, buildCourses, ids, parentIds);
         return courseController.searchCourseDTOS(parameterSearchCourse);
     }
 
     @PostMapping("/create")
-    @Operation(description = "Tạo khoá học")
+    @Operation(summary = "Tạo khoá học")
     public CourseDTO create(@RequestBody CourseDTO dto) {
         return courseController.createCourse(dto);
     }
 
     @PostMapping("/add-category/{course_id}")
-    @Operation(description = "Liên kết khoá học với danh mục")
+    @Operation(summary = "Liên kết khoá học với danh mục")
     public List<CategoryDTO> addCategory(@PathVariable("course_id") String cdId,
                                          @RequestParam(value = "category_ids", required = false) List<String> caIds) {
         return courseController.addCategoryToCourse(cdId, caIds);
     }
 
     @PostMapping("/accept/{course_id}")
-    @Operation(description = "Xác nhận khoá học")
+    @Operation(summary = "Xác nhận khoá học")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     public void acceptCourse(@PathVariable("course_id") String courseId) {
         courseController.acceptCourse(courseId);

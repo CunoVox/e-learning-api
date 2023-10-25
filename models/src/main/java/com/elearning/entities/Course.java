@@ -29,6 +29,5 @@ public class Course extends IBaseEntity{
     private Long duration;
     private Long totalLesson;
     private Long subscriptions;
-//    private String createdBy;
     private Boolean isPublished;
 }

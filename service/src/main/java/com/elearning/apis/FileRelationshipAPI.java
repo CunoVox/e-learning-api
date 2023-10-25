@@ -2,7 +2,6 @@ package com.elearning.apis;
 
 import com.elearning.controller.FileRelationshipController;
 import com.elearning.models.dtos.FileRelationshipDTO;
-import com.elearning.utils.enumAttribute.EnumFileType;
 import com.elearning.utils.enumAttribute.EnumParentFileType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,9 +25,8 @@ public class FileRelationshipAPI {
     @PostMapping(path = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public FileRelationshipDTO uploadFile(@RequestPart(value = "file") MultipartFile file,
                                           @RequestParam(value = "parent_id") String parentId,
-                                          @RequestParam(value = "parent_type") EnumParentFileType parentType,
-                                          @RequestParam(value = "file_type") EnumFileType fileType) {
-        return fileRelationshipController.saveFile(file, parentId, parentType.name(), fileType.name());
+                                          @RequestParam(value = "parent_type") EnumParentFileType parentType) {
+        return fileRelationshipController.saveFile(file, parentId, parentType.name());
     }
 
     @Operation(summary = "Xoá File")

@@ -20,8 +20,6 @@ public class FileRelationshipDTO {
     private String parentType;
     @JsonProperty("file_id")
     private String fileId;
-    @JsonProperty("file_type")
-    private String fileType;
     @JsonProperty("mime_type")
     private String mimeType;
     private String name;
