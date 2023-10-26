@@ -50,7 +50,6 @@ public class CourseController extends BaseController {
         }
         dto.setId(null);
         Course course = buildEntity(dto);
-//        return this.toDTOs(Collections.singletonList(this.saveCategory(course))).get(0);
         Course courseSaved = this.saveCourse(course);
 
         //Price
@@ -75,15 +74,11 @@ public class CourseController extends BaseController {
     }
 
     public CourseDTO getCourseById(String courseId) {
-        Optional<Course> course = courseRepository.findById(courseId);
-        if (course.isEmpty()) {
-            throw new ServiceException("Không tìm thấy khóa học");
+        ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).build());
+        if (!listWrapper.getData().isNullOrEmpty()){
+            return listWrapper.getData().get(0);
         }
-        Course cD = course.get();
-        ParameterSearchCourse searchCategory = ParameterSearchCourse
-                .builder().level(cD.getLevel()).build();
-//        return buildCourseTree(Collections.singletonList(toDTO(cD)), searchCategory).get(0);
-        return null;
+        return new CourseDTO();
     }
 
     public List<CategoryDTO> addCategoryToCourse(String courseId, List<String> categoryIds) {

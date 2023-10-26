@@ -27,7 +27,7 @@ public class CourseDTO {
 
     private String slug;
 
-    private EnumCourseContentType type;
+    private String type;
 
     private EnumCourseType courseType;
 

@@ -99,6 +99,12 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
 
         Query query = new Query();
         query.addCriteria(new Criteria().andOperator(criteria));
+
+        if (parameterSearchCourse.getMaxResult() == null) {
+            return ListWrapper.<Course>builder()
+                    .data(mongoTemplate.find(query, Course.class))
+                    .build();
+        }
 //      Phân trang
         long totalResult;
         if (parameterSearchCourse.getMultiValue().isBlankOrNull()) {

@@ -21,7 +21,7 @@ public class Course extends IBaseEntity{
     private String name;
     private String nameMode;
     private String slug;
-    private EnumCourseContentType contentType;
+    private String contentType;
     private String parentId;
     private int level;
     private String description;
