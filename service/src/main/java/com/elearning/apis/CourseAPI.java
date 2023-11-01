@@ -29,7 +29,7 @@ public class CourseAPI {
     @Autowired
     private CourseController courseController;
 
-    @GetMapping("/")
+    @GetMapping("")
     @Operation(summary = "Danh sách khoá học")
     public ListWrapper<CourseDTO> getCourse(@RequestParam(value = "level", required = false) Integer level,
                                             @RequestParam(value = "multi_value", required = false) String multiValue,
