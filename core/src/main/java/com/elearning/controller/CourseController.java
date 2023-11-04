@@ -119,6 +119,7 @@ public class CourseController extends BaseController {
                 .currentPage(wrapper.getCurrentPage())
                 .totalPage(wrapper.getTotalPage())
                 .total(wrapper.getTotal())
+                .maxResult(wrapper.getMaxResult())
                 .data(courseDTOS)
                 .build();
     }

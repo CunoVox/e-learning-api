@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface IFileRelationshipRepository extends MongoRepository<FileRelationship, String> {
     List<FileRelationship> findAllByParentIdInAndParentType(Collection<String> parentIds, String parentType);
+    FileRelationship findByPathFile(String pathFile);
+    void deleteByPathFile(String pathFile);
 }

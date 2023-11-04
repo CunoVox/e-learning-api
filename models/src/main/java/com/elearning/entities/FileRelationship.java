@@ -22,5 +22,5 @@ public class FileRelationship extends IBaseEntity{
     private Long size;
     private Long duration;
     private String webViewLink;
-//    private String createdBy;
+    private String pathFile;
 }

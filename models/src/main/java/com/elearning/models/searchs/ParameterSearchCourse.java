@@ -23,7 +23,7 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private String multiValue;
 
-    private String buildType;
+    private String createdBy;
 
     private String name;
 

@@ -36,7 +36,6 @@ public class CategoryAPI {
     public List<CategoryDTO> getCategories(@RequestParam(value = "build_type") EnumCategoryBuildType buildType,
                                            @RequestParam(value = "level", required = false) Integer level,
                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
-                                           @RequestParam(value = "build_courses", required = false) Boolean buildCourses,
                                            @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds,
                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
         ParameterSearchCategory parameterSearchCategory = new ParameterSearchCategory();
@@ -48,9 +47,6 @@ public class CategoryAPI {
         }
         if (isDeleted != null) {
             parameterSearchCategory.setIsDeleted(isDeleted);
-        }
-        if (buildCourses != null) {
-            parameterSearchCategory.setBuildCourses(buildCourses);
         }
         if (!categoriesIds.isNullOrEmpty()) {
             parameterSearchCategory.setCategoriesIds(categoriesIds);

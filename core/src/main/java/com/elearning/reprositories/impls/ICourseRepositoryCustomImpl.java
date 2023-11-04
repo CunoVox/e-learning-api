@@ -2,6 +2,7 @@ package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
+import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepository;
@@ -12,6 +13,7 @@ import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumConnectorType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.LimitOperation;
@@ -58,6 +60,10 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
 
         QueryBuilderUtils.addSingleValueFilter(criteria, "name", parameterSearchCourse.getName());
 
+        if (!parameterSearchCourse.getCreatedBy().isBlankOrNull()) {
+            criteria.add(Criteria.where("createdBy").is(parameterSearchCourse.getCreatedBy().trim()));
+        }
+
         Criteria criteriaKeywords = null;
         Criteria criteriaKeywordsExternal = null;
         if (!parameterSearchCourse.getMultiValue().isBlankOrNull()) {
@@ -98,6 +104,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         }
 
         Query query = new Query();
+        query.with(Sort.by("createdAt").descending());
         query.addCriteria(new Criteria().andOperator(criteria));
 
         if (parameterSearchCourse.getMaxResult() == null) {
@@ -138,12 +145,18 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
     }
 
     private Collection<String> getCourseIdsByKeyword(String keyword) {
+        Map<String, List<String>> mapProductIds = new HashMap<>();
         //danh mục
         List<Category> productCategories = categoryRepository.findAllByNameModeLike(keyword);
         List<String> categoryIds = productCategories.stream().map(Category::getId).collect(Collectors.toList());
-        Map<String, List<String>> mapProductIds = connector.getIdRelatedObjectsById(Category.class.getAnnotation(Document.class).collection(),
-                categoryIds, Course.class.getAnnotation(Document.class).collection(),
-                EnumConnectorType.COURSE_TO_CATEGORY.name());
+        if (!categoryIds.isNullOrEmpty()){
+            mapProductIds.putAll(connector.getIdRelatedObjectsById(Category.class.getAnnotation(Document.class).collection(),
+                    categoryIds, Course.class.getAnnotation(Document.class).collection(),
+                    EnumConnectorType.COURSE_TO_CATEGORY.name()));
+        }
+        if (mapProductIds.size() == 0) {
+            return new ArrayList<>();
+        }
         return mapProductIds.values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
 

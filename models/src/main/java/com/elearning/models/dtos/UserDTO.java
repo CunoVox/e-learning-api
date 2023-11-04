@@ -15,10 +15,9 @@ public class UserDTO {
     private String id;
     @JsonProperty("full_name")
     private String fullName;
-    @JsonIgnore
-    private String password;
     private String email;
     private String address;
+    private String avatar;
     @JsonProperty("is_deleted")
     private Boolean isDeleted;
     @JsonProperty("is_email_confirmed")

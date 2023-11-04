@@ -1,8 +1,12 @@
 package com.elearning.controller;
 
+import com.elearning.entities.Category;
+import com.elearning.entities.Course;
 import com.elearning.entities.FileRelationship;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.FileRelationshipDTO;
+import com.elearning.reprositories.ICategoryRepository;
+import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IFileRelationshipRepository;
 import com.elearning.utils.Constants;
 import com.elearning.utils.Extensions;
@@ -14,6 +18,7 @@ import com.google.api.services.drive.model.Permission;
 import lombok.experimental.ExtensionMethod;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -51,17 +56,18 @@ public class FileRelationshipController extends BaseController {
         return null;
     }
 
-    public String getPathFile(FileRelationshipDTO fileRelationshipDTO){
-        if (fileRelationshipDTO !=null){
-            switch (EnumParentFileType.valueOf(fileRelationshipDTO.getParentType())) {
-                // Case 1
+    public String getPathFile(String fileId, String parentType) {
+        if (!parentType.isBlankOrNull() && !fileId.isBlankOrNull()) {
+            switch (EnumParentFileType.valueOf(parentType)) {
+                // Case 1 - Video
                 case COURSE_VIDEO:
-                    return Constants.BASE_VIDEO_URL + fileRelationshipDTO.getFileId() + "/preview";
-                // Case 2
+                    return Constants.BASE_VIDEO_URL + fileId + "/preview";
+
+                // Case 2 - Image
                 case COURSE_IMAGE:
-                    // Case 3
                 case CATEGORY_IMAGE:
-                    return Constants.BASE_IMAGE_URL + fileRelationshipDTO.getFileId();
+                case USER_AVATAR:
+                    return Constants.BASE_IMAGE_URL + fileId;
 
                 default:
                     return null;
@@ -70,17 +76,21 @@ public class FileRelationshipController extends BaseController {
         return null;
     }
 
-    public List<FileRelationshipDTO> getFileRelationships(List<String> parentIds, String type){
+    public List<FileRelationshipDTO> getFileRelationships(List<String> parentIds, String type) {
         List<FileRelationship> fileRelationships = fileRelationshipRepository.findAllByParentIdInAndParentType(parentIds, type);
         return toDTOS(fileRelationships);
     }
 
-    public Map<String, String> getUrlOfFile(List<FileRelationshipDTO> fileRelationshipDTOS){
+    public List<FileRelationshipDTO> getAllFile() {
+        List<FileRelationship> fileRelationships = fileRelationshipRepository.findAll();
+        return toDTOS(fileRelationships);
+    }
+
+    public Map<String, String> getUrlOfFile(List<FileRelationshipDTO> fileRelationshipDTOS) {
         Map<String, String> map = new HashMap<>();
-        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS){
-            String url = getPathFile(fileRelationshipDTO);
-            if (!url.isBlankOrNull()){
-                map.put(fileRelationshipDTO.getParentId(), url);
+        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS) {
+            if (!fileRelationshipDTO.getPathFile().isBlankOrNull()) {
+                map.put(fileRelationshipDTO.getId(), fileRelationshipDTO.getPathFile());
             }
         }
         return map;
@@ -90,16 +100,28 @@ public class FileRelationshipController extends BaseController {
         googleDrive.files().delete(fileId).execute();
     }
 
-    public void deleteFile(String id) throws Exception {
+    public void deleteFile(String id) {
         Optional<FileRelationship> fileRelationship = fileRelationshipRepository.findById(id);
         if (fileRelationship.isEmpty()) {
             throw new ServiceException("Không tìm thấy file trong hệ thống");
         }
-        deleteFileToGoogleDrive(fileRelationship.get().getFileId());
+        try {
+            deleteFileToGoogleDrive(fileRelationship.get().getFileId());
+        } catch (Exception ignored){}
         fileRelationshipRepository.deleteById(id);
     }
 
+    public void deleteFileByPathFile(String pathFile) {
+        FileRelationship fileRelationship = fileRelationshipRepository.findByPathFile(pathFile);
+        if (fileRelationship == null) {
+            throw new ServiceException("Không tìm thấy file trong hệ thống");
+        }
+        fileRelationshipRepository.deleteByPathFile(pathFile);
+    }
+
     public FileRelationshipDTO saveFile(MultipartFile multipartFile, String parentId, String parentType) {
+        //Todo: chưa validate tồn tại parentId
+//        validateUploadFile(parentId, parentType);
         String userId = this.getUserIdFromContext();
         File fileDrive = sendFileToGoogleDrive(multipartFile);
         if (fileDrive == null) {
@@ -108,6 +130,7 @@ public class FileRelationshipController extends BaseController {
         FileRelationship fileRelationship = buildFileDriveToFileRelationship(fileDrive);
         fileRelationship.setParentId(parentId);
         fileRelationship.setParentType(parentType);
+        fileRelationship.setPathFile(getPathFile(fileDrive.getId(), parentType));
         fileRelationship.setName(multipartFile.getOriginalFilename());
         fileRelationship.setCreatedAt(new Date());
         fileRelationship.setCreatedBy(userId);
@@ -135,10 +158,10 @@ public class FileRelationshipController extends BaseController {
         return permission;
     }
 
-    public List<FileRelationshipDTO> toDTOS(List<FileRelationship> entities){
+    public List<FileRelationshipDTO> toDTOS(List<FileRelationship> entities) {
         if (entities.isNullOrEmpty()) return new ArrayList<>();
         List<FileRelationshipDTO> dtos = new ArrayList<>();
-        for (FileRelationship entity : entities){
+        for (FileRelationship entity : entities) {
             dtos.add(toDTO(entity));
         }
         return dtos;
@@ -156,6 +179,7 @@ public class FileRelationshipController extends BaseController {
                 .size(entity.getSize())
                 .duration(entity.getDuration())
                 .webViewLink(entity.getWebViewLink())
+                .pathFile(entity.getPathFile())
                 .build();
     }
 }

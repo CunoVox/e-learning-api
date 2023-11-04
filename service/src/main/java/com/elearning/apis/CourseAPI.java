@@ -10,6 +10,7 @@ import com.elearning.utils.enumAttribute.EnumCourseType;
 import com.elearning.utils.enumAttribute.EnumListBuildType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,6 +25,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/course")
+@Tag(name = "Course", description = "Course API")
 @ExtensionMethod(Extensions.class)
 public class CourseAPI {
     @Autowired
@@ -35,10 +37,11 @@ public class CourseAPI {
                                             @RequestParam(value = "multi_value", required = false) String multiValue,
                                             @RequestParam(value = "name", required = false) String name,
                                             @RequestParam(value = "slug", required = false) String slug,
-                                            @RequestParam(value = "from_date", required = false) Date fromDate,
-                                            @RequestParam(value = "to_date", required = false) Date toDate,
+                                            @RequestParam(value = "from_date", required = false) Long fromDate,
+                                            @RequestParam(value = "to_date", required = false) Long toDate,
                                             @RequestParam(value = "price_from", required = false) BigDecimal priceFrom,
                                             @RequestParam(value = "price_to", required = false) BigDecimal priceTo,
+                                            @RequestParam(value = "created_by", required = false) String createdBy,
                                             @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
                                             @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
                                             @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
@@ -58,12 +61,17 @@ public class CourseAPI {
         parameterSearchCourse.setMultiValue(multiValue);
         parameterSearchCourse.setName(name);
         parameterSearchCourse.setSlug(slug);
-        parameterSearchCourse.setFromDate(fromDate);
-        parameterSearchCourse.setToDate(toDate);
+        parameterSearchCourse.setCreatedBy(createdBy);
         parameterSearchCourse.setIsDeleted(isDeleted);
         parameterSearchCourse.setIds(ids);
         parameterSearchCourse.setParentIds(parentIds);
         parameterSearchCourse.setStartIndex(startIndex);
+        if (fromDate !=null) {
+            parameterSearchCourse.setFromDate(new Date(fromDate));
+        }
+        if (toDate != null) {
+            parameterSearchCourse.setToDate(new Date(toDate));
+        }
         if (priceFrom != null) {
             parameterSearchCourse.setPriceFrom(priceFrom);
         }

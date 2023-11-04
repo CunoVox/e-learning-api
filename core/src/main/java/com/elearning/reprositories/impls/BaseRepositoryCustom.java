@@ -45,7 +45,7 @@ public abstract class BaseRepositoryCustom {
         for (Map.Entry<String, Object> entry : values.entrySet()) {
             update.set(entry.getKey(), entry.getValue());
         }
-        update.set("updatedStamp", new Date());
+        update.set("updatedAt", new Date());
         update.set("updatedBy", updateBy);
         UpdateResult updateResult = mongoTemplate.updateFirst(
                 Query.query(Criteria.where("_id").is(id)), update, clazz);

@@ -56,12 +56,11 @@ public class CategoryController extends BaseController{
     }
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
-        SecurityUserDetail userDetails = this.getUserDetailFromContext();
-        if (userDetails != null) {
-            categoryDTO.setCreatedBy(userDetails.getFullName());
-            categoryDTO.setUpdateBy(userDetails.getFullName());
+        String userId = this.getUserIdFromContext();
+        if (!userId.isBlankOrNull()) {
+            categoryDTO.setCreatedBy(userId);
+            categoryDTO.setUpdateBy(userId);
             Category category = buildEntity(categoryDTO);
-            //TODO: chưa có lưu image
             return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
         }
         return null;

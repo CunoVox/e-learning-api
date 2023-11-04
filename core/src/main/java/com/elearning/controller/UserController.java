@@ -2,25 +2,25 @@ package com.elearning.controller;
 
 import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
-import com.elearning.entities.VerificationCode;
 import com.elearning.handler.ServiceException;
-import com.elearning.models.dtos.ResetPasswordDTO;
-import com.elearning.models.dtos.UpdateUserDTO;
-import com.elearning.models.dtos.UserDTO;
+import com.elearning.models.dtos.*;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
+import com.elearning.models.searchs.ParameterSearchUser;
+import com.elearning.models.wrapper.ListWrapper;
+import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.Extensions;
+import com.elearning.utils.StringUtils;
+import com.elearning.utils.enumAttribute.EnumParentFileType;
 import com.elearning.utils.enumAttribute.EnumRole;
-import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -29,6 +29,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,28 +42,54 @@ public class UserController {
     @Autowired
     private VerificationCodeController verificationCodeController;
     @Autowired
+    private FileRelationshipController fileRelationshipController;
+    @Autowired
     private EmailSender emailSender;
     private final AuthenticationManager authManager;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ISequenceValueItemRepository sequenceValueItemRepository;
+
     public UserDTO createDTO(UserDTO dto) {
-        dto.setId(UUID.randomUUID().toString());
+        dto.setId(sequenceValueItemRepository.getSequence(User.class));
 
         User user = dtoToUser(dto);
         user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setFullNameMod(StringUtils.stripAccents(user.getFullName()));
         user = userRepository.save(user);
-
-        dto = userToDto(user);
+        dto = toDto(user);
         return dto;
     }
 
+    public ListWrapper<UserDTO> searchUser(ParameterSearchUser parameterSearchUser) {
+        ListWrapper<User> wrapper = userRepository.searchUser(parameterSearchUser);
+        List<UserDTO> userDTOS = toDTOs(wrapper.getData());
+        return ListWrapper.<UserDTO>builder()
+                .currentPage(wrapper.getCurrentPage())
+                .totalPage(wrapper.getTotalPage())
+                .maxResult(wrapper.getMaxResult())
+                .total(wrapper.getTotal())
+                .data(userDTOS)
+                .build();
+    }
+
+    public UserDTO getUserDetail(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        return toDto(user.get());
+    }
+
     public User create(UserDTO dto) {
-        dto.setId(UUID.randomUUID().toString());
+        dto.setId(sequenceValueItemRepository.getSequence(User.class));
         User user = dtoToUser(dto);
         user.setEmail(user.getEmail().trim().toLowerCase(Locale.ROOT));
         user.roles.add(EnumRole.ROLE_USER);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setFullNameMod(StringUtils.stripAccents(user.getFullName()));
         user = userRepository.save(user);
         return user;
     }
@@ -119,29 +146,32 @@ public class UserController {
         }
         return new AuthResponse();
     }
-    public UserDTO update(String email, UpdateUserDTO dto){
+
+    public UserDTO update(String email, UpdateUserDTO dto) {
         User entity = userRepository.findByEmail(email);
-        if(entity == null){
+        if (entity == null) {
             throw new ServiceException("User not found");
         }
         int flag = 0;
-        if(!dto.getFullName().isEmpty()){
+        if (!dto.getFullName().isEmpty()) {
             entity.setFullName(dto.getFullName());
+            entity.setFullNameMod(StringUtils.stripAccents(entity.getFullName()));
             flag = 1;
         }
-        if(!dto.getAddress().isEmpty()){
+        if (!dto.getAddress().isEmpty()) {
             entity.setAddress(dto.getAddress());
             flag = 1;
         }
-        if(flag != 0){
+        if (flag != 0) {
             entity.setUpdatedAt(new Date());
         }
         userRepository.save(entity);
-        return userToDto(entity);
+        return toDto(entity);
     }
+
     private AuthResponse getAuthResponse(User entity) {
         UserDTO dto;
-        dto = userToDto(entity);
+        dto = toDto(entity);
         SecurityUserDetail userDetail = (SecurityUserDetail) userDetailsService.loadUserByUsername(entity.getEmail());
         var jwtToken = jwtController.generateToken(userDetail);
         var refreshToken = jwtController.generateRefreshToken(userDetail);
@@ -165,7 +195,7 @@ public class UserController {
     @Transactional
     public void userResetPassword(String email, ResetPasswordDTO dto) {
         User u = userRepository.findByEmail(email);
-        if(u != null) {
+        if (u != null) {
             String userId = u.getId();
             verificationCodeController.resetPasswordConfirmCode(userId, dto.getCode());
             if (dto.getNewPassword().length() < 8) {
@@ -181,7 +211,7 @@ public class UserController {
                 user.get().setPassword(passwordEncoder.encode(dto.getConfirmPassword()));
                 userRepository.save(user.get());
             }
-        }else{
+        } else {
             throw new ServiceException("Không tìm thấy người dùng");
         }
     }
@@ -195,7 +225,7 @@ public class UserController {
         if (user == null) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
-        return userToDto(user);
+        return toDto(user);
     }
 
     public UserDTO findById(String id) {
@@ -203,7 +233,7 @@ public class UserController {
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng");
         }
-        return userToDto(user.get());
+        return toDto(user.get());
     }
 
     protected User findUserById(String id) {
@@ -238,7 +268,7 @@ public class UserController {
 //            entity.setIsEmailConfirmed(true);
             entity.setUpdatedAt(new Date());
             userRepository.save(entity);
-            return userToDto(entity);
+            return toDto(entity);
         }
     }
 
@@ -246,11 +276,46 @@ public class UserController {
         return modelMapper.map(dto, User.class);
     }
 
-    public UserDTO userToDto(User user) {
+    public UserDTO toDto(User user) {
         if (user == null) {
             return null;
         }
-        return modelMapper.map(user, UserDTO.class);
+        List<FileRelationshipDTO> fileRelationshipDTO = fileRelationshipController.getFileRelationships(Collections.singletonList(user.getId()), EnumParentFileType.USER_AVATAR.name());
+        return UserDTO.builder()
+                .id(user.getId())
+                .fullName(user.getFullName())
+                .email(user.getEmail())
+                .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(0).getPathFile() : null)
+                .address(user.getAddress())
+                .isDeleted(user.getIsDeleted())
+                .isEmailConfirmed(user.isEmailConfirmed)
+                .build();
+//        return modelMapper.map(user, UserDTO.class);
     }
 
+    public List<UserDTO> toDTOs(List<User> users) {
+        if (users.isNullOrEmpty()) return new ArrayList<>();
+        List<String> ids = users.stream().map(User::getId).collect(Collectors.toList());
+        List<FileRelationshipDTO> fileRelationshipDTOS = fileRelationshipController.getFileRelationships(ids, EnumParentFileType.USER_AVATAR.name());
+        Map<String, FileRelationshipDTO> fileRelationshipDTOMap = new HashMap<>();
+        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS) {
+            if (fileRelationshipDTOMap.get(fileRelationshipDTO.getParentId()) != null) {
+                fileRelationshipDTOMap.put(fileRelationshipDTO.getParentId(), fileRelationshipDTO);
+            }
+        }
+        List<UserDTO> userDTOS = new ArrayList<>();
+        for (User user : users) {
+            FileRelationshipDTO fileRelationshipDTO = fileRelationshipDTOMap.get(user.getId());
+            userDTOS.add(UserDTO.builder()
+                    .id(user.getId())
+                    .fullName(user.getFullName())
+                    .email(user.getEmail())
+                    .avatar(fileRelationshipDTO != null ? fileRelationshipDTO.getPathFile() : null)
+                    .address(user.getAddress())
+                    .isDeleted(user.getIsDeleted())
+                    .isEmailConfirmed(user.isEmailConfirmed)
+                    .build());
+        }
+        return userDTOS;
+    }
 }
