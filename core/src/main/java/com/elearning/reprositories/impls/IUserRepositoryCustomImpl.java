@@ -1,5 +1,6 @@
 package com.elearning.reprositories.impls;
 
+import com.elearning.entities.Course;
 import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchUser;
 import com.elearning.models.wrapper.ListWrapper;
@@ -91,5 +92,12 @@ public class IUserRepositoryCustomImpl extends BaseRepositoryCustom implements I
                 .maxResult(parameterSearchUser.getMaxResult())
                 .data(mongoTemplate.find(query, User.class))
                 .build();
+    }
+
+    @Override
+    public void updateDeleted(String id, boolean deleted, String updateBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("isDeleted", deleted);
+        updateAttribute(id, map, updateBy, User.class);
     }
 }

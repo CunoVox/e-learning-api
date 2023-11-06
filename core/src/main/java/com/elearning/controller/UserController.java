@@ -23,6 +23,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ExtensionMethod(Extensions.class)
-public class UserController {
+public class UserController extends BaseController{
     private final ModelMapper modelMapper;
     private final IUserRepository userRepository;
     private final JwtController jwtController;
@@ -73,6 +74,14 @@ public class UserController {
                 .total(wrapper.getTotal())
                 .data(userDTOS)
                 .build();
+    }
+
+    public void lockAndUnLockUser(String userId, boolean lock) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        userRepository.updateDeleted(userId, lock, getUserIdFromContext());
     }
 
     public UserDTO getUserDetail(String userId) {
@@ -133,7 +142,7 @@ public class UserController {
                 throw new ServiceException("Email hoặc mật khẩu không chính xác!");
             }
             if (entity.getIsDeleted()) {
-                throw new ServiceException("Tài khoản bị tạm khóa");
+                throw new ServiceException("Tài khoản bị tạm khóa, vui lòng liên hệ quản trị viên để được hổ trợ!");
             }
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(

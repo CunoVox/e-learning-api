@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,6 +41,14 @@ public class UserAPI {
         var email = context.getName();
 
         return userController.update(email, dto);
+    }
+
+    @Operation(summary = "Khoá và mở khoá người dùng")
+    @PostMapping("/lock/{id}/{lock}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void lockAndUnLockUser(@PathVariable(value = "id") String id,
+                                  @PathVariable(value = "lock") boolean lock) {
+        userController.lockAndUnLockUser(id, lock);
     }
 
     @Operation(summary = "Xin gửi mail reset password")

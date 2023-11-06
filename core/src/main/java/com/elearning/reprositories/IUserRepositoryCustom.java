@@ -6,4 +6,5 @@ import com.elearning.models.wrapper.ListWrapper;
 
 public interface IUserRepositoryCustom {
     ListWrapper<User> searchUser(ParameterSearchUser parameterSearchUser);
+    void updateDeleted(String id, boolean deleted, String updateBy);
 }
