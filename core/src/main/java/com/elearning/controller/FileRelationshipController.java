@@ -90,7 +90,7 @@ public class FileRelationshipController extends BaseController {
         Map<String, String> map = new HashMap<>();
         for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS) {
             if (!fileRelationshipDTO.getPathFile().isBlankOrNull()) {
-                map.put(fileRelationshipDTO.getId(), fileRelationshipDTO.getPathFile());
+                map.put(fileRelationshipDTO.getParentId(), fileRelationshipDTO.getPathFile());
             }
         }
         return map;

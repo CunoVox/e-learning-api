@@ -34,7 +34,7 @@ springdoc:
     disable-swagger-default-url: true
 
 server:
-  port: 8989
+  port: 8080
   servlet:
     context-path: /e-learning
   max-http-header-size: 10MB
