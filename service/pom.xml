@@ -4,7 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <groupId>com.elearning</groupId>
     <artifactId>service</artifactId>
+    <version>1.0.1</version>
+    <packaging>jar</packaging>
 
     <properties>
         <core.version>1.0.1</core.version>
@@ -12,12 +15,11 @@
         <maven.compiler.source>11</maven.compiler.source>
     </properties>
 
-    <name>service</name>
     <parent>
-        <groupId>com.elearning</groupId>
-        <artifactId>e-learning-api</artifactId>
-        <version>1.0.1</version>
-        <relativePath>../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.12</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <dependencies>
