@@ -184,7 +184,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- Đường dẫn đến file applicationMain--> <!--- đổi đường dẫn cho phù hợp project của bạn -->
-                    <mainClass>net.lvs.productservice.ProductServiceApplication</mainClass>
+                    <mainClass>com/elearning/ServiceApplication</mainClass>
                     <layout>JAR</layout>
                     <!--                    <layout>WAR</layout>-->
                 </configuration>
