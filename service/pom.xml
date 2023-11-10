@@ -167,8 +167,8 @@
                                 <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
                                 <username>20110472@student.hcmute.edu.vn</username>
                                 <password>cmVmdGtuOjAxOjE3MzExMzQ4NDY6dnBzRnlvcURyVDliakx5aDNCNWtqTkxQOGhI</password>
-                                <repoKey>e-learning-libs-release</repoKey>
-                                <snapshotRepoKey>e-learning-libs-snapshot</snapshotRepoKey>
+                                <repoKey>e-learning-libs-release-local</repoKey>
+                                <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
                             </publisher>
                         </configuration>
                     </execution>
