@@ -53,9 +53,9 @@
 
     <distributionManagement>
         <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/e-learning-team/e-learning-api</url>
+            <id>central</id>
+            <name>a0b1phntbyra0-artifactory-primary-0-releases</name>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
     </distributionManagement>
 
