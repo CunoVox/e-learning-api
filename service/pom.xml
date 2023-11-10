@@ -144,4 +144,54 @@
             <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
     </distributionManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jfrog.buildinfo</groupId>
+                <artifactId>artifactory-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>publish</goal>
+                        </goals>
+                        <configuration>
+                            <deployProperties>
+                                <gradle>awesome</gradle>
+                                <review.team>qa</review.team>
+                            </deployProperties>
+                            <publisher>
+                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                                <username>20110472@student.hcmute.edu.vn</username>
+                                <password>cmVmdGtuOjAxOjE3MzExMzQ4NDY6dnBzRnlvcURyVDliakx5aDNCNWtqTkxQOGhI</password>
+                                <repoKey>e-learning-libs-release</repoKey>
+                                <snapshotRepoKey>e-learning-libs-snapshot</snapshotRepoKey>
+                            </publisher>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <!-- Đường dẫn đến file applicationMain--> <!--- đổi đường dẫn cho phù hợp project của bạn -->
+                    <mainClass>net.lvs.productservice.ProductServiceApplication</mainClass>
+                    <layout>JAR</layout>
+                    <!--                    <layout>WAR</layout>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <finalName>product-service</finalName>
+    </build>
 </project>
