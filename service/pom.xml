@@ -144,7 +144,12 @@
             <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
     </distributionManagement>
-
+    <repositories>
+        <repository>
+            <id>e-learning-libs-release</id>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
