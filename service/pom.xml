@@ -17,6 +17,7 @@
         <groupId>com.elearning</groupId>
         <artifactId>e-learning-api</artifactId>
         <version>1.0.1</version>
+        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <dependencies>
