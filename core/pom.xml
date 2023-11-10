@@ -8,7 +8,7 @@
 
     <properties>
         <core.version>1.0.1</core.version>
-    </properties>
+    </properties> 
 
     <name>core</name>
     <description>core</description>
