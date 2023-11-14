@@ -4,12 +4,12 @@
     <servers>
         <server>
             <username>20110472@student.hcmute.edu.vn</username>
-            <password>cmVmdGtuOjAxOjE3MzExMzI4NjU6M0dFa1Z3RXNaQlJzenR3QUdYcmlHQjA3SEgx</password>
+            <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
             <id>central</id>
         </server>
         <server>
             <username>20110472@student.hcmute.edu.vn</username>
-            <password>cmVmdGtuOjAxOjE3MzExMzI4NjU6M0dFa1Z3RXNaQlJzenR3QUdYcmlHQjA3SEgx</password>
+            <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
             <id>snapshots</id>
         </server>
     </servers>
