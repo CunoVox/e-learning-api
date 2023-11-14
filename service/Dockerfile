@@ -1,11 +1,4 @@
-# Giai đoạn 1: Sử dụng Maven để tải dependencies và tạo tệp .jar
-FROM maven:3.8.4-openjdk-11 AS builder
-WORKDIR /app
-COPY . .
-RUN mvn -B clean dependency:list install
-
-# Giai đoạn 2: Sử dụng Java runtime để chạy ứng dụng
-FROM openjdk:11-jre-slim
-WORKDIR /app
-COPY --from=builder /app/target/service.jar /app/service.jar
-CMD ["java", "-jar", "service.jar"]
+FROM adoptopenjdk/openjdk11:alpine-jre
+EXPOSE 8080
+ADD /target/service.jar /service.jar
+ENTRYPOINT ["java","-jar","/service.jar"]
