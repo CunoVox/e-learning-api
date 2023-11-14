@@ -15,7 +15,7 @@
         <server>
             <username>20110472@student.hcmute.edu.vn</username>
             <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
-            <id>e-learning-libs-release</id>
+            <id>e-learning-libs-release-local</id>
         </server>
     </servers>
     <profiles>
