@@ -86,6 +86,20 @@
             <version>v3-rev136-1.25.0</version>
         </dependency>
     </dependencies>
+
+    <distributionManagement>
+        <repository>
+            <id>central</id>
+            <name>a0b1phntbyra0-artifactory-primary-0-releases</name>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
+        </repository>
+    </distributionManagement>
+    <repositories>
+        <repository>
+            <id>e-learning-libs-release</id>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
             <plugin>
@@ -144,48 +158,4 @@
         <finalName>service</finalName>
     </build>
 
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <name>a0b1phntbyra0-artifactory-primary-0-releases</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
-        </repository>
-    </distributionManagement>
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>e-learning-libs-snapshot</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
-        </repository>
-        <repository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>e-learning-libs-snapshot</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
-        </repository>
-        <!--        <repository>-->
-        <!--            <id>e-learning-libs-release</id>-->
-        <!--            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>-->
-        <!--        </repository>-->
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>central</id>
-            <name>e-learning-libs-snapshot</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
-        </pluginRepository>
-        <pluginRepository>
-            <snapshots/>
-            <id>snapshots</id>
-            <name>e-learning-libs-snapshot</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
-        </pluginRepository>
-    </pluginRepositories>
 </project>
