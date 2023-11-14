@@ -42,8 +42,8 @@ public class EnrollmentController extends BaseController {
         Enrollment enrollment = buildEntity(enrollmentDTO);
         return saveEnrollment(enrollment);
     }
-
-    private Enrollment buildEntity(EnrollmentDTO enrollmentDTO) {
+    @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
+    public Enrollment buildEntity(EnrollmentDTO enrollmentDTO) {
         Enrollment enrollment = Enrollment.builder()
                 .courseId(enrollmentDTO.getCourseId())
                 .userId(enrollmentDTO.getUserId())
@@ -80,25 +80,34 @@ public class EnrollmentController extends BaseController {
             entity.setUpdatedAt(new Date());
             entity.setUpdatedBy(enrollment.getUserId());
 
-            entity = iEnrollmentRepository.save(entity);
-            return toDTO(entity);
+            Enrollment e1 = iEnrollmentRepository.save(entity);
+            return toDTO(e1);
         }
         // Kiểm tra giá tiền
         Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
         if (pricePromotion != null) {
             //Nếu có giá khuyến mãi
-            return enrollPromotionPrice(enrollment);
+            throw new ServiceException("Chưa xử lý giá tiền");
+//            return enrollPromotionPrice(enrollment);
         }
         // Nếu không có giá khuyến mãi tính bằng giá bán
         Price priceSell = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.SELL.name());
         if (priceSell != null && priceSell.getPrice() != null) {
             //Nếu giá bán free
             if (priceSell.getPrice().isNullOrZero()) {
+                Long sub = course.getSubscriptions();
+                course.setSubscriptions((sub != null) ? sub + 1 : 1);
+                iCourseRepository.save(course);
+
+                enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
                 enrollment.setPricePurchase(priceSell.getPrice().toString());
                 enrollment = iEnrollmentRepository.save(enrollment);
+
+
                 return toDTO(enrollment);
             } else {
-                return enrollSellPrice(enrollment);
+                throw new ServiceException("Chưa xử lý giá tiền");
+//                return enrollSellPrice(enrollment);
             }
         }
         return null;

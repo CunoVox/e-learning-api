@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @SuperBuilder
 public class Enrollment extends IBaseEntity{
-    private String id;
+
     private String courseId;
     private String userId;
     private String pricePurchase;
