@@ -2,8 +2,8 @@
 FROM maven:3.8.4-openjdk-11 AS builder
 WORKDIR /app
 COPY . .
-COPY /etc/maven/settings.xml /root/.m2/settings.xml
-RUN mvn deploy -s /etc/maven/settings.xml -DskipTests -DaltDeploymentRepository=central::default::https://elearning.jfrog.io/artifactory/e-learning-libs-release-local
+COPY ../service/settings.xml /root/.m2/settings.xml
+RUN mvn deploy -s /service/settings.xml -DskipTests -DaltDeploymentRepository=central::default::https://elearning.jfrog.io/artifactory/e-learning-libs-release-local
 
 # Giai đoạn 2: Sử dụng Java runtime để chạy ứng dụng
 FROM openjdk:11-jre-slim
