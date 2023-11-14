@@ -3,6 +3,7 @@ package com.elearning.controller;
 import com.elearning.connector.Connector;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
+import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
@@ -11,6 +12,7 @@ import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ICourseRepository;
+import com.elearning.reprositories.IPriceRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
@@ -39,6 +41,8 @@ public class CourseController extends BaseController {
     private FileRelationshipController fileRelationshipController;
     @Autowired
     private PriceController priceController;
+//    @Autowired
+//    private IPriceRepository priceRepository;
     @Autowired
     Connector connector;
 
@@ -50,7 +54,7 @@ public class CourseController extends BaseController {
         }
         dto.setId(null);
         Course course = buildEntity(dto);
-        Course courseSaved = this.saveCourse(course);
+        Course courseSaved = saveCourse(course);
 
         //Price
         priceController.updatePriceSell(courseSaved.getId(), dto.getPriceSell());
@@ -149,10 +153,13 @@ public class CourseController extends BaseController {
             //Ảnh
             List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.COURSE_IMAGE.name());
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
+
             //toDTO
             List<CourseDTO> allChildDTOS = new ArrayList<>();
             for (Course course : courses) {
                 CourseDTO courseDTO = toDTO(course);
+                //Giá tiền
+                courseDTO.setPriceSell(priceController.findCoursePriceSell(courseDTO.getId()));
                 courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                 courseDTO.setImagePath(mapImageUrl.get(course.getId()));
                 courseDTOS.add(courseDTO);

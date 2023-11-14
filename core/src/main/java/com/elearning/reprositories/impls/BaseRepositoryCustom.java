@@ -25,6 +25,7 @@ public abstract class BaseRepositoryCustom {
     @Autowired
     protected ICategoryRepository categoryRepository;
 
+
 //    @Autowired
 //    protected ICourseRepository courseRepository;
 //
