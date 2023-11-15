@@ -4,8 +4,10 @@ import com.elearning.entities.Course;
 import com.elearning.entities.Enrollment;
 import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
 import com.elearning.models.searchs.ParameterSearchCourse;
+import com.elearning.models.searchs.ParameterSearchEnrollment;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IEnrollmentRepository;
@@ -18,8 +20,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @ExtensionMethod(Extensions.class)
@@ -42,6 +47,14 @@ public class EnrollmentController extends BaseController {
         Enrollment enrollment = buildEntity(enrollmentDTO);
         return saveEnrollment(enrollment);
     }
+    public Boolean checkEnrollment(String courseId){
+        String userId = this.getUserIdFromContext();
+        if (userId == null) {
+            return false;
+        }
+        Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
+        return entity != null;
+    }
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public Enrollment buildEntity(EnrollmentDTO enrollmentDTO) {
         Enrollment enrollment = Enrollment.builder()
@@ -59,6 +72,28 @@ public class EnrollmentController extends BaseController {
         return enrollment;
     }
 
+    public ListWrapper<EnrollmentDTO> userEnrollments(ParameterSearchEnrollment parameterSearchEnrollment) {
+        String userId = this.getUserIdFromContext();
+        if (userId == null) {
+            return ListWrapper.<EnrollmentDTO>builder()
+                    .data(new ArrayList<>())
+                    .build();
+        }
+        parameterSearchEnrollment.setUserIds(Collections.singletonList(userId));
+        return searchEnrollments(parameterSearchEnrollment);
+    }
+    public ListWrapper<EnrollmentDTO> searchEnrollments(ParameterSearchEnrollment parameterSearchEnrollment){
+        ListWrapper<Enrollment> wrapper = iEnrollmentRepository.searchEnrollment(parameterSearchEnrollment);
+        List<EnrollmentDTO> enrollmentDTOS = toDTOs(wrapper.getData());
+        return ListWrapper.<EnrollmentDTO>builder()
+                .currentPage(wrapper.getCurrentPage())
+                .totalPage(wrapper.getTotalPage())
+                .total(wrapper.getTotal())
+                .maxResult(wrapper.getMaxResult())
+                .data(enrollmentDTOS)
+                .build();
+    }
+//    public Boolean
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
@@ -92,25 +127,23 @@ public class EnrollmentController extends BaseController {
         }
         // Nếu không có giá khuyến mãi tính bằng giá bán
         Price priceSell = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.SELL.name());
-        if (priceSell != null && priceSell.getPrice() != null) {
-            //Nếu giá bán free
-            if (priceSell.getPrice().isNullOrZero()) {
-                Long sub = course.getSubscriptions();
-                course.setSubscriptions((sub != null) ? sub + 1 : 1);
-                iCourseRepository.save(course);
+        //Nếu giá bán free
+        if (priceSell != null && priceSell.getPrice() != null && priceSell.getPrice().isNullOrZero()) {
+            Long sub = course.getSubscriptions();
+            course.setSubscriptions((sub != null) ? sub + 1 : 1);
+            iCourseRepository.save(course);
 
-                enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
-                enrollment.setPricePurchase(priceSell.getPrice().toString());
-                enrollment = iEnrollmentRepository.save(enrollment);
+            enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
+            enrollment.setCreatedBy(enrollment.getUserId());
+            enrollment.setPricePurchase(priceSell.getPrice().toString());
+            enrollment = iEnrollmentRepository.save(enrollment);
 
 
-                return toDTO(enrollment);
-            } else {
-                throw new ServiceException("Chưa xử lý giá tiền");
+            return toDTO(enrollment);
+        } else {
+            throw new ServiceException("Chưa xử lý giá tiền");
 //                return enrollSellPrice(enrollment);
-            }
         }
-        return null;
     }
 
     private EnrollmentDTO enrollPromotionPrice(Enrollment enrollment) {
@@ -136,4 +169,13 @@ public class EnrollmentController extends BaseController {
                 .isDeleted(entity.getIsDeleted() != null && entity.getIsDeleted())
                 .build();
     }
+
+    public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments) {
+        if (enrollments == null) return Collections.emptyList();
+
+        return enrollments.stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }

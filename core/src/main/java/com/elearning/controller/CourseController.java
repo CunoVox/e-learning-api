@@ -230,6 +230,7 @@ public class CourseController extends BaseController {
                 .nameMode(entity.getNameMode())
                 .parentId(entity.getParentId())
                 .level(entity.getLevel())
+                .subscriptions(entity.getSubscriptions())
                 .children(new ArrayList<>())
                 .type(entity.getContentType())
                 .courseType(entity.getCourseType())
