@@ -15,7 +15,8 @@ public class EnrollmentDTO {
 
     @JsonProperty("course_id")
     private String courseId;
-
+    @JsonProperty("course")
+    private CourseDTO courseDTO;
     @JsonProperty("user_id")
     private String userId;
     @JsonProperty("price_purchase")

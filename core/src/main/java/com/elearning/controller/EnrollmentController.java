@@ -37,6 +37,8 @@ public class EnrollmentController extends BaseController {
     ICourseRepository iCourseRepository;
     @Autowired
     IPriceRepository iPriceRepository;
+    @Autowired
+    CourseController courseController;
 
     public EnrollmentDTO createEnrollment(EnrollmentDTO enrollmentDTO) {
         String userId = this.getUserIdFromContext();
@@ -156,7 +158,14 @@ public class EnrollmentController extends BaseController {
 
     public EnrollmentDTO toDTO(Enrollment entity) {
         if (entity == null) return null;
-        return EnrollmentDTO.builder()
+        ListWrapper<CourseDTO> courseListWrapper =
+                courseController.searchCourseDTOS(
+                        ParameterSearchCourse.builder()
+                                .ids(Collections.singletonList(entity.getCourseId()))
+                                .build());
+        CourseDTO dto = courseListWrapper.getData().get(0);
+        dto.setChildren(null);
+        EnrollmentDTO enrollmentDTO = EnrollmentDTO.builder()
                 .id(entity.getId())
                 .courseId(entity.getCourseId())
                 .userId(entity.getUserId())
@@ -168,6 +177,10 @@ public class EnrollmentController extends BaseController {
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .isDeleted(entity.getIsDeleted() != null && entity.getIsDeleted())
                 .build();
+        if(courseListWrapper != null && !courseListWrapper.getData().isEmpty()){
+            enrollmentDTO.setCourseDTO(dto);
+        }
+        return enrollmentDTO;
     }
 
     public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments) {

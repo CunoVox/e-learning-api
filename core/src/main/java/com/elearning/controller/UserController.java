@@ -294,7 +294,7 @@ public class UserController extends BaseController{
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(0).getPathFile() : null)
+                .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(fileRelationshipDTO.size() - 1).getPathFile() : null)
                 .address(user.getAddress())
                 .isDeleted(user.getIsDeleted())
                 .isEmailConfirmed(user.isEmailConfirmed)
