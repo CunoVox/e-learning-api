@@ -126,8 +126,8 @@
                 <configuration>
                     <publisher>
                         <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                        <username>deployer</username>
-                        <password>APAftRufbMPMmZXXHP4KstrMVm4</password>
+                        <username>20110472@student.hcmute.edu.vn</username>
+                        <password>eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiIwb1puczRYWjlSWU1TbGFfYlFsb1JlUlo0eGxKOEJWRC1Sbmx0aUFBb3BFIn0.eyJzdWIiOiJqZmZlQDAxaGVuOGdhZjFuZHBwMGVhcTYydnYxbnl5L3VzZXJzLzIwMTEwNDcyQHN0dWRlbnQuaGNtdXRlLmVkdS52biIsInNjcCI6InN5c3RlbTppZGVudGl0aWVzOnIsdyxkIiwiYXVkIjoiamZhY0AqIiwiaXNzIjoiamZmZUAwMWhlbjhnYWYxbmRwcDBlYXE2MnZ2MW55eSIsImlhdCI6MTcwMDI5MTc4MCwianRpIjoiZTJjZjkxYzEtNmIyNi00NjRjLTk5YmEtZmJmMDZhYWFmMTYyIn0.bZO5YGixILOb3F8KxANQE_YfkCreqczXnxTy-xvPaXCSA-mtJMv7J1e4_Saq4lluJJUSspjB2NTUTabH5fGlBahrQMPKfTAECYaX2m32yTEAWCTPOZpdFeH2QNufv0QGfeNwGq0Xs-yXOg4HMAbYbd5u903J0dog1GCw_SDah485NDuX5qTFZtMCSaZf7hbF4x0MVDFyog850TqLbD5rW2kBUzpT25Bo1Tptj_Djq3mIg8N3suAYgj5yfP7nYdTJ3diIJqAayspny1rYJbAOEdH1xFvtSt9DXJj__XQVvKpnC5XU693xnhDJVRajynpsVwwI7xY266FD3jQQsTx02w</password>
                         <repoKey>e-learning-libs-release</repoKey>
                     </publisher>
                 </configuration>
