@@ -102,36 +102,36 @@
     </repositories>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.jfrog.buildinfo</groupId>
-                <artifactId>artifactory-maven-plugin</artifactId>
-                <version>3.4.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <publisher>
-                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                                <username>20110472@student.hcmute.edu.vn</username>
-                                <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>
-                                <repoKey>e-learning</repoKey>
-                            </publisher>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <publisher>
-                        <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                        <username>20110472@student.hcmute.edu.vn</username>
-                        <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>
-                        <repoKey>e-learning</repoKey>
-                    </publisher>
-                </configuration>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.jfrog.buildinfo</groupId>-->
+<!--                <artifactId>artifactory-maven-plugin</artifactId>-->
+<!--                <version>3.4.0</version>-->
+<!--                <inherited>false</inherited>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <id>build-info</id>-->
+<!--                        <goals>-->
+<!--                            <goal>publish</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <publisher>-->
+<!--                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>-->
+<!--                                <username>20110472@student.hcmute.edu.vn</username>-->
+<!--                                <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>-->
+<!--                                <repoKey>e-learning</repoKey>-->
+<!--                            </publisher>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--                <configuration>-->
+<!--                    <publisher>-->
+<!--                        <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>-->
+<!--                        <username>20110472@student.hcmute.edu.vn</username>-->
+<!--                        <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>-->
+<!--                        <repoKey>e-learning</repoKey>-->
+<!--                    </publisher>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
