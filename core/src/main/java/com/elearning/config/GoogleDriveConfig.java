@@ -37,12 +37,13 @@ public class GoogleDriveConfig {
         HttpTransport httpTransport = new NetHttpTransport();
         JacksonFactory jsonFactory = new JacksonFactory();
         ClassLoader classLoader = getClass().getClassLoader();
-        return new GoogleCredential.Builder()
-                .setTransport(httpTransport)
-                .setJsonFactory(jsonFactory)
-                .setServiceAccountId(Constants.SERVICE_ACCOUNT_ID)
-                .setServiceAccountScopes(elenco)
-                .setServiceAccountPrivateKeyFromP12File(new File(classLoader.getResource("credentials.p12").getFile()))
-                .build();
+        return new GoogleCredential();
+//        return new GoogleCredential.Builder()
+//                .setTransport(httpTransport)
+//                .setJsonFactory(jsonFactory)
+//                .setServiceAccountId(Constants.SERVICE_ACCOUNT_ID)
+//                .setServiceAccountScopes(elenco)
+//                .setServiceAccountPrivateKeyFromP12File(new File(classLoader.getResource("credentials.p12").getFile()))
+//                .build();
     }
 }
