@@ -137,7 +137,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- Đường dẫn đến file applicationMain--> <!--- đổi đường dẫn cho phù hợp project của bạn -->
-                    <mainClass>com/elearning/ServiceApplication</mainClass>
+                    <mainClass>com/elearning/ServiceApplication.java</mainClass>
                     <layout>JAR</layout>
                 </configuration>
                 <executions>
