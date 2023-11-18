@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableMongoRepositories
 @Slf4j
-public class ServiceApplication {
+public class ServiceApplication { 
     public static void main(String[] args) {
         SpringApplication.run(ServiceApplication.class, args);
         log.info("-----------------------------------------------------------");

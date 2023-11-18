@@ -22,18 +22,6 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>net.lvs</groupId>
-                <artifactId>e-learning-api</artifactId>
-                <version>1.0.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
 
         <dependency>
@@ -105,25 +93,66 @@
             <name>e-learning-libs-release</name>
             <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>e-learning-libs-snapshot</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
-        </snapshotRepository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>e-learning-libs-release</id>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
+        </repository>
+    </repositories>
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.jfrog.buildinfo</groupId>
+                <artifactId>artifactory-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>publish</goal>
+                        </goals>
+                        <configuration>
+                            <deployProperties>
+                                <gradle>awesome</gradle>
+                                <review.team>qa</review.team>
+                            </deployProperties>
+                            <publisher>
+                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                                <username>20110472@student.hcmute.edu.vn</username>
+                                <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
+                                <repoKey>e-learning-libs-release-local</repoKey>
+                                <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
+                            </publisher>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <publisher>
+                        <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                        <username>20110472@student.hcmute.edu.vn</username>
+                        <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
+                        <repoKey>e-learning-libs-release-local</repoKey>
+                        <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
+                    </publisher>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <!-- Đường dẫn đến file applicationMain--> <!--- đổi đường dẫn cho phù hợp project của bạn -->
+                    <mainClass>com/elearning/ServiceApplication</mainClass>
+                    <layout>JAR</layout>
                 </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
         <finalName>service</finalName>
