@@ -47,9 +47,44 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0b1phntbyra0-artifactory-primary-0-releases</name>
+            <name>e-learning-libs-release</name>
             <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>e-learning-libs-snapshot</name>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot</url>
+        </snapshotRepository>
     </distributionManagement>
-
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jfrog.buildinfo</groupId>
+                <artifactId>artifactory-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>publish</goal>
+                        </goals>
+                        <configuration>
+                            <deployProperties>
+                                <gradle>awesome</gradle>
+                                <review.team>qa</review.team>
+                            </deployProperties>
+                            <publisher>
+                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                                <username>20110472@student.hcmute.edu.vn</username>
+                                <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
+                                <repoKey>e-learning-libs-release-local</repoKey>
+                                <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
+                            </publisher>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
