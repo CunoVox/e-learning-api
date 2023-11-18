@@ -114,16 +114,11 @@
                             <goal>publish</goal>
                         </goals>
                         <configuration>
-                            <deployProperties>
-                                <gradle>awesome</gradle>
-                                <review.team>qa</review.team>
-                            </deployProperties>
                             <publisher>
                                 <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
                                 <username>20110472@student.hcmute.edu.vn</username>
                                 <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
-                                <repoKey>e-learning-libs-release-local</repoKey>
-                                <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
+                                <repoKey>e-learning-libs-release</repoKey>
                             </publisher>
                         </configuration>
                     </execution>
@@ -133,8 +128,7 @@
                         <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
                         <username>20110472@student.hcmute.edu.vn</username>
                         <password>cmVmdGtuOjAxOjE3MzE1MDkwODg6TUFpNmtqQklqSEZVZTlTOTdEcnMydmJ2ZERt</password>
-                        <repoKey>e-learning-libs-release-local</repoKey>
-                        <snapshotRepoKey>e-learning-libs-snapshot-local</snapshotRepoKey>
+                        <repoKey>e-learning-libs-release</repoKey>
                     </publisher>
                 </configuration>
             </plugin>
