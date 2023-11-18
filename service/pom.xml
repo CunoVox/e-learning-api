@@ -116,8 +116,8 @@
                         <configuration>
                             <publisher>
                                 <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                                <username>deployer</username>
-                                <password>cmVmdGtuOjAxOjAwMDAwMDAwMDA6MjRFWTdKUmYwRWZ4SkVNNUhPczVHZTY1WnJr</password>
+                                <username>20110472@student.hcmute.edu.vn</username>
+                                <password>eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJzMjZRNThuMXp5ejc1SFBJYkV0ckJULWNNSG5RSjZEdFZqT3R3eU9oeXQwIn0.eyJleHQiOiJ7XCJyZXZvY2FibGVcIjp0cnVlfSIsInN1YiI6Ik15SkZyb2dcLzIwMTEwNDcyQHN0dWRlbnQuaGNtdXRlLmVkdS52biIsInNjcCI6InN1YnNjcmlwdGlvbjo2ODk0ODU2Mzc6YXBpIiwiYXVkIjoiamZib0AqIiwiaXNzIjoianBheUAwMWc5eTBzMWZ5ZDRtNjB0YjlkM3B2MXc5cyIsImV4cCI6MTczMTgzMTgyNSwiaWF0IjoxNzAwMjk1ODI1LCJqdGkiOiI3NjUyNjk3My00NWJmLTQyNGEtOTRkNC02MjBlZTRkMjIxOTMifQ.cBYxRmjiy-G81DSA0CnJjsTZyNvguzwDSDVIJxZ1FDlOwU-a_1w2ZK9w4Cy88NoVM9DMBaph4xZ1MeBFCWUFh4_Z4AWI916CCd7vXsds3_iUvrRBLerBAQr4gdNema9fWSfv6kxKU83zjG-q4cMFscfWR4_p4iQXAzwxEYosR7CQWicZSzxQiq5eZ1-sslzA4BOJD5HNrI5sNOTWNmUzIxDIKLQQ9FZpFQu6OwHdtzvIEeC7xnaulXbb1F8LCoxwI3E00RjotfgbSjS5Gg1GjyyWOUsAvslJv4ru8t6_xXETZV1_Ccz2WG6UnLDPkhWmP1me7wTCn2tShPtTzLJwLA</password>
                                 <repoKey>e-learning-libs-release</repoKey>
                             </publisher>
                         </configuration>
@@ -126,8 +126,8 @@
                 <configuration>
                     <publisher>
                         <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                        <username>deployer</username>
-                        <password>cmVmdGtuOjAxOjAwMDAwMDAwMDA6MjRFWTdKUmYwRWZ4SkVNNUhPczVHZTY1WnJr</password>
+                        <username>20110472@student.hcmute.edu.vn</username>
+                        <password>eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJzMjZRNThuMXp5ejc1SFBJYkV0ckJULWNNSG5RSjZEdFZqT3R3eU9oeXQwIn0.eyJleHQiOiJ7XCJyZXZvY2FibGVcIjp0cnVlfSIsInN1YiI6Ik15SkZyb2dcLzIwMTEwNDcyQHN0dWRlbnQuaGNtdXRlLmVkdS52biIsInNjcCI6InN1YnNjcmlwdGlvbjo2ODk0ODU2Mzc6YXBpIiwiYXVkIjoiamZib0AqIiwiaXNzIjoianBheUAwMWc5eTBzMWZ5ZDRtNjB0YjlkM3B2MXc5cyIsImV4cCI6MTczMTgzMTgyNSwiaWF0IjoxNzAwMjk1ODI1LCJqdGkiOiI3NjUyNjk3My00NWJmLTQyNGEtOTRkNC02MjBlZTRkMjIxOTMifQ.cBYxRmjiy-G81DSA0CnJjsTZyNvguzwDSDVIJxZ1FDlOwU-a_1w2ZK9w4Cy88NoVM9DMBaph4xZ1MeBFCWUFh4_Z4AWI916CCd7vXsds3_iUvrRBLerBAQr4gdNema9fWSfv6kxKU83zjG-q4cMFscfWR4_p4iQXAzwxEYosR7CQWicZSzxQiq5eZ1-sslzA4BOJD5HNrI5sNOTWNmUzIxDIKLQQ9FZpFQu6OwHdtzvIEeC7xnaulXbb1F8LCoxwI3E00RjotfgbSjS5Gg1GjyyWOUsAvslJv4ru8t6_xXETZV1_Ccz2WG6UnLDPkhWmP1me7wTCn2tShPtTzLJwLA</password>
                         <repoKey>e-learning-libs-release</repoKey>
                     </publisher>
                 </configuration>
