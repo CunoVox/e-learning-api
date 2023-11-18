@@ -22,6 +22,11 @@
       <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="e-learning-libs-release-local" />
+      <option name="name" value="e-learning-libs-release-local" />
+      <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-release-local" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="e-learning-libs-release" />
       <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-release" />

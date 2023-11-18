@@ -90,14 +90,14 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>e-learning-libs-release</name>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
+            <name>e-learning-libs-release-local</name>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
-            <id>e-learning-libs-release</id>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
+            <id>e-learning-libs-release-local</id>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
         </repository>
     </repositories>
     <build>
