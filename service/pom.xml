@@ -102,36 +102,36 @@
     </repositories>
     <build>
         <plugins>
-<!--            <plugin>-->
-<!--                <groupId>org.jfrog.buildinfo</groupId>-->
-<!--                <artifactId>artifactory-maven-plugin</artifactId>-->
-<!--                <version>3.4.0</version>-->
-<!--                <inherited>false</inherited>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <id>build-info</id>-->
-<!--                        <goals>-->
-<!--                            <goal>publish</goal>-->
-<!--                        </goals>-->
-<!--                        <configuration>-->
-<!--                            <publisher>-->
-<!--                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>-->
-<!--                                <username>20110472@student.hcmute.edu.vn</username>-->
-<!--                                <password>eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiIwb1puczRYWjlSWU1TbGFfYlFsb1JlUlo0eGxKOEJWRC1Sbmx0aUFBb3BFIn0.eyJzdWIiOiJqZmFjQDAxaGVuOGdhZjFuZHBwMGVhcTYydnYxbnl5L3VzZXJzLzIwMTEwNDcyQHN0dWRlbnQuaGNtdXRlLmVkdS52biIsInNjcCI6ImFwcGxpZWQtcGVybWlzc2lvbnMvYWRtaW4iLCJhdWQiOiIqQCoiLCJpc3MiOiJqZmZlQDAxaGVuOGdhZjFuZHBwMGVhcTYydnYxbnl5IiwiaWF0IjoxNzAwMzAwMTkzLCJqdGkiOiI5ODc1YTYyMS02NjViLTQwMmQtYTk4Yy1iM2Q3MDM0YmI3MDIifQ.jeKNws3E7-SdVEKtIYPv6crHsJc-zN-apL7BQqzgUk6Ysd1YKI217Bn9KRDTBl7g89bOu5urNee2drdLqNMq6BFZGDD7_EW7ad6hha7dZSJjU-j67AkflBd1idk4ON1rSQrn1EYsv0Y3cQueVgugr_6WAudfQm9GXnGcEwQxJCDLZKfvWhZTtpWzqbFDooQr4X1C2-kTr9E8KoSnN_uvpsX-9ClB04F-LBEl5fddFo6eNLAhwQoZ4ppURKEQcKurUKbeC2D2f0FnN4RXBzKo3WrH4Gppgrvn0d3tXneLV3-W5vPHdtyEA1K_HCOm3vc9Ifq9xNJOMXFKJ90gpHKNFw</password>-->
-<!--                                <repoKey>e-learning</repoKey>-->
-<!--                            </publisher>-->
-<!--                        </configuration>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <publisher>-->
-<!--                        <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>-->
-<!--                        <username>20110472@student.hcmute.edu.vn</username>-->
-<!--                        <password>eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiIwb1puczRYWjlSWU1TbGFfYlFsb1JlUlo0eGxKOEJWRC1Sbmx0aUFBb3BFIn0.eyJzdWIiOiJqZmFjQDAxaGVuOGdhZjFuZHBwMGVhcTYydnYxbnl5L3VzZXJzLzIwMTEwNDcyQHN0dWRlbnQuaGNtdXRlLmVkdS52biIsInNjcCI6ImFwcGxpZWQtcGVybWlzc2lvbnMvYWRtaW4iLCJhdWQiOiIqQCoiLCJpc3MiOiJqZmZlQDAxaGVuOGdhZjFuZHBwMGVhcTYydnYxbnl5IiwiaWF0IjoxNzAwMzAwMTkzLCJqdGkiOiI5ODc1YTYyMS02NjViLTQwMmQtYTk4Yy1iM2Q3MDM0YmI3MDIifQ.jeKNws3E7-SdVEKtIYPv6crHsJc-zN-apL7BQqzgUk6Ysd1YKI217Bn9KRDTBl7g89bOu5urNee2drdLqNMq6BFZGDD7_EW7ad6hha7dZSJjU-j67AkflBd1idk4ON1rSQrn1EYsv0Y3cQueVgugr_6WAudfQm9GXnGcEwQxJCDLZKfvWhZTtpWzqbFDooQr4X1C2-kTr9E8KoSnN_uvpsX-9ClB04F-LBEl5fddFo6eNLAhwQoZ4ppURKEQcKurUKbeC2D2f0FnN4RXBzKo3WrH4Gppgrvn0d3tXneLV3-W5vPHdtyEA1K_HCOm3vc9Ifq9xNJOMXFKJ90gpHKNFw</password>-->
-<!--                        <repoKey>e-learning</repoKey>-->
-<!--                    </publisher>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
+            <plugin>
+                <groupId>org.jfrog.buildinfo</groupId>
+                <artifactId>artifactory-maven-plugin</artifactId>
+                <version>3.4.0</version>
+                <inherited>false</inherited>
+                <executions>
+                    <execution>
+                        <id>build-info</id>
+                        <goals>
+                            <goal>publish</goal>
+                        </goals>
+                        <configuration>
+                            <publisher>
+                                <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                                <username>20110472@student.hcmute.edu.vn</username>
+                                <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>
+                                <repoKey>e-learning</repoKey>
+                            </publisher>
+                        </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <publisher>
+                        <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
+                        <username>20110472@student.hcmute.edu.vn</username>
+                        <password>cmVmdGtuOjAxOjE3MzE4MzQxNTY6VVJaVnVJcTU4TnhSODlmRkRLbTlXc01ITXFt</password>
+                        <repoKey>e-learning</repoKey>
+                    </publisher>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
