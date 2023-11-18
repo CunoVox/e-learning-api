@@ -97,7 +97,7 @@
     <repositories>
         <repository>
             <id>e-learning-libs-release</id>
-            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
     </repositories>
     <build>
