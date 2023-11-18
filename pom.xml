@@ -47,9 +47,15 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0b1phntbyra0-artifactory-primary-0-releases-local</name>
+            <name>e-learning-libs-release-local</name>
             <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
         </repository>
     </distributionManagement>
+    <repositories>
+        <repository>
+            <id>e-learning-libs-release-local</id>
+            <url>https://elearning.jfrog.io/artifactory/e-learning-libs-release-local</url>
+        </repository>
+    </repositories>
 
 </project>
