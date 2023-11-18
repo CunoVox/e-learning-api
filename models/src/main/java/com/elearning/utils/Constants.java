@@ -18,4 +18,13 @@ public class Constants {
     public static final String BASE_VIDEO_URL = "https://drive.google.com/file/d/";
 
 
+    //VNPAY
+    public static final String VNP_PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    public static final String VNP_RETURN_URL = "http://localhost:3000/payment-success";
+    public static final String VNP_TMN_CODE = "FV2FPW0B";
+    public static final String VNP_SECRET_KEY = "TSYFMBEBBUSUVSBPNQCWEFQDIMEBKFBD";
+    public static final String VNP_API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    public static final String VNP_VERSION = "2.1.0";
+    public static final String VNP_COMMAND= "pay";
+
 }
