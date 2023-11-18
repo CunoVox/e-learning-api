@@ -116,8 +116,8 @@
                         <configuration>
                             <publisher>
                                 <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                                <username>20110472@student.hcmute.edu.vn</username>
-                                <password>Hoanhao@1512</password>
+                                <username>deployer</username>
+                                <password>cmVmdGtuOjAxOjAwMDAwMDAwMDA6MjRFWTdKUmYwRWZ4SkVNNUhPczVHZTY1WnJr</password>
                                 <repoKey>e-learning-libs-release</repoKey>
                             </publisher>
                         </configuration>
@@ -126,8 +126,8 @@
                 <configuration>
                     <publisher>
                         <contextUrl>https://elearning.jfrog.io/artifactory</contextUrl>
-                        <username>20110472@student.hcmute.edu.vn</username>
-                        <password>Hoanhao@1512</password>
+                        <username>deployer</username>
+                        <password>cmVmdGtuOjAxOjAwMDAwMDAwMDA6MjRFWTdKUmYwRWZ4SkVNNUhPczVHZTY1WnJr</password>
                         <repoKey>e-learning-libs-release</repoKey>
                     </publisher>
                 </configuration>
