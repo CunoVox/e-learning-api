@@ -136,20 +136,17 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <!-- Đường dẫn đến file applicationMain--> <!--- đổi đường dẫn cho phù hợp project của bạn -->
-                    <mainClass>com/elearning/ServiceApplication.java</mainClass>
-                    <layout>JAR</layout>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
         <finalName>service</finalName>
     </build>
+
 
 </project>
