@@ -2,6 +2,7 @@ package com.elearning.handler;
 
 import com.elearning.models.wrapper.ObjectResponseWrapper;
 import com.sun.jdi.InternalException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -39,9 +40,14 @@ public class ErrorHandle extends ResponseEntityExceptionHandler {
     protected ObjectResponseWrapper handleSignatureException(SignatureException ex){
             return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
     }
-    @ExceptionHandler(AccessDeniedException.class)
+    @ExceptionHandler({AccessDeniedException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     protected ObjectResponseWrapper handleAccessDeniedException(AccessDeniedException ex){
+        return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
+    }
+    @ExceptionHandler({ExpiredJwtException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ObjectResponseWrapper handleExpiredJwtException(ExpiredJwtException ex){
         return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
     }
     @ExceptionHandler(ServiceException.class)
