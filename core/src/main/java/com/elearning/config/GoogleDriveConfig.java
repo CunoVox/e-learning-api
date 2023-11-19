@@ -43,14 +43,13 @@ public class GoogleDriveConfig {
         JacksonFactory jsonFactory = new JacksonFactory();
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         try {
-//            return new GoogleCredential.Builder()
-//                    .setTransport(httpTransport)
-//                    .setJsonFactory(jsonFactory)
-//                    .setServiceAccountId(Constants.SERVICE_ACCOUNT_ID)
-//                    .setServiceAccountScopes(elenco)
-//                    .setServiceAccountPrivateKeyFromP12File(new File((new File(GoogleDriveConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())) + File.separator + "credentials.p12"))
-//                    .build();
-            return new GoogleCredential();
+            return new GoogleCredential.Builder()
+                    .setTransport(httpTransport)
+                    .setJsonFactory(jsonFactory)
+                    .setServiceAccountId(Constants.SERVICE_ACCOUNT_ID)
+                    .setServiceAccountScopes(elenco)
+                    .setServiceAccountPrivateKeyFromP12File(new File((new File(GoogleDriveConfig.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())) + File.separator + "credentials.p12"))
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
             return new GoogleCredential();

@@ -33,7 +33,7 @@ public class UserAPI {
     @Autowired
     private UserController userController;
     @Autowired
-    VerificationCodeController verificationCodeController;
+    private VerificationCodeController verificationCodeController;
 
     @Operation(summary = "Cập nhật người dùng")
     @PostMapping("/profile/update")
