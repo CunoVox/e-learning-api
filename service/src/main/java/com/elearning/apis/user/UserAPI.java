@@ -32,7 +32,8 @@ import java.util.List;
 public class UserAPI {
     @Autowired
     private UserController userController;
-    private final VerificationCodeController verificationCodeController;
+    @Autowired
+    VerificationCodeController verificationCodeController;
 
     @Operation(summary = "Cập nhật người dùng")
     @PostMapping("/profile/update")
