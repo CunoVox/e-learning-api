@@ -49,7 +49,8 @@ public class EnrollmentController extends BaseController {
         Enrollment enrollment = buildEntity(enrollmentDTO);
         return saveEnrollment(enrollment);
     }
-    public Boolean checkEnrollment(String courseId){
+
+    public Boolean checkEnrollment(String courseId) {
         String userId = this.getUserIdFromContext();
         if (userId == null) {
             return false;
@@ -57,6 +58,7 @@ public class EnrollmentController extends BaseController {
         Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
         return entity != null;
     }
+
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public Enrollment buildEntity(EnrollmentDTO enrollmentDTO) {
         Enrollment enrollment = Enrollment.builder()
@@ -84,9 +86,10 @@ public class EnrollmentController extends BaseController {
         parameterSearchEnrollment.setUserIds(Collections.singletonList(userId));
         return searchEnrollments(parameterSearchEnrollment);
     }
-    public ListWrapper<EnrollmentDTO> searchEnrollments(ParameterSearchEnrollment parameterSearchEnrollment){
+
+    public ListWrapper<EnrollmentDTO> searchEnrollments(ParameterSearchEnrollment parameterSearchEnrollment) {
         ListWrapper<Enrollment> wrapper = iEnrollmentRepository.searchEnrollment(parameterSearchEnrollment);
-        List<EnrollmentDTO> enrollmentDTOS = toDTOs(wrapper.getData());
+        List<EnrollmentDTO> enrollmentDTOS = toDTOs(wrapper.getData(), parameterSearchEnrollment.getBuildCourseChild());
         return ListWrapper.<EnrollmentDTO>builder()
                 .currentPage(wrapper.getCurrentPage())
                 .totalPage(wrapper.getTotalPage())
@@ -95,7 +98,8 @@ public class EnrollmentController extends BaseController {
                 .data(enrollmentDTOS)
                 .build();
     }
-//    public Boolean
+
+    //    public Boolean
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
@@ -118,7 +122,7 @@ public class EnrollmentController extends BaseController {
             entity.setUpdatedBy(enrollment.getUserId());
 
             Enrollment e1 = iEnrollmentRepository.save(entity);
-            return toDTO(e1);
+            return toDTO(e1, false);
         }
         // Kiểm tra giá tiền
         Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
@@ -141,7 +145,7 @@ public class EnrollmentController extends BaseController {
             enrollment = iEnrollmentRepository.save(enrollment);
 
 
-            return toDTO(enrollment);
+            return toDTO(enrollment, false);
         } else {
             throw new ServiceException("Chưa xử lý giá tiền");
 //                return enrollSellPrice(enrollment);
@@ -156,15 +160,16 @@ public class EnrollmentController extends BaseController {
         return null;
     }
 
-    public EnrollmentDTO toDTO(Enrollment entity) {
+    public EnrollmentDTO toDTO(Enrollment entity, Boolean buildCourseChild) {
         if (entity == null) return null;
-        ListWrapper<CourseDTO> courseListWrapper =
-                courseController.searchCourseDTOS(
-                        ParameterSearchCourse.builder()
-                                .ids(Collections.singletonList(entity.getCourseId()))
-                                .build());
+        ListWrapper<CourseDTO> courseListWrapper = courseController
+                .searchCourseDTOS(ParameterSearchCourse.builder()
+                        .ids(Collections.singletonList(entity.getCourseId()))
+                        .build());
         CourseDTO dto = courseListWrapper.getData().get(0);
-        dto.setChildren(null);
+        if (buildCourseChild == null || !buildCourseChild) {
+            dto.setChildren(null);
+        }
         EnrollmentDTO enrollmentDTO = EnrollmentDTO.builder()
                 .id(entity.getId())
                 .courseId(entity.getCourseId())
@@ -177,17 +182,17 @@ public class EnrollmentController extends BaseController {
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .isDeleted(entity.getIsDeleted() != null && entity.getIsDeleted())
                 .build();
-        if(courseListWrapper != null && !courseListWrapper.getData().isEmpty()){
+        if (!courseListWrapper.getData().isEmpty()) {
             enrollmentDTO.setCourseDTO(dto);
         }
         return enrollmentDTO;
     }
 
-    public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments) {
+    public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments, Boolean buildCourseChild) {
         if (enrollments == null) return Collections.emptyList();
 
         return enrollments.stream()
-                .map(this::toDTO)
+                .map(enrollment -> toDTO(enrollment, buildCourseChild))
                 .collect(Collectors.toList());
     }
 
