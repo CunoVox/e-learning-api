@@ -25,6 +25,9 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private String createdBy;
 
+    //true là build, rỗng hoặc false thì k build
+    private Boolean buildChild;
+
     private String name;
 
     private String slug;

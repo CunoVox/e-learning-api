@@ -45,6 +45,7 @@ public class CourseAPI {
                                             @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
                                             @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
                                             @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
+                                            @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
                                             @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
@@ -64,6 +65,7 @@ public class CourseAPI {
         parameterSearchCourse.setCreatedBy(createdBy);
         parameterSearchCourse.setIsDeleted(isDeleted);
         parameterSearchCourse.setIds(ids);
+        parameterSearchCourse.setBuildChild(buildChild);
         parameterSearchCourse.setParentIds(parentIds);
         parameterSearchCourse.setStartIndex(startIndex);
         if (fromDate !=null) {
