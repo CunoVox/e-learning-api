@@ -20,10 +20,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -99,7 +97,7 @@ public class EnrollmentController extends BaseController {
                 .build();
     }
 
-    //    public Boolean
+    //public Boolean
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
@@ -122,7 +120,7 @@ public class EnrollmentController extends BaseController {
             entity.setUpdatedBy(enrollment.getUserId());
 
             Enrollment e1 = iEnrollmentRepository.save(entity);
-            return toDTO(e1, false);
+            return toDTO(e1, courseController.getCourseById(e1.getCourseId()));
         }
         // Kiểm tra giá tiền
         Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
@@ -145,7 +143,7 @@ public class EnrollmentController extends BaseController {
             enrollment = iEnrollmentRepository.save(enrollment);
 
 
-            return toDTO(enrollment, false);
+            return toDTO(enrollment, courseController.getCourseById(enrollment.getCourseId()));
         } else {
             throw new ServiceException("Chưa xử lý giá tiền");
 //                return enrollSellPrice(enrollment);
@@ -160,39 +158,36 @@ public class EnrollmentController extends BaseController {
         return null;
     }
 
-    public EnrollmentDTO toDTO(Enrollment entity, Boolean buildCourseChild) {
+    public EnrollmentDTO toDTO(Enrollment entity, CourseDTO courseDTO) {
         if (entity == null) return null;
-        ListWrapper<CourseDTO> courseListWrapper = courseController
-                .searchCourseDTOS(ParameterSearchCourse.builder()
-                        .ids(Collections.singletonList(entity.getCourseId()))
-                        .build());
-        CourseDTO dto = courseListWrapper.getData().get(0);
-        if (buildCourseChild == null || !buildCourseChild) {
-            dto.setChildren(null);
-        }
-        EnrollmentDTO enrollmentDTO = EnrollmentDTO.builder()
+        return EnrollmentDTO.builder()
                 .id(entity.getId())
                 .courseId(entity.getCourseId())
                 .userId(entity.getUserId())
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
+                .courseDTO(courseDTO)
                 .currentCourse(entity.getCurrentCourse())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .isDeleted(entity.getIsDeleted() != null && entity.getIsDeleted())
                 .build();
-        if (!courseListWrapper.getData().isEmpty()) {
-            enrollmentDTO.setCourseDTO(dto);
-        }
-        return enrollmentDTO;
     }
 
     public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments, Boolean buildCourseChild) {
         if (enrollments == null) return Collections.emptyList();
-
+        List<String> courseIds = enrollments.stream().map(Enrollment::getCourseId).collect(Collectors.toList());
+        ListWrapper<CourseDTO> wrapper = courseController.searchCourseDTOS(ParameterSearchCourse.builder().buildChild(buildCourseChild).ids(courseIds).build());
+        Map<String, CourseDTO> courseDTOMap = new HashMap<>();
+        if (wrapper!=null && !wrapper.getData().isNullOrEmpty()) {
+            for (Enrollment enrollment : enrollments) {
+                Optional<CourseDTO> courseDTO = wrapper.getData().stream().filter(c -> c.getId().equals(enrollment.getCourseId())).findFirst();
+                courseDTO.ifPresent(dto -> courseDTOMap.put(enrollment.getId(), dto));
+            }
+        }
         return enrollments.stream()
-                .map(enrollment -> toDTO(enrollment, buildCourseChild))
+                .map(enrollment -> toDTO(enrollment, courseDTOMap.get(enrollment.getId())))
                 .collect(Collectors.toList());
     }
 

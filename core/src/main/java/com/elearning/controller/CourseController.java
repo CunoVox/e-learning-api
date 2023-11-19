@@ -132,19 +132,21 @@ public class CourseController extends BaseController {
         courses = new ArrayList<>(courses);
         List<CourseDTO> courseDTOS = new ArrayList<>();
         if (!courses.isNullOrEmpty()) {
-            //build khoá học con level 1 + 2 +3
-            List<String> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
-            List<Course> courseLevel2 = courseRepository.findAllByParentIdIn(courseIds);
-            List<String> level2Ids = new ArrayList<>();
-            List<Course> courseLevel3 = new ArrayList<>();
-            if (!courseLevel2.isNullOrEmpty()) {
-                level2Ids = courseLevel2.stream().map(Course::getId).collect(Collectors.toList());
-                courseLevel3 = courseRepository.findAllByParentIdIn(level2Ids);
-            }
             List<Course> allCourse = new ArrayList<>();
-            allCourse.addAll(courseLevel2);
-            allCourse.addAll(courseLevel3);
             allCourse.addAll(courses);
+            //build khoá học con level 1 + 2 +3
+            if (parameterSearchCourse.getBuildChild()!=null && parameterSearchCourse.getBuildChild()) {
+                List<String> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
+                List<Course> courseLevel2 = courseRepository.findAllByParentIdIn(courseIds);
+                List<String> level2Ids;
+                List<Course> courseLevel3 = new ArrayList<>();
+                if (!courseLevel2.isNullOrEmpty()) {
+                    level2Ids = courseLevel2.stream().map(Course::getId).collect(Collectors.toList());
+                    courseLevel3 = courseRepository.findAllByParentIdIn(level2Ids);
+                }
+                allCourse.addAll(courseLevel2);
+                allCourse.addAll(courseLevel3);
+            }
             List<String> allIds = allCourse.stream().map(Course::getId).collect(Collectors.toList());
 
             //Video
@@ -155,7 +157,6 @@ public class CourseController extends BaseController {
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
 
             //toDTO
-            List<CourseDTO> allChildDTOS = new ArrayList<>();
             for (Course course : courses) {
                 CourseDTO courseDTO = toDTO(course);
                 //Giá tiền
@@ -164,26 +165,30 @@ public class CourseController extends BaseController {
                 courseDTO.setImagePath(mapImageUrl.get(course.getId()));
                 courseDTOS.add(courseDTO);
             }
-            for (Course course : allCourse) {
-                CourseDTO courseDTO = toDTO(course);
-                courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
-                courseDTO.setImagePath(mapImageUrl.get(course.getId()));
-                allChildDTOS.add(courseDTO);
-            }
-            //Build TREE
-            Stack<CourseDTO> stack = new Stack<>();
-            for (CourseDTO courseDTO : courseDTOS) {
-                stack.push(courseDTO);
-                while (!stack.empty()) {
-                    CourseDTO courseParent = stack.pop();
-                    List<CourseDTO> courseChild = allChildDTOS.stream().filter(course -> (
-                            null != course.getParentId() &&
-                                    course.getParentId().equals(courseParent.getId()) &&
-                                    course.getLevel() == courseParent.getLevel() + 1
-                    )).collect(Collectors.toList());
-                    if (!courseChild.isEmpty()) {
-                        courseParent.setChildren(courseChild);
-                        courseChild.forEach(stack::push);
+            //build child
+            if (parameterSearchCourse.getBuildChild()!=null && parameterSearchCourse.getBuildChild()) {
+                List<CourseDTO> allChildDTOS = new ArrayList<>();
+                for (Course course : allCourse) {
+                    CourseDTO courseDTO = toDTO(course);
+                    courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
+                    courseDTO.setImagePath(mapImageUrl.get(course.getId()));
+                    allChildDTOS.add(courseDTO);
+                }
+                //Build TREE
+                Stack<CourseDTO> stack = new Stack<>();
+                for (CourseDTO courseDTO : courseDTOS) {
+                    stack.push(courseDTO);
+                    while (!stack.empty()) {
+                        CourseDTO courseParent = stack.pop();
+                        List<CourseDTO> courseChild = allChildDTOS.stream().filter(course -> (
+                                null != course.getParentId() &&
+                                        course.getParentId().equals(courseParent.getId()) &&
+                                        course.getLevel() == courseParent.getLevel() + 1
+                        )).collect(Collectors.toList());
+                        if (!courseChild.isEmpty()) {
+                            courseParent.setChildren(courseChild);
+                            courseChild.forEach(stack::push);
+                        }
                     }
                 }
             }
