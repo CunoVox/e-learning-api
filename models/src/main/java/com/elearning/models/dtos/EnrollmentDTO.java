@@ -43,6 +43,6 @@ public class EnrollmentDTO {
     private Date updatedAt;
 
     @JsonProperty("is_deleted")
-    private boolean isDeleted;
+    private boolean isDeleted = false;
 
 }

@@ -44,6 +44,7 @@ public class EnrollmentController extends BaseController {
             throw new ServiceException("Vui lòng đăng nhập!");
         }
         enrollmentDTO.setUserId(userId);
+        enrollmentDTO.setCreatedBy(userId);
         Enrollment enrollment = buildEntity(enrollmentDTO);
         return saveEnrollment(enrollment);
     }
@@ -107,20 +108,26 @@ public class EnrollmentController extends BaseController {
             throw new ServiceException("Không tin thấy khóa học!");
         }
         Course course = courseListWrapper.getData().get(0);
-        if (course.getLevel() != 1) {
-            throw new ServiceException("Lỗi khóa học không hợp lệ!");
-        }
+
         // Kiểm tra user đã đăng kí khóa học này chưa
         Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(course.getId(), enrollment.getUserId());
         // Nếu đã đăng kí cập nhật quá trình học.
         if (entity != null) {
-            entity.setCurrentCourse(entity.getCurrentCourse());
-            entity.setCurrentMillis(entity.getCurrentMillis());
+            if (!enrollment.getCurrentCourse().isBlankOrNull()) {
+                entity.setCurrentCourse(enrollment.getCurrentCourse());
+            }
+            if (enrollment.getCurrentMillis() != null) {
+                entity.setCurrentMillis(enrollment.getCurrentMillis());
+            }
             entity.setUpdatedAt(new Date());
             entity.setUpdatedBy(enrollment.getUserId());
 
             Enrollment e1 = iEnrollmentRepository.save(entity);
             return toDTO(e1, courseController.getCourseById(e1.getCourseId()));
+        }
+
+        if (course.getLevel() != 1) {
+            throw new ServiceException("Lỗi khóa học không hợp lệ!");
         }
         // Kiểm tra giá tiền
         Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
@@ -180,7 +187,7 @@ public class EnrollmentController extends BaseController {
         List<String> courseIds = enrollments.stream().map(Enrollment::getCourseId).collect(Collectors.toList());
         ListWrapper<CourseDTO> wrapper = courseController.searchCourseDTOS(ParameterSearchCourse.builder().buildChild(buildCourseChild).ids(courseIds).build());
         Map<String, CourseDTO> courseDTOMap = new HashMap<>();
-        if (wrapper!=null && !wrapper.getData().isNullOrEmpty()) {
+        if (wrapper != null && !wrapper.getData().isNullOrEmpty()) {
             for (Enrollment enrollment : enrollments) {
                 Optional<CourseDTO> courseDTO = wrapper.getData().stream().filter(c -> c.getId().equals(enrollment.getCourseId())).findFirst();
                 courseDTO.ifPresent(dto -> courseDTOMap.put(enrollment.getId(), dto));
