@@ -8,6 +8,8 @@ import com.elearning.utils.enumAttribute.EnumCourseType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,6 +28,20 @@ public class EnrollmentAPI {
     @PostMapping("/")
     public EnrollmentDTO courseEnroll(@RequestBody EnrollmentDTO dto) {
         return enrollmentController.createEnrollment(dto);
+    }
+
+    @PostMapping("/mark-completed/{enrollment_id}")
+    @Operation(summary = "Đánh dấu đã hoàn thành khóa học")
+    public ResponseEntity<?> markCompletedCourse(@PathVariable("enrollment_id") String enrollmentId, @RequestBody String courseId) {
+        enrollmentController.modifyCourseCompleteUser(enrollmentId, courseId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    @DeleteMapping("/mark-completed/{enrollment_id}/{course_id}")
+    @Operation(summary = "Đánh dấu đã hoàn thành khóa học")
+    public ResponseEntity<?> markUncompletedCourse(@PathVariable("enrollment_id") String enrollmentId, @PathVariable("course_id") String courseId) {
+        enrollmentController.modifyCourseCompleteUser(enrollmentId, courseId);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/check-enrollment/{course_id}")

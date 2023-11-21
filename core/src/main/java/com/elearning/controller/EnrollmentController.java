@@ -3,6 +3,7 @@ package com.elearning.controller;
 import com.elearning.entities.Course;
 import com.elearning.entities.Enrollment;
 import com.elearning.entities.Price;
+import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
@@ -14,9 +15,13 @@ import com.elearning.reprositories.IEnrollmentRepository;
 import com.elearning.reprositories.IPriceRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
 import com.elearning.utils.enumAttribute.EnumPriceType;
+import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
 import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 
 @Controller
 @ExtensionMethod(Extensions.class)
+@Slf4j
 public class EnrollmentController extends BaseController {
     @Autowired
     IEnrollmentRepository iEnrollmentRepository;
@@ -98,7 +104,55 @@ public class EnrollmentController extends BaseController {
                 .build();
     }
 
-    //public Boolean
+    public void modifyCourseCompleteUser(String enrollmentId, String courseId) {
+        String userId = this.getUserIdFromContext();
+        if (userId == null) {
+            throw new ServiceException("Vui lòng đăng nhập!");
+        }
+        ListWrapper<EnrollmentDTO> enrollmentDTOList =
+                searchEnrollments(ParameterSearchEnrollment.builder()
+                        .ids(Collections.singletonList(enrollmentId))
+                        .userIds(Collections.singletonList(userId))
+                        .buildCourseChild(true)
+                        .build());
+        if (enrollmentDTOList != null && enrollmentDTOList.getData() != null) {
+            List<CourseDTO> courseDTOS = enrollmentDTOList.getData().stream()
+                    .flatMap(enrollment -> enrollment.getCourseDTO().getChildren().stream())
+                    .flatMap(courseLevel2 -> courseLevel2.getChildren().stream()).collect(Collectors.toList());
+            List<String> courseId3 = courseDTOS.stream().filter(courseDTO -> courseDTO.getLevel()==3)
+                    .map(CourseDTO::getId)
+                    .collect(Collectors.toList());
+            boolean isPresent = courseId3.stream()
+                    .anyMatch(courseLevel3 ->  courseLevel3.equals(courseId));
+
+            if (!isPresent) {
+                throw new ServiceException("Không thể thực hiện hành động này");
+            }
+            Optional<Enrollment> enrollment = iEnrollmentRepository.findById(enrollmentId);
+            enrollment.ifPresent(value -> {
+                List<String> completedCourses = value.getCompletedCourse();
+                if (completedCourses == null) {
+                    completedCourses = new ArrayList<>();
+                }
+                if (completedCourses.contains(courseId)) {
+                    completedCourses.remove(courseId); // Remove courseId if already present
+                } else {
+                    completedCourses.add(courseId);
+                }
+                value.setCompletedCourse(completedCourses.stream().sorted().collect(Collectors.toList()));
+                value.setUpdatedBy(userId);
+                value.setUpdatedAt(new Date());
+
+                value.setPercentComplete((int) (((double)completedCourses.size() / courseId3.size()) * 100));
+                try {
+                    iEnrollmentRepository.save(value);
+                } catch (Exception e) {
+                    throw new ServiceException("Không thể thực hiện hành động này ", e);
+                }
+            });
+        }
+    }
+
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
@@ -174,6 +228,7 @@ public class EnrollmentController extends BaseController {
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
                 .courseDTO(courseDTO)
+                .completedCourseIds(entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()))
                 .currentCourse(entity.getCurrentCourse())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())

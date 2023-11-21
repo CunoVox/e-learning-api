@@ -41,7 +41,7 @@ public class CourseController extends BaseController {
     private FileRelationshipController fileRelationshipController;
     @Autowired
     private PriceController priceController;
-//    @Autowired
+    //    @Autowired
 //    private IPriceRepository priceRepository;
     @Autowired
     Connector connector;
@@ -79,7 +79,7 @@ public class CourseController extends BaseController {
 
     public CourseDTO getCourseById(String courseId) {
         ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).build());
-        if (!listWrapper.getData().isNullOrEmpty()){
+        if (!listWrapper.getData().isNullOrEmpty()) {
             return listWrapper.getData().get(0);
         }
         return new CourseDTO();
@@ -135,15 +135,17 @@ public class CourseController extends BaseController {
             List<Course> allCourse = new ArrayList<>();
             allCourse.addAll(courses);
             //build khoá học con level 1 + 2 +3
-            if (parameterSearchCourse.getBuildChild()!=null && parameterSearchCourse.getBuildChild()) {
-                List<String> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
-                List<Course> courseLevel2 = courseRepository.findAllByParentIdIn(courseIds);
-                List<String> level2Ids;
-                List<Course> courseLevel3 = new ArrayList<>();
-                if (!courseLevel2.isNullOrEmpty()) {
-                    level2Ids = courseLevel2.stream().map(Course::getId).collect(Collectors.toList());
-                    courseLevel3 = courseRepository.findAllByParentIdIn(level2Ids);
-                }
+            Long courseLevel3Size = 0L;
+            List<String> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
+            List<Course> courseLevel2 = courseRepository.findAllByParentIdIn(courseIds);
+            List<String> level2Ids;
+            List<Course> courseLevel3 = new ArrayList<>();
+            if (!courseLevel2.isNullOrEmpty()) {
+                level2Ids = courseLevel2.stream().map(Course::getId).collect(Collectors.toList());
+                courseLevel3 = courseRepository.findAllByParentIdIn(level2Ids);
+                courseLevel3Size = (long) courseLevel3.size();
+            }
+            if (parameterSearchCourse.getBuildChild() != null && parameterSearchCourse.getBuildChild()) {
                 allCourse.addAll(courseLevel2);
                 allCourse.addAll(courseLevel3);
             }
@@ -159,6 +161,7 @@ public class CourseController extends BaseController {
             //toDTO
             for (Course course : courses) {
                 CourseDTO courseDTO = toDTO(course);
+                courseDTO.setTotalLesson(courseLevel3Size);
                 //Giá tiền
                 courseDTO.setPriceSell(priceController.findCoursePriceSell(courseDTO.getId()));
                 courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
@@ -166,7 +169,7 @@ public class CourseController extends BaseController {
                 courseDTOS.add(courseDTO);
             }
             //build child
-            if (parameterSearchCourse.getBuildChild()!=null && parameterSearchCourse.getBuildChild()) {
+            if (parameterSearchCourse.getBuildChild() != null && parameterSearchCourse.getBuildChild()) {
                 List<CourseDTO> allChildDTOS = new ArrayList<>();
                 for (Course course : allCourse) {
                     CourseDTO courseDTO = toDTO(course);
@@ -235,6 +238,7 @@ public class CourseController extends BaseController {
                 .nameMode(entity.getNameMode())
                 .parentId(entity.getParentId())
                 .level(entity.getLevel())
+                .totalLesson(entity.getTotalLesson())
                 .subscriptions(entity.getSubscriptions())
                 .children(new ArrayList<>())
                 .type(entity.getContentType())
@@ -269,6 +273,4 @@ public class CourseController extends BaseController {
         course = courseRepository.save(course);
         return course;
     }
-
-
 }

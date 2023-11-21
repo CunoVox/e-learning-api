@@ -4,6 +4,8 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "enrollment")
 @Getter
 @Setter
@@ -18,4 +20,5 @@ public class Enrollment extends IBaseEntity{
     private String currentCourse;
     private Long currentMillis;
     private int percentComplete;
+    private List<String> completedCourse;
 }

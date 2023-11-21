@@ -10,7 +10,7 @@ public abstract class BaseController {
     public String getUserIdFromContext() {
         try {
             var context = SecurityContextHolder.getContext().getAuthentication();
-            log.info(context.getAuthorities().toString());
+//            log.info(context.getAuthorities().toString());
             SecurityUserDetail userDetail = (SecurityUserDetail) context.getPrincipal();
             if (userDetail != null) {
                 return userDetail.getId();
