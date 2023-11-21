@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ExtensionMethod(Extensions.class)
-public class UserController extends BaseController{
+public class UserController extends BaseController {
     private final ModelMapper modelMapper;
     private final IUserRepository userRepository;
     private final JwtController jwtController;
@@ -244,6 +244,19 @@ public class UserController extends BaseController{
         }
         return toDto(user.get());
     }
+
+    public Map<String, UserDTO> getUserByIds(List<String> ids) {
+        if (ids.isNullOrEmpty()) return new HashMap<>();
+        Map<String, UserDTO> map = new HashMap<>();
+        ListWrapper<UserDTO> wrapper = searchUser(ParameterSearchUser.builder().userIds(ids).build());
+        if (wrapper != null && !wrapper.getData().isNullOrEmpty()) {
+            map = wrapper.getData().stream()
+                    .filter(u -> ids.contains(u.getId()))
+                    .collect(Collectors.toMap(UserDTO::getId, u -> u));
+        }
+        return map;
+    }
+
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
