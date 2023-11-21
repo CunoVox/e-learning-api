@@ -43,6 +43,8 @@ public class EnrollmentController extends BaseController {
     IPriceRepository iPriceRepository;
     @Autowired
     CourseController courseController;
+    @Autowired
+    RatingController ratingController;
 
     public EnrollmentDTO createEnrollment(EnrollmentDTO enrollmentDTO) {
         String userId = this.getUserIdFromContext();
@@ -228,6 +230,7 @@ public class EnrollmentController extends BaseController {
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
                 .courseDTO(courseDTO)
+                .ratingDTO(ratingController.userRating(courseDTO.getId(),entity.getUserId()))
                 .completedCourseIds(entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()))
                 .currentCourse(entity.getCurrentCourse())
                 .createdBy(entity.getCreatedBy())

@@ -14,7 +14,6 @@ import java.util.List;
 @Builder
 public class EnrollmentDTO {
     private String id;
-
     @JsonProperty("course_id")
     private String courseId;
     @JsonProperty("course")
@@ -40,7 +39,8 @@ public class EnrollmentDTO {
 
     @JsonProperty("update_by")
     private String updateBy;
-
+    @JsonProperty("rating")
+    private RatingDTO ratingDTO;
     @JsonProperty("update_at")
     private Date updatedAt;
 

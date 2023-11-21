@@ -20,6 +20,7 @@ import com.elearning.utils.enumAttribute.*;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,8 @@ public class CourseController extends BaseController {
     private FileRelationshipController fileRelationshipController;
     @Autowired
     private PriceController priceController;
+    @Autowired
+    private RatingController ratingController;
     //    @Autowired
 //    private IPriceRepository priceRepository;
     @Autowired
@@ -52,7 +55,7 @@ public class CourseController extends BaseController {
         if (userId != null) {
             dto.setCreatedBy(userId);
         }
-        dto.setId(null);
+//        dto.setId(null);
         Course course = buildEntity(dto);
         Course courseSaved = saveCourse(course);
 
@@ -72,13 +75,18 @@ public class CourseController extends BaseController {
             if (!courseDTO.getChildren().isNullOrEmpty()) {
                 for (CourseDTO children : courseDTO.getChildren()) {
                     courseRepository.updateCourseType(children.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+                    if(children.getLevel() == 2 && !children.getChildren().isEmpty()){
+                        for (CourseDTO children3 : children.getChildren()) {
+                            courseRepository.updateCourseType(children3.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+                        }
+                    }
                 }
             }
         }
     }
 
     public CourseDTO getCourseById(String courseId) {
-        ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).build());
+        ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).buildChild(Boolean.TRUE).build());
         if (!listWrapper.getData().isNullOrEmpty()) {
             return listWrapper.getData().get(0);
         }
@@ -164,6 +172,8 @@ public class CourseController extends BaseController {
                 courseDTO.setTotalLesson(courseLevel3Size);
                 //Giá tiền
                 courseDTO.setPriceSell(priceController.findCoursePriceSell(courseDTO.getId()));
+//                courseDTO.setRatings(ratingController.courseRating(courseDTO.getId()));
+                courseDTO.setCourseRatings(ratingController.calcRating(courseDTO.getId()));
                 courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                 courseDTO.setImagePath(mapImageUrl.get(course.getId()));
                 courseDTOS.add(courseDTO);
@@ -198,7 +208,6 @@ public class CourseController extends BaseController {
         }
         return courseDTOS;
     }
-
     private Course buildEntity(CourseDTO inputDTO) {
         if (inputDTO.getName().isBlankOrNull()) {
             throw new ServiceException("Tiêu đề không được để trống!");

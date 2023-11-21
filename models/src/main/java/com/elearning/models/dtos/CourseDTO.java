@@ -68,7 +68,10 @@ public class CourseDTO {
 
     @JsonProperty("created_at")
     private Date createAt;
-
+//    @JsonProperty("ratings")
+//    private List<RatingDTO> ratings;
+    @JsonProperty("course_ratings")
+    private CourseRatingDTO courseRatings;
     @JsonProperty("update_by")
     private String updateBy;
 
