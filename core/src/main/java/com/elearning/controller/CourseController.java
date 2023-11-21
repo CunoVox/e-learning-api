@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,14 +74,27 @@ public class CourseController extends BaseController {
                 courseRepository.updateCourseType(courseId, EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
             }
             if (!courseDTO.getChildren().isNullOrEmpty()) {
-                for (CourseDTO children : courseDTO.getChildren()) {
-                    courseRepository.updateCourseType(children.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
-                    if(children.getLevel() == 2 && !children.getChildren().isEmpty()){
-                        for (CourseDTO children3 : children.getChildren()) {
-                            courseRepository.updateCourseType(children3.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
-                        }
-                    }
-                }
+//                for (CourseDTO children : courseDTO.getChildren()) {
+//                    courseRepository.updateCourseType(children.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+//                    if(children.getLevel() == 2 && !children.getChildren().isEmpty()){
+//                        for (CourseDTO children3 : children.getChildren()) {
+//                            courseRepository.updateCourseType(children3.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+//                        }
+//                    }
+//                }
+                CompletableFuture<Void> allOf = CompletableFuture.allOf(courseDTO.getChildren().stream()
+                        .map(course -> CompletableFuture.runAsync(() -> {
+                            courseRepository.updateCourseType(course.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+                            //accept course lv3
+                            if(course.getLevel() == 2 && !course.getChildren().isEmpty()){
+                                CompletableFuture<Void> future3 = CompletableFuture.allOf(course.getChildren().stream()
+                                        .map(courselv3 -> CompletableFuture.runAsync(() -> {
+                                            courseRepository.updateCourseType(courselv3.getId(), EnumCourseType.OFFICIAL.name(), getUserIdFromContext());
+                                        })).toArray(CompletableFuture[]::new));
+                                future3.join();
+                            }
+                        })).toArray(CompletableFuture[]::new));
+                allOf.join();
             }
         }
     }
@@ -247,7 +261,6 @@ public class CourseController extends BaseController {
                 .nameMode(entity.getNameMode())
                 .parentId(entity.getParentId())
                 .level(entity.getLevel())
-                .totalLesson(entity.getTotalLesson())
                 .subscriptions(entity.getSubscriptions())
                 .children(new ArrayList<>())
                 .type(entity.getContentType())
