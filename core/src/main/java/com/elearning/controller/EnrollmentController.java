@@ -121,11 +121,11 @@ public class EnrollmentController extends BaseController {
             List<CourseDTO> courseDTOS = enrollmentDTOList.getData().stream()
                     .flatMap(enrollment -> enrollment.getCourseDTO().getChildren().stream())
                     .flatMap(courseLevel2 -> courseLevel2.getChildren().stream()).collect(Collectors.toList());
-            List<String> courseId3 = courseDTOS.stream().filter(courseDTO -> courseDTO.getLevel()==3)
+            List<String> courseId3 = courseDTOS.stream().filter(courseDTO -> courseDTO.getLevel() == 3)
                     .map(CourseDTO::getId)
                     .collect(Collectors.toList());
             boolean isPresent = courseId3.stream()
-                    .anyMatch(courseLevel3 ->  courseLevel3.equals(courseId));
+                    .anyMatch(courseLevel3 -> courseLevel3.equals(courseId));
 
             if (!isPresent) {
                 throw new ServiceException("Không thể thực hiện hành động này");
@@ -145,7 +145,7 @@ public class EnrollmentController extends BaseController {
                 value.setUpdatedBy(userId);
                 value.setUpdatedAt(new Date());
 
-                value.setPercentComplete((int) (((double)completedCourses.size() / courseId3.size()) * 100));
+                value.setPercentComplete((int) (((double) completedCourses.size() / courseId3.size()) * 100));
                 try {
                     iEnrollmentRepository.save(value);
                 } catch (Exception e) {
@@ -230,8 +230,10 @@ public class EnrollmentController extends BaseController {
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
                 .courseDTO(courseDTO)
-                .ratingDTO(ratingController.userRating(courseDTO.getId(),entity.getUserId()))
-                .completedCourseIds(entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()))
+                .ratingDTO(ratingController.userRating(courseDTO.getId(), entity.getUserId()))
+                .completedCourseIds(entity.getCompletedCourse() != null ?
+                        entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()) :
+                        Collections.emptyList())
                 .currentCourse(entity.getCurrentCourse())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
