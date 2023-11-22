@@ -8,6 +8,7 @@ import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.FileRelationshipDTO;
+import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
@@ -43,6 +44,8 @@ public class CourseController extends BaseController {
     private FileRelationshipController fileRelationshipController;
     @Autowired
     private PriceController priceController;
+    @Autowired
+    private UserController userController;
     @Autowired
     private RatingController ratingController;
     //    @Autowired
@@ -89,7 +92,9 @@ public class CourseController extends BaseController {
                             //accept course lv3
                             if(course.getLevel() == 2 && !course.getChildren().isEmpty()){
                                 CompletableFuture<Void> future3 = CompletableFuture.allOf(course.getChildren().stream()
-                                        .map(courselv3 -> CompletableFuture.runAsync(() -> courseRepository.updateCourseType(courselv3.getId(), EnumCourseType.OFFICIAL.name(), userId))).toArray(CompletableFuture[]::new));
+                                        .map(courselv3 -> CompletableFuture.runAsync(() -> {
+                                            courseRepository.updateCourseType(courselv3.getId(), EnumCourseType.OFFICIAL.name(), userId);
+                                        })).toArray(CompletableFuture[]::new));
                                 future3.join();
                             }
                         })).toArray(CompletableFuture[]::new));
@@ -178,10 +183,15 @@ public class CourseController extends BaseController {
             //Ảnh
             List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.COURSE_IMAGE.name());
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
-
+            //Chi tiết người tạo khoá học
+            List<String> createdUserIds= courses.stream().map(Course::getCreatedBy).collect(Collectors.toList());
+            Map<String, UserDTO> userDTOMap = userController.getUserByIds(createdUserIds);
             //toDTO
             for (Course course : courses) {
                 CourseDTO courseDTO = toDTO(course);
+                //chi tiết người tạo
+                courseDTO.setCreatedUserInfo(new HashMap<>() {{
+                    put(course.getCreatedBy(), userDTOMap.get(course.getCreatedBy()).getFullName());}});
                 courseDTO.setTotalLesson(courseLevel3Size);
                 //Giá tiền
                 courseDTO.setPriceSell(priceController.findCoursePriceSell(courseDTO.getId()));
