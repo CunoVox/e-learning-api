@@ -70,20 +70,20 @@ public class RatingController extends BaseController {
 
     public CourseRatingDTO calcRating(String courseId) {
         List<Rating> ratings = ratingRepository.findAllByCourseId(courseId);
-        int totalRating = 0;
+        int rates = 0;
         int totalRatings = 0;
         Map<Integer, Integer> ratingCounts = new HashMap<>();
         for (int i = 1; i <= 5; i++) {
             ratingCounts.put(i, 0);
         }
         for (Rating rating : ratings) {
-            totalRating += rating.getRate();
+            rates += rating.getRate();
             ratingCounts.put(rating.getRate(), ratingCounts.get(rating.getRate()) + 1);
             totalRatings++;
         }
         return CourseRatingDTO.builder()
                 .totalRatings(totalRatings)
-                .averageRate((totalRatings > 0) ? ((double) totalRating / totalRatings) : 0.0)
+                .averageRate((totalRatings > 0) ? ((double) rates / totalRatings) : 0.0)
                 .ratingCounts(ratingCounts)
                 .build();
     }
