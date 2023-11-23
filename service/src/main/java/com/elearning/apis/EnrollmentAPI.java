@@ -55,8 +55,8 @@ public class EnrollmentAPI {
     public ListWrapper<EnrollmentDTO> myEnrollments(@RequestParam(value = "ids", required = false) List<String> ids,
                                                     @RequestParam(value = "course_ids", required = false) List<String> courseIds,
                                                     @RequestParam(value = "percent_complete", required = false) @Min(value = 0, message = "percentComplete phải lớn hơn 0") @Parameter(description = "Default: 0") Integer percentComplete,
-                                                    @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
-                                                    @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
+                                                    @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
+                                                    @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
                                                     @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                                     @RequestParam(value = "build_course_child", required = false) Boolean buildCourseChild) {
         ParameterSearchEnrollment parameterSearchEnrollment = setParameterSearchEnrollment(ids, courseIds, percentComplete, currentPage, maxResult, isDeleted, buildCourseChild);
@@ -70,8 +70,8 @@ public class EnrollmentAPI {
                                                       @RequestParam(value = "course_ids", required = false) List<String> courseIds,
                                                       @RequestParam(value = "user_ids", required = false) List<String> userIds,
                                                       @RequestParam(value = "percent_complete", required = false) @Min(value = 0, message = "percentComplete phải lớn hơn 0") @Parameter(description = "Default: 0") Integer percentComplete,
-                                                      @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
-                                                      @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
+                                                      @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
+                                                      @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
                                                       @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                                       @RequestParam(value = "build_course_child", required = false, defaultValue = "false") Boolean buildCourseChild) {
         ParameterSearchEnrollment parameterSearchEnrollment = setParameterSearchEnrollment(ids, courseIds, percentComplete, currentPage, maxResult, isDeleted, buildCourseChild);
@@ -83,8 +83,8 @@ public class EnrollmentAPI {
     private ParameterSearchEnrollment setParameterSearchEnrollment(@RequestParam(value = "ids", required = false) List<String> ids,
                                                                    @RequestParam(value = "course_ids", required = false) List<String> courseIds,
                                                                    @Parameter(description = "Default: 0") @RequestParam(value = "percent_complete", required = false) @Min(value = 0, message = "percentComplete phải lớn hơn 0") Integer percentComplete,
-                                                                   @Parameter(description = "Default: 1") @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") Integer currentPage,
-                                                                   @Parameter(description = "Default: 20; Size range: 1-100") @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") Integer maxResult,
+                                                                   @Parameter(description = "Default: 1") @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") Integer currentPage,
+                                                                   @Parameter(description = "Default: 20; Size range: 1-100") @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") Integer maxResult,
                                                                    @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                                                    @RequestParam(value = "build_course_child", required = false) Boolean buildCourseChild) {
         if (currentPage == null || currentPage == 0) {

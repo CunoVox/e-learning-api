@@ -94,15 +94,15 @@ public class JwtController {
     public AuthResponse refreshToken(String token) throws ServiceException {
         var storedToken = refreshTokenController.findById(token);
         if(storedToken.isEmpty()){
-            throw new ServiceException("Không có quyền truy cập");
+            throw new ServiceException("JWT_ERROR");
         }
         if(storedToken.get().getIsDeleted()){
             refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
-            throw new ServiceException("Không có quyền truy cập");
+            throw new ServiceException("JWT_ERROR");
         }
         if(storedToken.get().getExpiredAt().before(new Date())){
             refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
-            throw new ServiceException("Không có quyền truy cập");
+            throw new ServiceException("JWT_ERROR");
         }
         storedToken.get().setIsDeleted(true);
         refreshTokenController.save(storedToken.get());
@@ -128,7 +128,7 @@ public class JwtController {
 
     public AuthResponse refreshToken(Cookie cookie) throws ServiceException{
         if(cookie == null){
-            throw new ServiceException("Không có quyền truy cập");
+            throw new ServiceException("JWT_ERROR");
         }
         return refreshToken(cookie.getValue());
     }

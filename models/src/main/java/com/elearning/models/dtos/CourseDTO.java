@@ -62,6 +62,7 @@ public class CourseDTO {
 
     private List<CourseDTO> children;
 
+    @JsonProperty("category_ids")
     private List<String> categoryIds;
 
     @JsonProperty("created_by")

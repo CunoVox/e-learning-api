@@ -1,11 +1,15 @@
 package com.elearning.models.dtos;
 
+import com.elearning.utils.enumAttribute.EnumRole;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -24,4 +28,6 @@ public class UserDTO {
     private Boolean isDeleted;
     @JsonProperty("is_email_confirmed")
     private Boolean isEmailConfirmed;
+    public List<EnumRole> roles = new ArrayList<>();
+
 }
