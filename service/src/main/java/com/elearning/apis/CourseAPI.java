@@ -50,7 +50,8 @@ public class CourseAPI {
                                             @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
-                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
+                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds,
+                                            @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds) {
         if (currentPage == null || currentPage == 0) {
             currentPage = 1;
         }
@@ -70,7 +71,8 @@ public class CourseAPI {
         parameterSearchCourse.setBuildChild(buildChild);
         parameterSearchCourse.setParentIds(parentIds);
         parameterSearchCourse.setStartIndex(startIndex);
-        if (fromDate !=null) {
+        parameterSearchCourse.setCategoriesIds(categoriesIds);
+        if (fromDate != null) {
             parameterSearchCourse.setFromDate(new Date(fromDate));
         }
         if (toDate != null) {

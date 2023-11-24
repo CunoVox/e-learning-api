@@ -44,6 +44,8 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private List<String> parentIds;
 
+    private List<String> categoriesIds;
+
     //  page
     private Long startIndex;
 
