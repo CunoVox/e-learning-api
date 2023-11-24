@@ -30,9 +30,9 @@ public class EnrollmentAPI {
         return enrollmentController.createEnrollment(dto);
     }
 
-    @PostMapping("/mark-completed/{enrollment_id}")
+    @PostMapping("/mark-completed/{enrollment_id}/{course_id}")
     @Operation(summary = "Đánh dấu đã hoàn thành khóa học")
-    public ResponseEntity<?> markCompletedCourse(@PathVariable("enrollment_id") String enrollmentId, @RequestBody String courseId) {
+    public ResponseEntity<?> markCompletedCourse(@PathVariable("enrollment_id") String enrollmentId,@PathVariable("course_id") String courseId) {
         enrollmentController.modifyCourseCompleteUser(enrollmentId, courseId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
