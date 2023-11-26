@@ -31,10 +31,10 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
     @Override
     public ListWrapper<Course> searchCourse(ParameterSearchCourse parameterSearchCourse) {
         List<Criteria> criteria = new ArrayList<>();
-        Collection<String> courseIds = new ArrayList<>();
+        Collection<String> courseIds = null;
         if (parameterSearchCourse.getLevel() != null) {
             criteria.add(Criteria.where("level").is(parameterSearchCourse.getLevel()));
-        } else if (parameterSearchCourse.getIds().isNullOrEmpty() ){
+        } else if (parameterSearchCourse.getIds().isNullOrEmpty()) {
             criteria.add(Criteria.where("level").is(1));
         }
         if (!parameterSearchCourse.getParentIds().isNullOrEmpty()) {
@@ -89,9 +89,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         //danh mục
         if (!parameterSearchCourse.getCategoriesIds().isNullOrEmpty()) {
             List<String> ids = getCourseIdsByCategory(parameterSearchCourse.getCategoriesIds());
-            if (!ids.isNullOrEmpty()) {
-                courseIds.addAll(ids);
-            }
+            courseIds = courseIds.merge(ids);
         }
         if (criteriaKeywords != null) {
             if (criteriaKeywordsExternal == null) {
@@ -107,7 +105,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         if (null != parameterSearchCourse.getToDate()) {
             criteria.add(Criteria.where("createdAt").lte(parameterSearchCourse.getToDate()));
         }
-        if (!courseIds.isNullOrEmpty()) {
+        if (courseIds != null) {
             criteria.add(Criteria.where("_id").in(courseIds));
         }
 
@@ -157,7 +155,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         //danh mục
         List<Category> productCategories = categoryRepository.findAllByNameModeLike(keyword);
         List<String> categoryIds = productCategories.stream().map(Category::getId).collect(Collectors.toList());
-        if (!categoryIds.isNullOrEmpty()){
+        if (!categoryIds.isNullOrEmpty()) {
             mapProductIds.putAll(connector.getIdRelatedObjectsById(Category.class.getAnnotation(Document.class).collection(),
                     categoryIds, Course.class.getAnnotation(Document.class).collection(),
                     EnumConnectorType.COURSE_TO_CATEGORY.name()));
@@ -180,7 +178,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             categories.addAll(categoryRepository.findAllByParentIdIn(categoryLv2Ids));
         }
         List<String> allCategoryIds = categories.stream().map(Category::getId).collect(Collectors.toList());
-        if (!allCategoryIds.isNullOrEmpty()){
+        if (!allCategoryIds.isNullOrEmpty()) {
             mapProductIds.putAll(connector.getIdRelatedObjectsById(Category.class.getAnnotation(Document.class).collection(),
                     allCategoryIds, Course.class.getAnnotation(Document.class).collection(),
                     EnumConnectorType.COURSE_TO_CATEGORY.name()));
