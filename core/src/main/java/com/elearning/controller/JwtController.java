@@ -58,10 +58,10 @@ public class JwtController {
     public String generateToken(Map<String, Object> extraClaims, SecurityUserDetail userDetails){
         extraClaims.put("uId", userDetails.getId());
         extraClaims.put("fullName", userDetails.getFullName());
-        extraClaims.put("roles", userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+//        extraClaims.put("roles", userDetails
+//                .getAuthorities()
+//                .stream()
+//                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return buildToken(extraClaims, userDetails, ACCESS_TOKEN_EXPIRE_TIME_MILLIS);
     }
     public String generateRefreshToken(SecurityUserDetail userDetails){

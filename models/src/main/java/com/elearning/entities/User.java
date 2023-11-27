@@ -29,7 +29,7 @@ public class User extends IBaseEntity {
     //lecturer
     private String phoneNumber;
     private String profileLink;
-
+    private String description;
 
     public List<EnumRole> roles = new ArrayList<>();
 }
