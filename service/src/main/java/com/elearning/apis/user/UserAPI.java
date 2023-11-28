@@ -42,7 +42,11 @@ public class UserAPI {
 
         return userController.update(email, dto);
     }
-
+    @Operation(summary = "Đăng kí làm giảng viên")
+    @PostMapping("/lecturer/register")
+    public UserDTO register(@RequestBody UserDTO dto){
+        return userController.userLecturerUpdate(dto);
+    }
     @Operation(summary = "Khoá và mở khoá người dùng")
     @PostMapping("/lock/{id}/{lock}")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")

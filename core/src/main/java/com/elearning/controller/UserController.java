@@ -178,6 +178,33 @@ public class UserController extends BaseController {
         return toDto(entity);
     }
 
+    public UserDTO userLecturerUpdate(UserDTO dto) {
+        String userId = this.getUserIdFromContext();
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Vui lòng đăng nhập");
+        }
+        if(dto.getPhoneNumber().isBlankOrNull()){
+            throw new ServiceException("Vui lòng nhập số điện thoại");
+        }
+//        if(dto.getProfileLink().isBlankOrNull()){
+//            throw new ServiceException("Vui lòng nhập đường dẫn");
+//        }
+        if(dto.getDescription().isBlankOrNull()){
+            throw new ServiceException("Vui lòng mô tả");
+        }
+        User newUser = user.get();
+        newUser.setPhoneNumber(dto.getPhoneNumber());
+        newUser.setProfileLink(dto.getProfileLink());
+        newUser.setDescription(dto.getDescription());
+        if (!newUser.getRoles().contains(EnumRole.ROLE_LECTURE)) {
+            newUser.getRoles().add(EnumRole.ROLE_LECTURE);
+        }
+        userRepository.save(newUser);
+
+        return toDto(newUser);
+    }
+
     private AuthResponse getAuthResponse(User entity) {
         UserDTO dto;
         dto = toDto(entity);
@@ -311,6 +338,9 @@ public class UserController extends BaseController {
                 .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(fileRelationshipDTO.size() - 1).getPathFile() : null)
                 .address(user.getAddress())
                 .isDeleted(user.getIsDeleted())
+                .phoneNumber(user.getPhoneNumber())
+                .profileLink(user.getProfileLink())
+                .description(user.getDescription())
                 .isEmailConfirmed(user.isEmailConfirmed)
                 .build();
 //        return modelMapper.map(user, UserDTO.class);

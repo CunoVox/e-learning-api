@@ -28,6 +28,13 @@ public class UserDTO {
     private Boolean isDeleted;
     @JsonProperty("is_email_confirmed")
     private Boolean isEmailConfirmed;
+    //lecturer
+    @JsonProperty("phone_number")
+    private String phoneNumber;
+    @JsonProperty("profile_link")
+    private String profileLink;
+    @JsonProperty("description")
+    private String description;
     public List<EnumRole> roles = new ArrayList<>();
 
 }
