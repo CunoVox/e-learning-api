@@ -71,10 +71,11 @@ public class CourseDTO {
     @JsonProperty("created_user_info")
     private Map<String, String> createdUserInfo;
 
+    private List<AttributeDTO> attributes;
+
     @JsonProperty("created_at")
     private Date createAt;
-//    @JsonProperty("ratings")
-//    private List<RatingDTO> ratings;
+
     @JsonProperty("course_ratings")
     private CourseRatingDTO courseRatings;
     @JsonProperty("update_by")

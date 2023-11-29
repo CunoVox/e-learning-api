@@ -5,6 +5,8 @@ import com.elearning.security.SecurityUserDetail;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.util.Collection;
+
 @Slf4j
 public abstract class BaseController {
     public String getUserIdFromContext() {

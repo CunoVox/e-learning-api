@@ -81,6 +81,11 @@ public class UserController extends BaseController {
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
         }
+        if (user.get().getRoles().stream().anyMatch(u -> u.equals(EnumRole.ROLE_ADMIN))) {
+            if ((new ArrayList<>(getUserDetailFromContext().getAuthorities())).stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+                throw new ServiceException("Không đủ quyền thay đổi trạng thái người dùng này");
+            }
+        }
         userRepository.updateDeleted(userId, lock, getUserIdFromContext());
     }
 
@@ -184,13 +189,13 @@ public class UserController extends BaseController {
         if (user.isEmpty()) {
             throw new ServiceException("Vui lòng đăng nhập");
         }
-        if(dto.getPhoneNumber().isBlankOrNull()){
+        if (dto.getPhoneNumber().isBlankOrNull()) {
             throw new ServiceException("Vui lòng nhập số điện thoại");
         }
 //        if(dto.getProfileLink().isBlankOrNull()){
 //            throw new ServiceException("Vui lòng nhập đường dẫn");
 //        }
-        if(dto.getDescription().isBlankOrNull()){
+        if (dto.getDescription().isBlankOrNull()) {
             throw new ServiceException("Vui lòng mô tả");
         }
         User newUser = user.get();
@@ -251,6 +256,26 @@ public class UserController extends BaseController {
             throw new ServiceException("Không tìm thấy người dùng");
         }
     }
+
+    public void updateRoles(String userId, List<EnumRole> roles) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        //Manager không được thay đổi quyền của admin và ngang cấp và không được nâng quyền của mình lên cấp cao hơn
+        if ((user.get().getRoles().stream().anyMatch(u -> (u.equals(EnumRole.ROLE_ADMIN) || u.equals(EnumRole.ROLE_MANAGER))) ||
+                roles.stream().anyMatch(r -> r.equals(EnumRole.ROLE_ADMIN))) &&
+                (new ArrayList<>(getUserDetailFromContext().getAuthorities()))
+                        .stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+            throw new ServiceException("Không đủ quyền hạn để thay đổi vài trò");
+        }
+        //nếu rỗng thì set thành quyền user
+        if (roles.isNullOrEmpty()) {
+            roles = Collections.singletonList(EnumRole.ROLE_USER);
+        }
+        userRepository.updateUserRoles(userId, roles, getUserIdFromContext());
+    }
+
 
     public List<User> findAllUser() {
         return userRepository.findAll();

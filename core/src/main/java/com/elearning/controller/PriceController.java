@@ -63,13 +63,14 @@ public class PriceController extends BaseController {
                     .build());
         }
     }
-    protected BigDecimal findCoursePriceSell(String courseId){
-        Price price = priceRepository.findByParentIdAndType(courseId, EnumPriceType.SELL.name());
+    protected BigDecimal getPriceByParentId(String parentId, String priceType){
+        Price price = priceRepository.findByParentIdAndType(parentId, priceType);
         if(price != null){
             return price.getPrice();
         }
         return BigDecimal.ZERO;
     }
+
     public Price toEntity(PriceDTO priceDTO) {
         return Price.builder()
                 .type(priceDTO.getType())
