@@ -161,26 +161,34 @@ public class UserController extends BaseController {
         return new AuthResponse();
     }
 
-    public UserDTO update(String email, UpdateUserDTO dto) {
-        User entity = userRepository.findByEmail(email);
-        if (entity == null) {
+    public UserDTO update(UserDTO dto) {
+        String userId = getUserIdFromContext();
+        if (userId == null) {
+            throw new ServiceException("Vui lòng đăng nhập.");
+        }
+        Optional<User> entity = userRepository.findById(userId);
+        if (entity.isEmpty()) {
             throw new ServiceException("User not found");
         }
-        int flag = 0;
         if (!dto.getFullName().isEmpty()) {
-            entity.setFullName(dto.getFullName());
-            entity.setFullNameMod(StringUtils.stripAccents(entity.getFullName()));
-            flag = 1;
+            entity.get().setFullName(dto.getFullName());
+            entity.get().setFullNameMod(StringUtils.stripAccents(entity.get().getFullName()));
         }
         if (!dto.getAddress().isEmpty()) {
-            entity.setAddress(dto.getAddress());
-            flag = 1;
+            entity.get().setAddress(dto.getAddress());
         }
-        if (flag != 0) {
-            entity.setUpdatedAt(new Date());
+        if (!dto.getPhoneNumber().isBlankOrNull()) {
+            entity.get().setPhoneNumber(dto.getPhoneNumber());
         }
-        userRepository.save(entity);
-        return toDto(entity);
+        if (!dto.getProfileLink().isBlankOrNull()) {
+            entity.get().setProfileLink(dto.getProfileLink());
+        }
+        if (!dto.getDescription().isBlankOrNull()) {
+            entity.get().setDescription(dto.getDescription());
+        }
+        entity.get().setUpdatedAt(new Date());
+        userRepository.save(entity.get());
+        return toDto(entity.get());
     }
 
     public UserDTO userLecturerUpdate(UserDTO dto) {
@@ -189,15 +197,6 @@ public class UserController extends BaseController {
         if (user.isEmpty()) {
             throw new ServiceException("Vui lòng đăng nhập");
         }
-//        if(dto.getPhoneNumber().isBlankOrNull()){
-//            throw new ServiceException("Vui lòng nhập số điện thoại");
-//        }
-//        if(dto.getProfileLink().isBlankOrNull()){
-//            throw new ServiceException("Vui lòng nhập đường dẫn");
-//        }
-//        if(dto.getDescription().isBlankOrNull()){
-//            throw new ServiceException("Vui lòng mô tả");
-//        }
         User newUser = user.get();
         if (!dto.getPhoneNumber().isBlankOrNull()) {
             newUser.setPhoneNumber(dto.getPhoneNumber());
@@ -211,6 +210,7 @@ public class UserController extends BaseController {
         if (!newUser.getRoles().contains(EnumRole.ROLE_LECTURE)) {
             newUser.getRoles().add(EnumRole.ROLE_LECTURE);
         }
+        newUser.setUpdatedAt(new Date());
         userRepository.save(newUser);
 
         return toDto(newUser);

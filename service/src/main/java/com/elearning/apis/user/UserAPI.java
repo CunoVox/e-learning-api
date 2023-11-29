@@ -36,12 +36,10 @@ public class UserAPI {
     private final VerificationCodeController verificationCodeController;
 
     @Operation(summary = "Cập nhật người dùng")
-    @PostMapping("/profile/update")
-    public UserDTO update(@RequestBody UpdateUserDTO dto) {
-        var context = SecurityContextHolder.getContext().getAuthentication();
-        var email = context.getName();
+    @PatchMapping("/profile/update")
+    public UserDTO update(@RequestBody UserDTO dto) {
 
-        return userController.update(email, dto);
+        return userController.update(dto);
     }
 
     @Operation(summary = "Đăng kí làm giảng viên")
