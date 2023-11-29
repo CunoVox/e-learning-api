@@ -9,8 +9,8 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 public class Attribute extends IBaseEntity{
-    private String forId;
-    private String fieldName;
-    private Object fieldValue;
-    private String forCollection;
+//    private String forId;
+    private String attributeName;
+    private Object attributeValue;
+//    private String forCollection;
 }
