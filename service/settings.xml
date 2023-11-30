@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 http://maven.apache.org/xsd/settings-1.2.0.xsd" xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <servers>
+    <server>
+        <id>space-elearning</id>
+        <username>hoanhao</username>
+        <password>eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiIxUms1RmQwUEpOYWoiLCJhdWQiOiJjaXJjbGV0LXdlYi11aSIsIm9yZ0RvbWFpbiI6ImhvYW5oYW8iLCJuYW1lIjoiaG9hbmhhbyIsImlzcyI6Imh0dHBzOlwvXC9ob2FuaGFvLmpldGJyYWlucy5zcGFjZSIsInBlcm1fdG9rZW4iOiI0TkRlYjM0MjdLbmYiLCJwcmluY2lwYWxfdHlwZSI6IlVTRVIiLCJpYXQiOjE3MDA3OTI2ODN9.HTyvxu_u_tlhv0EbHH5CXAyixd-vMCNcI5CfVSp65AGqax9RfBk4QySRTV6hBTOOvuGM4PtT_pobMJzNhyLX0VtSsLwny-WiTjYG1zbZ3dCcTmksDHoAUmi5PDDqwzVgoJGWwD7BXVUe0m9CEZJhSVJVa7MtmWGC64d00akYdl8</password>
+    </server>
+  </servers>
+  <activeProfiles>
+    <activeProfile>artifactory</activeProfile>
+  </activeProfiles>
+</settings>
