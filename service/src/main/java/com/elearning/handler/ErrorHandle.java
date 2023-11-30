@@ -2,12 +2,14 @@ package com.elearning.handler;
 
 import com.elearning.models.wrapper.ObjectResponseWrapper;
 import com.sun.jdi.InternalException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -25,7 +27,7 @@ import java.util.List;
 public class ErrorHandle extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     protected ObjectResponseWrapper handleInternalException(Exception ex) {
         if (ex instanceof BadCredentialsException){
             return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
@@ -37,6 +39,16 @@ public class ErrorHandle extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     protected ObjectResponseWrapper handleSignatureException(SignatureException ex){
             return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
+    }
+    @ExceptionHandler({AccessDeniedException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ObjectResponseWrapper handleAccessDeniedException(AccessDeniedException ex){
+        return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
+    }
+    @ExceptionHandler({ExpiredJwtException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    protected ObjectResponseWrapper handleExpiredJwtException(ExpiredJwtException ex){
+        return ObjectResponseWrapper.builder().status(0).message(ex.getMessage()).build();
     }
     @ExceptionHandler(ServiceException.class)
     protected ObjectResponseWrapper handleServiceException(ServiceException e) {

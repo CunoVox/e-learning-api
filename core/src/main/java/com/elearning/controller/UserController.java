@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ExtensionMethod(Extensions.class)
-public class UserController extends BaseController{
+public class UserController extends BaseController {
     private final ModelMapper modelMapper;
     private final IUserRepository userRepository;
     private final JwtController jwtController;
@@ -80,6 +80,11 @@ public class UserController extends BaseController{
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        if (user.get().getRoles().stream().anyMatch(u -> u.equals(EnumRole.ROLE_ADMIN))) {
+            if ((new ArrayList<>(getUserDetailFromContext().getAuthorities())).stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+                throw new ServiceException("Không đủ quyền thay đổi trạng thái người dùng này");
+            }
         }
         userRepository.updateDeleted(userId, lock, getUserIdFromContext());
     }
@@ -178,6 +183,33 @@ public class UserController extends BaseController{
         return toDto(entity);
     }
 
+    public UserDTO userLecturerUpdate(UserDTO dto) {
+        String userId = this.getUserIdFromContext();
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Vui lòng đăng nhập");
+        }
+        if (dto.getPhoneNumber().isBlankOrNull()) {
+            throw new ServiceException("Vui lòng nhập số điện thoại");
+        }
+//        if(dto.getProfileLink().isBlankOrNull()){
+//            throw new ServiceException("Vui lòng nhập đường dẫn");
+//        }
+        if (dto.getDescription().isBlankOrNull()) {
+            throw new ServiceException("Vui lòng mô tả");
+        }
+        User newUser = user.get();
+        newUser.setPhoneNumber(dto.getPhoneNumber());
+        newUser.setProfileLink(dto.getProfileLink());
+        newUser.setDescription(dto.getDescription());
+        if (!newUser.getRoles().contains(EnumRole.ROLE_LECTURE)) {
+            newUser.getRoles().add(EnumRole.ROLE_LECTURE);
+        }
+        userRepository.save(newUser);
+
+        return toDto(newUser);
+    }
+
     private AuthResponse getAuthResponse(User entity) {
         UserDTO dto;
         dto = toDto(entity);
@@ -225,6 +257,26 @@ public class UserController extends BaseController{
         }
     }
 
+    public void updateRoles(String userId, List<EnumRole> roles) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        //Manager không được thay đổi quyền của admin và ngang cấp và không được nâng quyền của mình lên cấp cao hơn
+        if ((user.get().getRoles().stream().anyMatch(u -> (u.equals(EnumRole.ROLE_ADMIN) || u.equals(EnumRole.ROLE_MANAGER))) ||
+                roles.stream().anyMatch(r -> r.equals(EnumRole.ROLE_ADMIN))) &&
+                (new ArrayList<>(getUserDetailFromContext().getAuthorities()))
+                        .stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+            throw new ServiceException("Không đủ quyền hạn để thay đổi vài trò");
+        }
+        //nếu rỗng thì set thành quyền user
+        if (roles.isNullOrEmpty()) {
+            roles = Collections.singletonList(EnumRole.ROLE_USER);
+        }
+        userRepository.updateUserRoles(userId, roles, getUserIdFromContext());
+    }
+
+
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
@@ -244,6 +296,19 @@ public class UserController extends BaseController{
         }
         return toDto(user.get());
     }
+
+    public Map<String, UserDTO> getUserByIds(List<String> ids) {
+        if (ids.isNullOrEmpty()) return new HashMap<>();
+        Map<String, UserDTO> map = new HashMap<>();
+        ListWrapper<UserDTO> wrapper = searchUser(ParameterSearchUser.builder().userIds(ids).build());
+        if (wrapper != null && !wrapper.getData().isNullOrEmpty()) {
+            map = wrapper.getData().stream()
+                    .filter(u -> ids.contains(u.getId()))
+                    .collect(Collectors.toMap(UserDTO::getId, u -> u));
+        }
+        return map;
+    }
+
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
@@ -294,9 +359,13 @@ public class UserController extends BaseController{
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
+                .roles(user.getRoles())
                 .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(fileRelationshipDTO.size() - 1).getPathFile() : null)
                 .address(user.getAddress())
                 .isDeleted(user.getIsDeleted())
+                .phoneNumber(user.getPhoneNumber())
+                .profileLink(user.getProfileLink())
+                .description(user.getDescription())
                 .isEmailConfirmed(user.isEmailConfirmed)
                 .build();
 //        return modelMapper.map(user, UserDTO.class);

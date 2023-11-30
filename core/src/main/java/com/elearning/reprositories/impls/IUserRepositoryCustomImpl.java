@@ -7,6 +7,7 @@ import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.IUserRepositoryCustom;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
+import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.enumAttribute.EnumUserStatus;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.data.domain.Sort;
@@ -99,5 +100,12 @@ public class IUserRepositoryCustomImpl extends BaseRepositoryCustom implements I
         Map<String, Object> map = new HashMap<>();
         map.put("isDeleted", deleted);
         updateAttribute(id, map, updateBy, User.class);
+    }
+
+    @Override
+    public void updateUserRoles(String id, List<EnumRole> roles, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("roles", roles);
+        updateAttribute(id, map, updatedBy, User.class);
     }
 }

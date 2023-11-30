@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -61,14 +62,22 @@ public class CourseDTO {
 
     private List<CourseDTO> children;
 
+    @JsonProperty("category_ids")
     private List<String> categoryIds;
 
     @JsonProperty("created_by")
     private String createdBy;
 
+    @JsonProperty("created_user_info")
+    private Map<String, String> createdUserInfo;
+
+    private List<AttributeDTO> attributes;
+
     @JsonProperty("created_at")
     private Date createAt;
 
+    @JsonProperty("course_ratings")
+    private CourseRatingDTO courseRatings;
     @JsonProperty("update_by")
     private String updateBy;
 

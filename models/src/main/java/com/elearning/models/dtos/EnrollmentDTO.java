@@ -3,7 +3,9 @@ package com.elearning.models.dtos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -12,7 +14,6 @@ import java.util.Date;
 @Builder
 public class EnrollmentDTO {
     private String id;
-
     @JsonProperty("course_id")
     private String courseId;
     @JsonProperty("course")
@@ -38,11 +39,13 @@ public class EnrollmentDTO {
 
     @JsonProperty("update_by")
     private String updateBy;
-
+    @JsonProperty("rating")
+    private RatingDTO ratingDTO;
     @JsonProperty("update_at")
     private Date updatedAt;
 
     @JsonProperty("is_deleted")
-    private boolean isDeleted;
-
+    private boolean isDeleted = false;
+    @JsonProperty("completed_course_ids")
+    private List<String> completedCourseIds = new ArrayList<>();
 }

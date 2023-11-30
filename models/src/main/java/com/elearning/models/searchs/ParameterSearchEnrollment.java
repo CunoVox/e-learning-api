@@ -24,6 +24,7 @@ public class ParameterSearchEnrollment implements Serializable, Cloneable{
     private int percentComplete;
     private Boolean isDeleted;
 
+    private Boolean buildCourseChild;
     //  page
     private Long startIndex;
 

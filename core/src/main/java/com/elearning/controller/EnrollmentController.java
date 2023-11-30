@@ -3,6 +3,7 @@ package com.elearning.controller;
 import com.elearning.entities.Course;
 import com.elearning.entities.Enrollment;
 import com.elearning.entities.Price;
+import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
@@ -14,20 +15,23 @@ import com.elearning.reprositories.IEnrollmentRepository;
 import com.elearning.reprositories.IPriceRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
 import com.elearning.utils.enumAttribute.EnumPriceType;
+import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
 import lombok.experimental.ExtensionMethod;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
 @ExtensionMethod(Extensions.class)
+@Slf4j
 public class EnrollmentController extends BaseController {
     @Autowired
     IEnrollmentRepository iEnrollmentRepository;
@@ -39,6 +43,8 @@ public class EnrollmentController extends BaseController {
     IPriceRepository iPriceRepository;
     @Autowired
     CourseController courseController;
+    @Autowired
+    RatingController ratingController;
 
     public EnrollmentDTO createEnrollment(EnrollmentDTO enrollmentDTO) {
         String userId = this.getUserIdFromContext();
@@ -46,10 +52,12 @@ public class EnrollmentController extends BaseController {
             throw new ServiceException("Vui lòng đăng nhập!");
         }
         enrollmentDTO.setUserId(userId);
+        enrollmentDTO.setCreatedBy(userId);
         Enrollment enrollment = buildEntity(enrollmentDTO);
         return saveEnrollment(enrollment);
     }
-    public Boolean checkEnrollment(String courseId){
+
+    public Boolean checkEnrollment(String courseId) {
         String userId = this.getUserIdFromContext();
         if (userId == null) {
             return false;
@@ -57,6 +65,7 @@ public class EnrollmentController extends BaseController {
         Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(courseId, userId);
         return entity != null;
     }
+
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public Enrollment buildEntity(EnrollmentDTO enrollmentDTO) {
         Enrollment enrollment = Enrollment.builder()
@@ -84,9 +93,10 @@ public class EnrollmentController extends BaseController {
         parameterSearchEnrollment.setUserIds(Collections.singletonList(userId));
         return searchEnrollments(parameterSearchEnrollment);
     }
-    public ListWrapper<EnrollmentDTO> searchEnrollments(ParameterSearchEnrollment parameterSearchEnrollment){
+
+    public ListWrapper<EnrollmentDTO> searchEnrollments(ParameterSearchEnrollment parameterSearchEnrollment) {
         ListWrapper<Enrollment> wrapper = iEnrollmentRepository.searchEnrollment(parameterSearchEnrollment);
-        List<EnrollmentDTO> enrollmentDTOS = toDTOs(wrapper.getData());
+        List<EnrollmentDTO> enrollmentDTOS = toDTOs(wrapper.getData(), parameterSearchEnrollment.getBuildCourseChild());
         return ListWrapper.<EnrollmentDTO>builder()
                 .currentPage(wrapper.getCurrentPage())
                 .totalPage(wrapper.getTotalPage())
@@ -95,7 +105,56 @@ public class EnrollmentController extends BaseController {
                 .data(enrollmentDTOS)
                 .build();
     }
-//    public Boolean
+
+    public void modifyCourseCompleteUser(String enrollmentId, String courseId) {
+        String userId = this.getUserIdFromContext();
+        if (userId == null) {
+            throw new ServiceException("Vui lòng đăng nhập!");
+        }
+        ListWrapper<EnrollmentDTO> enrollmentDTOList =
+                searchEnrollments(ParameterSearchEnrollment.builder()
+                        .ids(Collections.singletonList(enrollmentId))
+                        .userIds(Collections.singletonList(userId))
+                        .buildCourseChild(true)
+                        .build());
+        if (enrollmentDTOList != null && enrollmentDTOList.getData() != null) {
+            List<CourseDTO> courseDTOS = enrollmentDTOList.getData().stream()
+                    .flatMap(enrollment -> enrollment.getCourseDTO().getChildren().stream())
+                    .flatMap(courseLevel2 -> courseLevel2.getChildren().stream()).collect(Collectors.toList());
+            List<String> courseId3 = courseDTOS.stream().filter(courseDTO -> courseDTO.getLevel() == 3)
+                    .map(CourseDTO::getId)
+                    .collect(Collectors.toList());
+            boolean isPresent = courseId3.stream()
+                    .anyMatch(courseLevel3 -> courseLevel3.equals(courseId));
+
+            if (!isPresent) {
+                throw new ServiceException("Không thể thực hiện hành động này");
+            }
+            Optional<Enrollment> enrollment = iEnrollmentRepository.findById(enrollmentId);
+            enrollment.ifPresent(value -> {
+                List<String> completedCourses = value.getCompletedCourse();
+                if (completedCourses == null) {
+                    completedCourses = new ArrayList<>();
+                }
+                if (completedCourses.contains(courseId)) {
+                    completedCourses.remove(courseId); // Remove courseId if already present
+                } else {
+                    completedCourses.add(courseId);
+                }
+                value.setCompletedCourse(completedCourses.stream().sorted().collect(Collectors.toList()));
+                value.setUpdatedBy(userId);
+                value.setUpdatedAt(new Date());
+
+                value.setPercentComplete((int) (((double) completedCourses.size() / courseId3.size()) * 100));
+                try {
+                    iEnrollmentRepository.save(value);
+                } catch (Exception e) {
+                    throw new ServiceException("Không thể thực hiện hành động này ", e);
+                }
+            });
+        }
+    }
+
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
@@ -105,20 +164,26 @@ public class EnrollmentController extends BaseController {
             throw new ServiceException("Không tin thấy khóa học!");
         }
         Course course = courseListWrapper.getData().get(0);
-        if (course.getLevel() != 1) {
-            throw new ServiceException("Lỗi khóa học không hợp lệ!");
-        }
+
         // Kiểm tra user đã đăng kí khóa học này chưa
         Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(course.getId(), enrollment.getUserId());
         // Nếu đã đăng kí cập nhật quá trình học.
         if (entity != null) {
-            entity.setCurrentCourse(entity.getCurrentCourse());
-            entity.setCurrentMillis(entity.getCurrentMillis());
+            if (!enrollment.getCurrentCourse().isBlankOrNull()) {
+                entity.setCurrentCourse(enrollment.getCurrentCourse());
+            }
+            if (enrollment.getCurrentMillis() != null) {
+                entity.setCurrentMillis(enrollment.getCurrentMillis());
+            }
             entity.setUpdatedAt(new Date());
             entity.setUpdatedBy(enrollment.getUserId());
 
             Enrollment e1 = iEnrollmentRepository.save(entity);
-            return toDTO(e1);
+            return toDTO(e1, courseController.getCourseById(e1.getCourseId()));
+        }
+
+        if (course.getLevel() != 1) {
+            throw new ServiceException("Lỗi khóa học không hợp lệ!");
         }
         // Kiểm tra giá tiền
         Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
@@ -141,7 +206,7 @@ public class EnrollmentController extends BaseController {
             enrollment = iEnrollmentRepository.save(enrollment);
 
 
-            return toDTO(enrollment);
+            return toDTO(enrollment, courseController.getCourseById(enrollment.getCourseId()));
         } else {
             throw new ServiceException("Chưa xử lý giá tiền");
 //                return enrollSellPrice(enrollment);
@@ -156,38 +221,40 @@ public class EnrollmentController extends BaseController {
         return null;
     }
 
-    public EnrollmentDTO toDTO(Enrollment entity) {
+    public EnrollmentDTO toDTO(Enrollment entity, CourseDTO courseDTO) {
         if (entity == null) return null;
-        ListWrapper<CourseDTO> courseListWrapper =
-                courseController.searchCourseDTOS(
-                        ParameterSearchCourse.builder()
-                                .ids(Collections.singletonList(entity.getCourseId()))
-                                .build());
-        CourseDTO dto = courseListWrapper.getData().get(0);
-        dto.setChildren(null);
-        EnrollmentDTO enrollmentDTO = EnrollmentDTO.builder()
+        return EnrollmentDTO.builder()
                 .id(entity.getId())
                 .courseId(entity.getCourseId())
                 .userId(entity.getUserId())
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
+                .courseDTO(courseDTO)
+                .ratingDTO(ratingController.userRating(courseDTO.getId(), entity.getUserId()))
+                .completedCourseIds(entity.getCompletedCourse() != null ?
+                        entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()) :
+                        Collections.emptyList())
                 .currentCourse(entity.getCurrentCourse())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .isDeleted(entity.getIsDeleted() != null && entity.getIsDeleted())
                 .build();
-        if(courseListWrapper != null && !courseListWrapper.getData().isEmpty()){
-            enrollmentDTO.setCourseDTO(dto);
-        }
-        return enrollmentDTO;
     }
 
-    public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments) {
+    public List<EnrollmentDTO> toDTOs(List<Enrollment> enrollments, Boolean buildCourseChild) {
         if (enrollments == null) return Collections.emptyList();
-
+        List<String> courseIds = enrollments.stream().map(Enrollment::getCourseId).collect(Collectors.toList());
+        ListWrapper<CourseDTO> wrapper = courseController.searchCourseDTOS(ParameterSearchCourse.builder().buildChild(buildCourseChild).ids(courseIds).build());
+        Map<String, CourseDTO> courseDTOMap = new HashMap<>();
+        if (wrapper != null && !wrapper.getData().isNullOrEmpty()) {
+            for (Enrollment enrollment : enrollments) {
+                Optional<CourseDTO> courseDTO = wrapper.getData().stream().filter(c -> c.getId().equals(enrollment.getCourseId())).findFirst();
+                courseDTO.ifPresent(dto -> courseDTOMap.put(enrollment.getId(), dto));
+            }
+        }
         return enrollments.stream()
-                .map(this::toDTO)
+                .map(enrollment -> toDTO(enrollment, courseDTOMap.get(enrollment.getId())))
                 .collect(Collectors.toList());
     }
 
