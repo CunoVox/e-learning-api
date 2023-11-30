@@ -1,6 +1,8 @@
 package com.elearning.apis;
 
 import com.elearning.controller.InvoiceController;
+import com.elearning.entities.Invoice;
+import com.elearning.models.dtos.InvoiceDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -27,4 +29,8 @@ public class InvoiceAPI {
     public String getUrlPayment(@RequestParam(value = "amount") BigDecimal amount) throws UnsupportedEncodingException {
         return invoiceController.GetUrlPayment(amount);
     }
+
+    @Operation(summary = "Tạo hoá đơn")
+    @PostMapping(path = "/create")
+    public InvoiceDTO createInvoice()
 }
