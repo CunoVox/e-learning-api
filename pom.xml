@@ -50,5 +50,10 @@
             <url>https://maven.pkg.jetbrains.space/hoanhao/p/e-learning/elearning</url>
         </repository>
     </distributionManagement>
-
+    <repositories>
+        <repository>
+            <id>space-elearning</id>
+            <url>https://maven.pkg.jetbrains.space/hoanhao/p/e-learning/elearning</url>
+        </repository>
+    </repositories>
 </project>
