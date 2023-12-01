@@ -6,6 +6,7 @@ import com.elearning.entities.Category;
 import com.elearning.entities.Course;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
+import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
@@ -77,6 +78,9 @@ public class CourseController extends BaseController {
             course.setCourseType(EnumCourseType.CHANGE_PRICE);
         }
         Course courseSaved = saveCourse(course);
+        if(!dto.getCategoryIds().isEmpty()){
+            addCategoryToCourse(courseSaved.getId(), dto.getCategoryIds());
+        }
         if (dto.getId().isBlankOrNull()) {
             priceController.updatePriceSell(courseSaved.getId(), dto.getPriceSell());
         }
