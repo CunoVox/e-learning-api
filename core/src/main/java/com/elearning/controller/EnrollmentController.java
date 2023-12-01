@@ -7,6 +7,7 @@ import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
+import com.elearning.models.dtos.InvoiceDTO;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.searchs.ParameterSearchEnrollment;
 import com.elearning.models.wrapper.ListWrapper;
@@ -45,6 +46,8 @@ public class EnrollmentController extends BaseController {
     CourseController courseController;
     @Autowired
     RatingController ratingController;
+    @Autowired
+    InvoiceController invoiceController;
 
     public EnrollmentDTO createEnrollment(EnrollmentDTO enrollmentDTO) {
         String userId = this.getUserIdFromContext();
@@ -157,6 +160,7 @@ public class EnrollmentController extends BaseController {
 
     @Transactional(rollbackFor = {NullPointerException.class, ServiceException.class})
     public EnrollmentDTO saveEnrollment(Enrollment enrollment) {
+
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
         parameterSearchCourse.setIds(Collections.singletonList(enrollment.getCourseId()));
         ListWrapper<Course> courseListWrapper = iCourseRepository.searchCourse(parameterSearchCourse);
@@ -185,32 +189,26 @@ public class EnrollmentController extends BaseController {
         if (course.getLevel() != 1) {
             throw new ServiceException("Lỗi khóa học không hợp lệ!");
         }
-        // Kiểm tra giá tiền
-        Price pricePromotion = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.PROMOTION.name());
-        if (pricePromotion != null) {
-            //Nếu có giá khuyến mãi
-            throw new ServiceException("Chưa xử lý giá tiền");
-//            return enrollPromotionPrice(enrollment);
-        }
-        // Nếu không có giá khuyến mãi tính bằng giá bán
+        // Kiểm tra đã thanh toán chưa
         Price priceSell = iPriceRepository.findByParentIdAndType(course.getId(), EnumPriceType.SELL.name());
-        //Nếu giá bán free
-        if (priceSell != null && priceSell.getPrice() != null && priceSell.getPrice().isNullOrZero()) {
-            Long sub = course.getSubscriptions();
-            course.setSubscriptions((sub != null) ? sub + 1 : 1);
-            iCourseRepository.save(course);
-
-            enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
-            enrollment.setCreatedBy(enrollment.getUserId());
-            enrollment.setPricePurchase(priceSell.getPrice().toString());
-            enrollment = iEnrollmentRepository.save(enrollment);
-
-
-            return toDTO(enrollment, courseController.getCourseById(enrollment.getCourseId()));
-        } else {
-            throw new ServiceException("Chưa xử lý giá tiền");
-//                return enrollSellPrice(enrollment);
+        InvoiceDTO invoiceDTO = null;
+        if (priceSell != null && !priceSell.getPrice().isNullOrZero()) {
+            invoiceDTO = invoiceController.getInvoice(course.getId(), getUserIdFromContext());
+            if (invoiceDTO == null) {
+                throw new ServiceException("Khoá học chưa được thanh toán");
+            }
         }
+        Long sub = course.getSubscriptions();
+        course.setSubscriptions((sub != null) ? sub + 1 : 1);
+        iCourseRepository.save(course);
+
+        enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
+        enrollment.setCreatedBy(enrollment.getUserId());
+        enrollment.setPricePurchase(invoiceDTO != null ? invoiceDTO.getPricePurchase().toString() : null);
+        enrollment = iEnrollmentRepository.save(enrollment);
+
+        return toDTO(enrollment, courseController.getCourseById(enrollment.getCourseId()));
+
     }
 
     private EnrollmentDTO enrollPromotionPrice(Enrollment enrollment) {

@@ -91,12 +91,14 @@ public class CourseAPI {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public CourseDTO create(@RequestBody CourseDTO dto) {
         return courseController.createCourse(dto);
     }
 
     @PostMapping("/add-category/{course_id}")
     @Operation(summary = "Liên kết khoá học với danh mục")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public List<CategoryDTO> addCategory(@PathVariable("course_id") String cdId,
                                          @RequestParam(value = "category_ids") List<String> caIds) {
         return courseController.addCategoryToCourse(cdId, caIds);

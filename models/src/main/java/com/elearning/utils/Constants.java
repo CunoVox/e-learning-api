@@ -3,7 +3,7 @@ package com.elearning.utils;
 public class Constants {
 
     public static final String SERVICE_URL = "http://localhost:8080/e-learning";
-    public static final String WEB_URL = "http://localhost:5173/";
+    public static final String WEB_URL = "http://localhost:5173";
 
     public static final int ACCESS_TOKEN_EXPIRE_TIME_MILLIS = 100 * 60 * 1000; // ( 10' //100'
     public static final int REFRESH_TOKEN_EXPIRE_TIME_MILLIS = 24 * 60 * 60 * 7 * 1000; // 7 days
