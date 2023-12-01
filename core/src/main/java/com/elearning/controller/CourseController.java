@@ -78,7 +78,7 @@ public class CourseController extends BaseController {
             course.setCourseType(EnumCourseType.CHANGE_PRICE);
         }
         Course courseSaved = saveCourse(course);
-        if(!dto.getCategoryIds().isEmpty()){
+        if (!dto.getCategoryIds().isEmpty()) {
             addCategoryToCourse(courseSaved.getId(), dto.getCategoryIds());
         }
         if (dto.getId().isBlankOrNull()) {
@@ -191,6 +191,12 @@ public class CourseController extends BaseController {
                 allCourse.addAll(courseLevel2);
                 allCourse.addAll(courseLevel3);
             }
+            Map<String, List<String>> mapCategoryIds = connector.getIdRelatedObjectsById(
+                    Course.class.getAnnotation(Document.class).collection(),
+                    courseIds,
+                    Category.class.getAnnotation(Document.class).collection(),
+                    EnumConnectorType.COURSE_TO_CATEGORY.name());
+
             List<String> allIds = allCourse.stream().map(Course::getId).collect(Collectors.toList());
 
             //Video
@@ -210,6 +216,8 @@ public class CourseController extends BaseController {
                     put(course.getCreatedBy(), userDTOMap.get(course.getCreatedBy()).getFullName());
                 }});
                 courseDTO.setTotalLesson(courseLevel3Size);
+                //Danh mục
+                courseDTO.setCategoryIds(mapCategoryIds.get(course.getId()));
                 //Giá tiền
                 courseDTO.setPriceSell(priceController.getPriceByParentId(courseDTO.getId(), EnumPriceType.SELL.name()));
 //                courseDTO.setRatings(ratingController.courseRating(courseDTO.getId()));
