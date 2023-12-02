@@ -60,7 +60,7 @@ public class CourseController extends BaseController {
         //Price
         if (!dto.getId().isBlankOrNull()) {
             BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
-            if (currentPrice.compareTo(dto.getPriceSell()) != 0) {
+            if (!Objects.equals(currentPrice, dto.getPriceSell())) {
                 List<Attribute> attributes = course.getAttributes();
                 if (!attributes.isNullOrEmpty()) {
                     attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
@@ -74,11 +74,11 @@ public class CourseController extends BaseController {
                         .findFirst()
                         .map(Collections::singletonList)
                         .orElseGet(Collections::emptyList));
+                course.setCourseType(EnumCourseType.CHANGE_PRICE);
             }
-            course.setCourseType(EnumCourseType.CHANGE_PRICE);
         }
         Course courseSaved = saveCourse(course);
-        if (!dto.getCategoryIds().isEmpty()) {
+        if (!dto.getCategoryIds().isNullOrEmpty()) {
             addCategoryToCourse(courseSaved.getId(), dto.getCategoryIds());
         }
         if (dto.getId().isBlankOrNull()) {
