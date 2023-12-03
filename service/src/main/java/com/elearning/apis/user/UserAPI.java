@@ -89,6 +89,7 @@ public class UserAPI {
                                         @RequestParam(value = "to_date", required = false) Long toDate,
                                         @RequestParam(value = "key_word", required = false) String multiValue,
                                         @RequestParam(value = "user_ids", required = false) List<String> userIds,
+                                        @RequestParam(value = "roles", required = false) List<EnumRole> roles,
                                         @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
                                         @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn hoặc bằng 100") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult
     ) {
@@ -109,6 +110,7 @@ public class UserAPI {
         }
         parameterSearchUser.setMultiValue(multiValue);
         parameterSearchUser.setUserIds(userIds);
+        parameterSearchUser.setRoles(roles);
         parameterSearchUser.setStartIndex(startIndex);
         parameterSearchUser.setMaxResult(maxResult);
         return userController.searchUser(parameterSearchUser);

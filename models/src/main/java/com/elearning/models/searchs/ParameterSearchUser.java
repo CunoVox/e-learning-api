@@ -1,5 +1,6 @@
 package com.elearning.models.searchs;
 
+import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.enumAttribute.EnumUserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,4 +22,6 @@ public class ParameterSearchUser {
     EnumUserStatus status;
     private Long startIndex;
     private Integer maxResult;
+
+    private List<EnumRole> roles;
 }

@@ -18,30 +18,11 @@
 //public class TestConnector {
 //    @Autowired
 //    Connector connector;
+//
+//    //Viết hàm deleteConnector
 //    @Test
-//    public void testCreateConnector(){
-//        connector.addRelatedObjectById(
-//                "course",
-//                "2",
-//                Category.class.getAnnotation(Document.class).collection(),
-//                "3",
-//                EnumRelatedObjectsStatus.ACTIVE.getValue(),
-//                EnumConnectorType.COURSE_TO_TAG.name(),
-//                "haohao");
-//        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
-//                "course",
-//                "2",
-//                "category",
-//                "3",
-//                EnumRelatedObjectsStatus.ACTIVE.getValue(),
-//                EnumConnectorType.COURSE_TO_TAG.name(),
-//                "haohao");
-////        Map<String, List<String>> mapTagIds = connector.getIdRelatedObjectsById(
-////                "course",
-////                List.of("1", "2"),
-////                "tag",
-////                EnumConnectorType.COURSE_TO_TAG.name());
-////        List<String> categories = connector.getIdRelatedObjectsById("category", "1", "course",EnumConnectorType.COURSE_TO_CATEGORY.name());
-////        System.out.println(mapTagIds);
+//    public void testDeleteConnector() {
+//        connector.deleteConnector("course", "1237", "category", EnumConnectorType.COURSE_TO_CATEGORY.name());
 //    }
+//
 //}

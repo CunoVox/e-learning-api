@@ -4,6 +4,7 @@ import com.elearning.connector.Connector;
 import com.elearning.entities.Attribute;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
+import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
 import com.elearning.models.searchs.ParameterSearchCategory;
@@ -278,6 +279,7 @@ public class CourseController extends BaseController {
             if (courseCheck.isEmpty()) {
                 throw new ServiceException("Khoá học không tồn tại trong hệ thống!");
             }
+            course.setCourseType(courseCheck.get().getCourseType());
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());

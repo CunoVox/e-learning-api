@@ -3,6 +3,7 @@ package com.elearning.utils;
 public class Constants {
 
     public static final String SERVICE_URL = "http://localhost:8080/e-learning";
+    public static final String WEB_URL = "http://localhost:5173";
 
     public static final int ACCESS_TOKEN_EXPIRE_TIME_MILLIS = 100 * 60 * 1000; // ( 10' //100'
     public static final int REFRESH_TOKEN_EXPIRE_TIME_MILLIS = 24 * 60 * 60 * 7 * 1000; // 7 days
@@ -17,5 +18,14 @@ public class Constants {
     public static final String BASE_IMAGE_URL = "https://lh3.googleusercontent.com/d/";
     public static final String BASE_VIDEO_URL = "https://drive.google.com/file/d/";
 
+
+    //VNPAY
+    public static final String VNP_PAY_URL = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    public static final String VNP_RETURN_URL = WEB_URL + "/vnpay-return";
+    public static final String VNP_TMN_CODE = "FV2FPW0B";
+    public static final String VNP_SECRET_KEY = "TSYFMBEBBUSUVSBPNQCWEFQDIMEBKFBD";
+    public static final String VNP_API_URL = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
+    public static final String VNP_VERSION = "2.1.0";
+    public static final String VNP_COMMAND= "pay";
 
 }
