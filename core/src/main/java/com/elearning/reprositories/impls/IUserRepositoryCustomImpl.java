@@ -32,6 +32,11 @@ public class IUserRepositoryCustomImpl extends BaseRepositoryCustom implements I
                 criteria.add(Criteria.where("isDeleted").is(true));
             }
         }
+        //Lọc roles
+        if (!parameterSearchUser.getRoles().isNullOrEmpty()) {
+            criteria.add(Criteria.where("roles").in(parameterSearchUser.getRoles()));
+        }
+        //Lọc theo keyword
         Criteria criteriaKeywords = null;
         if (!parameterSearchUser.getMultiValue().isBlankOrNull()) {
             String multiValue = parameterSearchUser.getMultiValue().trim();

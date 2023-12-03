@@ -4,6 +4,7 @@ import com.elearning.connector.Connector;
 import com.elearning.entities.Attribute;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
+import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
 import com.elearning.models.searchs.ParameterSearchCategory;
