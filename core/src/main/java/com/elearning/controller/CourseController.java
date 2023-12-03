@@ -278,6 +278,7 @@ public class CourseController extends BaseController {
             if (courseCheck.isEmpty()) {
                 throw new ServiceException("Khoá học không tồn tại trong hệ thống!");
             }
+            course.setCourseType(courseCheck.get().getCourseType());
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());
