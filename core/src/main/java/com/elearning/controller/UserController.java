@@ -375,20 +375,15 @@ public class UserController extends BaseController {
         if (users.isNullOrEmpty()) return new ArrayList<>();
         List<String> ids = users.stream().map(User::getId).collect(Collectors.toList());
         List<FileRelationshipDTO> fileRelationshipDTOS = fileRelationshipController.getFileRelationships(ids, EnumParentFileType.USER_AVATAR.name());
-        Map<String, FileRelationshipDTO> fileRelationshipDTOMap = new HashMap<>();
-        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS) {
-            if (fileRelationshipDTOMap.get(fileRelationshipDTO.getParentId()) != null) {
-                fileRelationshipDTOMap.put(fileRelationshipDTO.getParentId(), fileRelationshipDTO);
-            }
-        }
+        Map<String, String> fileRelationshipDTOMap = fileRelationshipController.getUrlOfFile(fileRelationshipDTOS);
         List<UserDTO> userDTOS = new ArrayList<>();
         for (User user : users) {
-            FileRelationshipDTO fileRelationshipDTO = fileRelationshipDTOMap.get(user.getId());
             userDTOS.add(UserDTO.builder()
                     .id(user.getId())
                     .fullName(user.getFullName())
                     .email(user.getEmail())
-                    .avatar(fileRelationshipDTO != null ? fileRelationshipDTO.getPathFile() : null)
+                    .roles(user.getRoles())
+                    .avatar(fileRelationshipDTOMap.get(user.getId()))
                     .address(user.getAddress())
                     .isDeleted(user.getIsDeleted())
                     .isEmailConfirmed(user.isEmailConfirmed)
