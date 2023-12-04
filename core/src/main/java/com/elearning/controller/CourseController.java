@@ -77,20 +77,21 @@ public class CourseController extends BaseController {
                         .orElseGet(Collections::emptyList));
                 course.setCourseType(EnumCourseType.CHANGE_PRICE);
             }
+            priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
         }
         Course courseSaved = saveCourse(course);
         if (!dto.getCategoryIds().isNullOrEmpty()) {
+            connector.deleteConnector(
+                    Course.class.getAnnotation(Document.class).collection(),
+                    courseSaved.getId(),
+                    Category.class.getAnnotation(Document.class).collection(),
+                    EnumConnectorType.COURSE_TO_CATEGORY.name());
             addCategoryToCourse(courseSaved.getId(), dto.getCategoryIds());
         }
-        if (dto.getId().isBlankOrNull()) {
-            priceController.updatePriceSell(courseSaved.getId(), dto.getPriceSell());
-        }
-
         if (dto.getPricePromotion() != null && dto.getPricePromotion().getPrice() != null)
             priceController.createPrice(dto.getPricePromotion());
         return getCourseById(course.getId());
     }
-
     public void changeCourseType(String courseId, EnumCourseType courseType) {
         CourseDTO courseDTO = getCourseById(courseId);
         if (courseDTO != null) {
@@ -140,9 +141,11 @@ public class CourseController extends BaseController {
             }
         }
         List<CategoryDTO> categoryDTOS = new ArrayList<>();
+
         if (categoryIds != null) {
-            for (String id : categoryIds) {
-                var category = categoryController.getCategoryById(id);
+            List<Category> categories = categoryRepository.findAllByIdIn(categoryIds);
+            for (Category category : categories) {
+//                var category = categoryController.getCategoryById(id);
                 if (category != null) {
                     connector.addRelatedObjectById(
                             Course.class.getAnnotation(Document.class).collection(),
@@ -152,7 +155,7 @@ public class CourseController extends BaseController {
                             EnumRelatedObjectsStatus.ACTIVE.getValue(),
                             EnumConnectorType.COURSE_TO_CATEGORY.name(),
                             userId);
-                    categoryDTOS.add(category);
+                    categoryDTOS.add(categoryController.toDTO(category));
                 }
             }
         }
@@ -280,6 +283,14 @@ public class CourseController extends BaseController {
                 throw new ServiceException("Khoá học không tồn tại trong hệ thống!");
             }
             course.setCourseType(courseCheck.get().getCourseType());
+            course.setDescription(courseCheck.get().getDescription());
+            if(!inputDTO.getDescription().isBlankOrNull()){
+                course.setDescription(inputDTO.getDescription());
+            }
+            course.setRequirement(courseCheck.get().getRequirement());
+            if(!inputDTO.getRequirement().isBlankOrNull()){
+                course.setRequirement(inputDTO.getRequirement());
+            }
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());
@@ -310,6 +321,8 @@ public class CourseController extends BaseController {
                 .level(entity.getLevel())
                 .subscriptions(entity.getSubscriptions())
                 .children(new ArrayList<>())
+                .description(entity.getDescription())
+                .requirement(entity.getRequirement())
                 .type(entity.getContentType())
                 .courseType(entity.getCourseType())
                 .createdBy(entity.getCreatedBy())
