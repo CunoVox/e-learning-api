@@ -110,7 +110,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         }
 
         Query query = new Query();
-        query.with(Sort.by("createdAt").descending());
+//        query.with(Sort.by("createdAt").descending());
         query.addCriteria(new Criteria().andOperator(criteria));
 
         if (parameterSearchCourse.getMaxResult() == null) {
