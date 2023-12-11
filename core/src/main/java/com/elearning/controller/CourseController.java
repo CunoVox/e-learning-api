@@ -95,6 +95,9 @@ public class CourseController extends BaseController {
         CourseDTO courseDTO = getCourseById(courseId);
         if (courseDTO != null) {
             courseRepository.updateCourseType(courseId, courseType.name(), getUserIdFromContext());
+            if (courseType.equals(EnumCourseType.CHANGE_PRICE)) {
+                priceController.updatePriceSell(courseId, courseDTO.getPriceSell());
+            }
             if (!courseDTO.getChildren().isNullOrEmpty()) {
                 String userId = getUserIdFromContext();
                 CompletableFuture<Void> allOf = CompletableFuture.allOf(courseDTO.getChildren().stream()

@@ -6,6 +6,7 @@ import com.elearning.entities.Invoice;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
+import com.elearning.models.dtos.EnrollmentDTO;
 import com.elearning.models.dtos.InvoiceDTO;
 import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IInvoiceRepository;
@@ -37,7 +38,8 @@ public class InvoiceController extends BaseController{
     private IUserRepository userRepository;
     @Autowired
     private CourseController courseController;
-
+    @Autowired
+    private EnrollmentController enrollmentController;
     public String getUrlPayment(String courseId, String customerId) throws UnsupportedEncodingException {
         validateInvoice(courseId, customerId);
         CourseDTO courseDTO = courseController.getCourseById(courseId);
@@ -98,7 +100,12 @@ public class InvoiceController extends BaseController{
     public InvoiceDTO createInvoice(InvoiceDTO invoiceDTO) {
         validateInvoice(invoiceDTO.getCourseId(), invoiceDTO.getCustomerId());
         invoiceDTO.setCreatedBy(getUserIdFromContext());
-        return toDTO(invoiceRepository.save(toEntity(invoiceDTO)));
+        InvoiceDTO invoiceToSave = toDTO(invoiceRepository.save(toEntity(invoiceDTO)));
+        enrollmentController.createEnrollment(EnrollmentDTO.builder()
+                .courseId(invoiceToSave.getCourseId())
+                .userId(invoiceToSave.getCustomerId())
+                .build());
+        return invoiceToSave;
     }
 
     public InvoiceDTO getInvoice(String courseId, String customerId) {
@@ -135,11 +142,12 @@ public class InvoiceController extends BaseController{
                 .customerId(dto.getCustomerId())
                 .pricePurchase(dto.getPricePurchase())
                 .status(dto.getStatus())
+                .createdAt(new Date())
                 .build();
     }
 
     public InvoiceDTO toDTO(Invoice dto) {
-        if (dto == null) return new InvoiceDTO();
+        if (dto == null) return null;
         return InvoiceDTO.builder()
                 .id(dto.getId())
                 .createdBy(dto.getCreatedBy())

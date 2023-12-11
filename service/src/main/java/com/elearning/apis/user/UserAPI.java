@@ -49,10 +49,10 @@ public class UserAPI {
     }
 
     @Operation(summary = "Khoá và mở khoá người dùng")
-    @PostMapping("/lock/{id}/{lock}")
+    @PostMapping("/lock/{id}")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     public void lockAndUnLockUser(@PathVariable(value = "id") String id,
-                                  @PathVariable(value = "lock") boolean lock) {
+                                  @RequestParam(value = "lock") boolean lock) {
         userController.lockAndUnLockUser(id, lock);
     }
 
