@@ -1,5 +1,6 @@
 package com.elearning.apis;
 
+import com.elearning.annotation.validator.ValuesAllowed;
 import com.elearning.controller.CourseController;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
@@ -47,6 +48,7 @@ public class CourseAPI {
                                             @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
+                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
                                             @RequestParam(value = "parent_ids", required = false) List<String> parentIds,
                                             @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds) {
         if (currentPage == null || currentPage == 0) {
@@ -69,6 +71,7 @@ public class CourseAPI {
         parameterSearchCourse.setParentIds(parentIds);
         parameterSearchCourse.setStartIndex(startIndex);
         parameterSearchCourse.setCategoriesIds(categoriesIds);
+        parameterSearchCourse.setSortBy(sortBy);
         if (fromDate != null) {
             parameterSearchCourse.setFromDate(new Date(fromDate));
         }

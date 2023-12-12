@@ -40,6 +40,8 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private BigDecimal priceTo;
 
+    private String sortBy;
+
     private List<String> ids;
 
     private List<String> parentIds;

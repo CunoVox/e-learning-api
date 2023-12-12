@@ -5,12 +5,12 @@ import com.elearning.entities.Course;
 import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
-import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.ICourseRepositoryCustom;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.QueryBuilderUtils;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumConnectorType;
+import com.elearning.utils.enumAttribute.EnumSortCourse;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -109,8 +109,55 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             criteria.add(Criteria.where("_id").in(courseIds));
         }
 
+        //sort theo rating
+        if (!parameterSearchCourse.getSortBy().isBlankOrNull() && parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_RATING.name())) {
+            Aggregation aggregation = Aggregation.newAggregation(
+                    Aggregation.match(new Criteria().andOperator(criteria)),
+                    Aggregation.lookup("rating", "_id", "courseId", "rating"),
+                    Aggregation.unwind("rating", true),
+                    Aggregation.group("_id")
+                            .first("partnerId").as("partnerId")
+                            .first("courseType").as("courseType")
+                            .first("status").as("status")
+                            .first("name").as("name")
+                            .first("nameMod").as("nameMod")
+                            .first("slug").as("slug")
+                            .first("contentType").as("contentType")
+                            .first("parentId").as("parentId")
+                            .first("level").as("level")
+                            .first("description").as("description")
+                            .first("requirement").as("requirement")
+                            .first("duration").as("duration")
+                            .first("subscriptions").as("subscriptions")
+                            .first("isPublished").as("isPublished")
+                            .first("attributes").as("attributes")
+                            .first("createdAt").as("createdAt")
+                            .first("updatedAt").as("updatedAt")
+                            .first("createdBy").as("createdBy")
+                            .first("updatedBy").as("updatedBy")
+                            .first("isDeleted").as("isDeleted")
+                            .avg("rating.rate").as("averageRating")
+                            .count().as("totalRating"),
+                    Aggregation.sort(Sort.Direction.DESC, "averageRating", "totalRating"),
+                    Aggregation.skip(parameterSearchCourse.getStartIndex()),
+                    Aggregation.limit(parameterSearchCourse.getMaxResult())
+            );
+            AggregationResults<Course> results = mongoTemplate.aggregate(aggregation, Course.class, Course.class);
+            List<Course> courses = results.getMappedResults();
+            return ListWrapper.<Course>builder()
+                    .total(courses.size())
+                    .totalPage((courses.size() - 1) / parameterSearchCourse.getMaxResult() + 1)
+                    .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
+                    .maxResult(parameterSearchCourse.getMaxResult())
+                    .data(courses)
+                    .build();
+        }
+
         Query query = new Query();
 //        query.with(Sort.by("createdAt").descending());
+        if (!parameterSearchCourse.getSortBy().isBlankOrNull() && parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_SUB.name())) {
+            query.with(Sort.by("subscriptions").descending());
+        }
         query.addCriteria(new Criteria().andOperator(criteria));
 
         if (parameterSearchCourse.getMaxResult() == null) {

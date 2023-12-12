@@ -186,12 +186,12 @@ public class CourseController extends BaseController {
             //build khoá học con level 1 + 2 +3
             Long courseLevel3Size = 0L;
             List<String> courseIds = courses.stream().map(Course::getId).collect(Collectors.toList());
-            List<Course> courseLevel2 = courseRepository.findAllByParentIdIn(courseIds);
+            List<Course> courseLevel2 = courseRepository.findAllByParentIdInAndIsDeletedNotIn(courseIds, true);
             List<String> level2Ids;
             List<Course> courseLevel3 = new ArrayList<>();
             if (!courseLevel2.isNullOrEmpty()) {
                 level2Ids = courseLevel2.stream().map(Course::getId).collect(Collectors.toList());
-                courseLevel3 = courseRepository.findAllByParentIdIn(level2Ids);
+                courseLevel3 = courseRepository.findAllByParentIdInAndIsDeletedNotIn(level2Ids, true);
                 courseLevel3Size = (long) courseLevel3.size();
             }
             if (parameterSearchCourse.getBuildChild() != null && parameterSearchCourse.getBuildChild()) {
