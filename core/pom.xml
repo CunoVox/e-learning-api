@@ -114,8 +114,9 @@
 
     <distributionManagement>
         <repository>
-            <id>space-elearning</id>
-            <url>https://maven.pkg.jetbrains.space/hoanhao/p/e-learning/elearning</url>
+            <id>central</id>
+            <name>a0woqaeurzf4c-artifactory-primary-0-releases</name>
+            <url>https://elearningteam.jfrog.io/artifactory/e-learning-libs-release</url>
         </repository>
     </distributionManagement>
     <build>
