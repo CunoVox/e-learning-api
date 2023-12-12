@@ -10,18 +10,15 @@ import com.elearning.utils.Extensions;
 import com.elearning.utils.QueryBuilderUtils;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumConnectorType;
+import com.elearning.utils.enumAttribute.EnumCourseType;
 import com.elearning.utils.enumAttribute.EnumSortCourse;
 import lombok.experimental.ExtensionMethod;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
-import org.springframework.data.mongodb.core.aggregation.LimitOperation;
-import org.springframework.data.mongodb.core.aggregation.SkipOperation;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,8 +42,10 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             criteria.add(Criteria.where("_id").in(parameterSearchCourse.getIds()));
         }
 
-        if (parameterSearchCourse.getSearchType() != null) {
+        if (parameterSearchCourse.getSearchType() != null && !parameterSearchCourse.getSearchType().equals(EnumCourseType.OFFICIAL.name())) {
             criteria.add(Criteria.where("courseType").is(parameterSearchCourse.getSearchType()));
+        } else if (parameterSearchCourse.getSearchType() != null) {
+            criteria.add(Criteria.where("courseType").in(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()));
         }
         if (parameterSearchCourse.getIsDeleted() != null) {
             criteria.add(Criteria.where("isDeleted").is(parameterSearchCourse.getIsDeleted()));
