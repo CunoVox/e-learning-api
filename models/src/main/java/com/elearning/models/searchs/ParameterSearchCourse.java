@@ -25,6 +25,9 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private String createdBy;
 
+    //true là build, rỗng hoặc false thì k build
+    private Boolean buildChild;
+
     private String name;
 
     private String slug;
@@ -37,9 +40,13 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private BigDecimal priceTo;
 
+    private String sortBy;
+
     private List<String> ids;
 
     private List<String> parentIds;
+
+    private List<String> categoriesIds;
 
     //  page
     private Long startIndex;

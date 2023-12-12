@@ -1,5 +1,6 @@
 package com.elearning.apis;
 
+import com.elearning.annotation.validator.ValuesAllowed;
 import com.elearning.controller.CourseController;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.dtos.CourseDTO;
@@ -7,7 +8,6 @@ import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.enumAttribute.EnumCourseType;
-import com.elearning.utils.enumAttribute.EnumListBuildType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -42,12 +42,15 @@ public class CourseAPI {
                                             @RequestParam(value = "price_from", required = false) BigDecimal priceFrom,
                                             @RequestParam(value = "price_to", required = false) BigDecimal priceTo,
                                             @RequestParam(value = "created_by", required = false) String createdBy,
-                                            @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
-                                            @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
+                                            @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
+                                            @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
                                             @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
+                                            @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
-                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
+                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
+                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds,
+                                            @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds) {
         if (currentPage == null || currentPage == 0) {
             currentPage = 1;
         }
@@ -64,9 +67,12 @@ public class CourseAPI {
         parameterSearchCourse.setCreatedBy(createdBy);
         parameterSearchCourse.setIsDeleted(isDeleted);
         parameterSearchCourse.setIds(ids);
+        parameterSearchCourse.setBuildChild(buildChild);
         parameterSearchCourse.setParentIds(parentIds);
         parameterSearchCourse.setStartIndex(startIndex);
-        if (fromDate !=null) {
+        parameterSearchCourse.setCategoriesIds(categoriesIds);
+        parameterSearchCourse.setSortBy(sortBy);
+        if (fromDate != null) {
             parameterSearchCourse.setFromDate(new Date(fromDate));
         }
         if (toDate != null) {
@@ -88,21 +94,39 @@ public class CourseAPI {
 
     @PostMapping("/create")
     @Operation(summary = "Tạo khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public CourseDTO create(@RequestBody CourseDTO dto) {
         return courseController.createCourse(dto);
     }
 
     @PostMapping("/add-category/{course_id}")
     @Operation(summary = "Liên kết khoá học với danh mục")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public List<CategoryDTO> addCategory(@PathVariable("course_id") String cdId,
-                                         @RequestParam(value = "category_ids", required = false) List<String> caIds) {
+                                         @RequestParam(value = "category_ids") List<String> caIds) {
         return courseController.addCategoryToCourse(cdId, caIds);
     }
 
-    @PostMapping("/accept/{course_id}")
-    @Operation(summary = "Xác nhận khoá học")
-    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
-    public void acceptCourse(@PathVariable("course_id") String courseId) {
-        courseController.acceptCourse(courseId);
+    @PutMapping("/change-course-type")
+    @Operation(summary = "Thay đổi tình trạng khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void changeCourseType(@RequestParam("course_id") String courseId,
+                                 @RequestParam(value = "course_type") EnumCourseType course_type) {
+        courseController.changeCourseType(courseId, course_type);
+    }
+
+    @PutMapping("/lecturer/change-course-type")
+    @Operation(summary = "Thay đổi tình trạng khoá học từ DRAFT -> WAITING")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void changeCourseToWaiting(@RequestParam("course_id") String courseId) {
+        courseController.changeCourseType(courseId, EnumCourseType.WAITING);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    @Operation(summary = "Ẩn hoặc bỏ ẩn khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void deleteCourse(@PathVariable("id") String courseId,
+                             @RequestParam("is_deleted") Boolean isDeleted) {
+        courseController.updateIsDeleted(courseId, isDeleted);
     }
 }

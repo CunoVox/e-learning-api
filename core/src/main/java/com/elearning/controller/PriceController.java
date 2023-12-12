@@ -63,6 +63,13 @@ public class PriceController extends BaseController {
                     .build());
         }
     }
+    protected BigDecimal getPriceByParentId(String parentId, String priceType){
+        Price price = priceRepository.findByParentIdAndType(parentId, priceType);
+        if(price != null){
+            return price.getPrice();
+        }
+        return BigDecimal.ZERO;
+    }
 
     public Price toEntity(PriceDTO priceDTO) {
         return Price.builder()

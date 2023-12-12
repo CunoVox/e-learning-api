@@ -28,15 +28,14 @@ public class FileRelationshipAPI {
                                           @RequestParam(value = "parent_type") EnumParentFileType parentType) {
         return fileRelationshipController.saveFile(file, parentId, parentType.name());
     }
-
-    @Operation(summary = "Xoá file bằng path file")
+    @Operation(summary = "Xoá file bằng id")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     @DeleteMapping("/delete/{id}")
     public void deleteFile(@PathVariable(value = "id") String id) throws Exception {
         fileRelationshipController.deleteFile(id);
     }
 
-    @Operation(summary = "Xoá file bằng id")
+    @Operation(summary = "Xoá file bằng path file")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     @DeleteMapping("/delete")
     public void deleteFileByPathFile(@RequestParam(value = "path_file") String pathFile) {

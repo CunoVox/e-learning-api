@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @ExtensionMethod(Extensions.class)
-public class UserController extends BaseController{
+public class UserController extends BaseController {
     private final ModelMapper modelMapper;
     private final IUserRepository userRepository;
     private final JwtController jwtController;
@@ -80,6 +80,11 @@ public class UserController extends BaseController{
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        if (user.get().getRoles().stream().anyMatch(u -> u.equals(EnumRole.ROLE_ADMIN))) {
+            if ((new ArrayList<>(getUserDetailFromContext().getAuthorities())).stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+                throw new ServiceException("Không đủ quyền thay đổi trạng thái người dùng này");
+            }
         }
         userRepository.updateDeleted(userId, lock, getUserIdFromContext());
     }
@@ -156,26 +161,59 @@ public class UserController extends BaseController{
         return new AuthResponse();
     }
 
-    public UserDTO update(String email, UpdateUserDTO dto) {
-        User entity = userRepository.findByEmail(email);
-        if (entity == null) {
+    public UserDTO update(UserDTO dto) {
+        String userId = getUserIdFromContext();
+        if (userId == null) {
+            throw new ServiceException("Vui lòng đăng nhập.");
+        }
+        Optional<User> entity = userRepository.findById(userId);
+        if (entity.isEmpty()) {
             throw new ServiceException("User not found");
         }
-        int flag = 0;
         if (!dto.getFullName().isEmpty()) {
-            entity.setFullName(dto.getFullName());
-            entity.setFullNameMod(StringUtils.stripAccents(entity.getFullName()));
-            flag = 1;
+            entity.get().setFullName(dto.getFullName());
+            entity.get().setFullNameMod(StringUtils.stripAccents(entity.get().getFullName()));
         }
         if (!dto.getAddress().isEmpty()) {
-            entity.setAddress(dto.getAddress());
-            flag = 1;
+            entity.get().setAddress(dto.getAddress());
         }
-        if (flag != 0) {
-            entity.setUpdatedAt(new Date());
+        if (!dto.getPhoneNumber().isBlankOrNull()) {
+            entity.get().setPhoneNumber(dto.getPhoneNumber());
         }
-        userRepository.save(entity);
-        return toDto(entity);
+        if (!dto.getProfileLink().isBlankOrNull()) {
+            entity.get().setProfileLink(dto.getProfileLink());
+        }
+        if (!dto.getDescription().isBlankOrNull()) {
+            entity.get().setDescription(dto.getDescription());
+        }
+        entity.get().setUpdatedAt(new Date());
+        userRepository.save(entity.get());
+        return toDto(entity.get());
+    }
+
+    public UserDTO userLecturerUpdate(UserDTO dto) {
+        String userId = this.getUserIdFromContext();
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Vui lòng đăng nhập");
+        }
+        User newUser = user.get();
+        if (!dto.getPhoneNumber().isBlankOrNull()) {
+            newUser.setPhoneNumber(dto.getPhoneNumber());
+        }
+        if (!dto.getProfileLink().isBlankOrNull()) {
+            newUser.setProfileLink(dto.getProfileLink());
+        }
+        if (!dto.getDescription().isBlankOrNull()) {
+            newUser.setDescription(dto.getDescription());
+        }
+        if (!newUser.getRoles().contains(EnumRole.ROLE_LECTURE)) {
+            newUser.getRoles().add(EnumRole.ROLE_LECTURE);
+        }
+        newUser.setUpdatedAt(new Date());
+        userRepository.save(newUser);
+
+        return toDto(newUser);
     }
 
     private AuthResponse getAuthResponse(User entity) {
@@ -225,6 +263,26 @@ public class UserController extends BaseController{
         }
     }
 
+    public void updateRoles(String userId, List<EnumRole> roles) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
+        }
+        //Manager không được thay đổi quyền của admin và ngang cấp và không được nâng quyền của mình lên cấp cao hơn
+        if ((user.get().getRoles().stream().anyMatch(u -> (u.equals(EnumRole.ROLE_ADMIN) || u.equals(EnumRole.ROLE_MANAGER))) ||
+                roles.stream().anyMatch(r -> r.equals(EnumRole.ROLE_ADMIN))) &&
+                (new ArrayList<>(getUserDetailFromContext().getAuthorities()))
+                        .stream().noneMatch(u -> (u.toString()).equals(EnumRole.ROLE_ADMIN.name()))) {
+            throw new ServiceException("Không đủ quyền hạn để thay đổi vài trò");
+        }
+        //nếu rỗng thì set thành quyền user
+        if (roles.isNullOrEmpty()) {
+            roles = Collections.singletonList(EnumRole.ROLE_USER);
+        }
+        userRepository.updateUserRoles(userId, roles, getUserIdFromContext());
+    }
+
+
     public List<User> findAllUser() {
         return userRepository.findAll();
     }
@@ -244,6 +302,19 @@ public class UserController extends BaseController{
         }
         return toDto(user.get());
     }
+
+    public Map<String, UserDTO> getUserByIds(List<String> ids) {
+        if (ids.isNullOrEmpty()) return new HashMap<>();
+        Map<String, UserDTO> map = new HashMap<>();
+        ListWrapper<UserDTO> wrapper = searchUser(ParameterSearchUser.builder().userIds(ids).build());
+        if (wrapper != null && !wrapper.getData().isNullOrEmpty()) {
+            map = wrapper.getData().stream()
+                    .filter(u -> ids.contains(u.getId()))
+                    .collect(Collectors.toMap(UserDTO::getId, u -> u));
+        }
+        return map;
+    }
+
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
@@ -294,9 +365,13 @@ public class UserController extends BaseController{
                 .id(user.getId())
                 .fullName(user.getFullName())
                 .email(user.getEmail())
-                .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(0).getPathFile() : null)
+                .roles(user.getRoles())
+                .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(fileRelationshipDTO.size() - 1).getPathFile() : null)
                 .address(user.getAddress())
                 .isDeleted(user.getIsDeleted())
+                .phoneNumber(user.getPhoneNumber())
+                .profileLink(user.getProfileLink())
+                .description(user.getDescription())
                 .isEmailConfirmed(user.isEmailConfirmed)
                 .build();
 //        return modelMapper.map(user, UserDTO.class);
@@ -306,20 +381,15 @@ public class UserController extends BaseController{
         if (users.isNullOrEmpty()) return new ArrayList<>();
         List<String> ids = users.stream().map(User::getId).collect(Collectors.toList());
         List<FileRelationshipDTO> fileRelationshipDTOS = fileRelationshipController.getFileRelationships(ids, EnumParentFileType.USER_AVATAR.name());
-        Map<String, FileRelationshipDTO> fileRelationshipDTOMap = new HashMap<>();
-        for (FileRelationshipDTO fileRelationshipDTO : fileRelationshipDTOS) {
-            if (fileRelationshipDTOMap.get(fileRelationshipDTO.getParentId()) != null) {
-                fileRelationshipDTOMap.put(fileRelationshipDTO.getParentId(), fileRelationshipDTO);
-            }
-        }
+        Map<String, String> fileRelationshipDTOMap = fileRelationshipController.getUrlOfFile(fileRelationshipDTOS);
         List<UserDTO> userDTOS = new ArrayList<>();
         for (User user : users) {
-            FileRelationshipDTO fileRelationshipDTO = fileRelationshipDTOMap.get(user.getId());
             userDTOS.add(UserDTO.builder()
                     .id(user.getId())
                     .fullName(user.getFullName())
                     .email(user.getEmail())
-                    .avatar(fileRelationshipDTO != null ? fileRelationshipDTO.getPathFile() : null)
+                    .roles(user.getRoles())
+                    .avatar(fileRelationshipDTOMap.get(user.getId()))
                     .address(user.getAddress())
                     .isDeleted(user.getIsDeleted())
                     .isEmailConfirmed(user.isEmailConfirmed)

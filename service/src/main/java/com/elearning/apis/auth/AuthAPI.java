@@ -84,15 +84,18 @@ public class AuthAPI {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SignatureException {
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
-        refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+        if(requestCookie != null){
+            refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
+            Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
+            delete.setHttpOnly(true);
+            delete.setPath("/");
+            delete.setMaxAge(0);
+            response.addCookie(delete);
 
-        Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
-        delete.setHttpOnly(true);
-        delete.setPath("/");
-        delete.setMaxAge(0);
-        response.addCookie(delete);
+            SecurityContextHolder.clearContext();
 
-        SecurityContextHolder.clearContext();
+        }
+
 
         return ResponseEntity.ok()
                 .body(null);

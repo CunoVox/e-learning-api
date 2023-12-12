@@ -1,6 +1,8 @@
 package com.elearning.controller;
 
+import com.elearning.connector.Connector;
 import com.elearning.entities.Category;
+import com.elearning.entities.Course;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.searchs.ParameterSearchCategory;
@@ -10,8 +12,11 @@ import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
 import lombok.experimental.ExtensionMethod;
+import org.apache.commons.lang3.builder.Diff;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -26,6 +31,9 @@ public class CategoryController extends BaseController{
     @Autowired
     private ISequenceValueItemRepository sequenceValueItemRepository;
 
+    @Autowired
+    private Connector connector;
+
     public CategoryDTO getCategoryById(String categoryId) {
         Optional<Category> categories = categoryRepository.findById(categoryId);
         if (categories.isEmpty()) {
@@ -37,9 +45,8 @@ public class CategoryController extends BaseController{
     }
 
     public List<CategoryDTO> searchCategoryDTOS(ParameterSearchCategory parameterSearchCategory) {
-        if (parameterSearchCategory.getLevel() == null && !parameterSearchCategory.getBuildType().isBlankOrNull()
-                && parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())
-                && parameterSearchCategory.getParentIds().isNullOrEmpty()) {
+        if (parameterSearchCategory.getLevel() == null && parameterSearchCategory.getParentIds().isNullOrEmpty()
+                && parameterSearchCategory.getCategoriesIds().isNullOrEmpty()) {
             parameterSearchCategory.setLevel(1);
         }
         List<Category> categoriesEntities = categoryRepository.searchCategories(parameterSearchCategory);
@@ -47,12 +54,13 @@ public class CategoryController extends BaseController{
         if (categories.isNullOrEmpty()) {
             return new ArrayList<>();
         }
+        ParameterSearchCategory searchCategory = ParameterSearchCategory.builder().level(parameterSearchCategory.getLevel()).build();
+        List<CategoryDTO> categoryDTOS = buildCategoryTree(categories, searchCategory);
         if (parameterSearchCategory.getBuildType() == null ||
                 parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
-            ParameterSearchCategory searchCategory = ParameterSearchCategory.builder().level(parameterSearchCategory.getLevel()).build();
-            return buildCategoryTree(categories, searchCategory);
+            return categoryDTOS;
         }
-        return categories;
+        return buildCategoryList(categoryDTOS);
     }
 
     public CategoryDTO createCategory(CategoryDTO categoryDTO) {
@@ -75,15 +83,47 @@ public class CategoryController extends BaseController{
         //TODO: chưa có cập nhật image
         return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
     }
-
-    public void deleteCategory(String categoryId, String deleteBy) {
-        Optional<Category> category = categoryRepository.findById(categoryId);
-        if (category.isEmpty()) {
+    public void updateCategoryName(String categoryId, String name) {
+        Optional<Category> validateCate = categoryRepository.findById(categoryId);
+        if (validateCate.isEmpty()) {
             throw new ServiceException("Danh mục không tồn tại");
         }
-        category.get().setUpdatedBy(deleteBy);
-        category.get().setIsDeleted(true);
-        this.saveCategory(category.get());
+        if (name.isBlankOrNull()) {
+            throw new ServiceException("Tên danh mục không được để trống");
+        }
+        Category category = validateCate.get();
+        category.setName(name);
+        category.setNameMode(StringUtils.stripAccents(name));
+        category.setSlug(StringUtils.getSlug(name) + "-" + category.getId());
+        category.setUpdatedAt(new Date());
+        category.setUpdatedBy(getUserIdFromContext());
+        categoryRepository.save(category);
+    }
+
+    public void deleteCategory(String categoryId) {
+        List<CategoryDTO> categoryDTOS = searchCategoryDTOS(ParameterSearchCategory.builder()
+                .categoriesIds(Collections.singletonList(categoryId))
+                .buildType(EnumCategoryBuildType.LIST.name()).build());
+
+        if (categoryDTOS.isNullOrEmpty()) {
+            throw new ServiceException("Danh mục không tồn tại");
+        }
+        List<String> categoryIds = categoryDTOS.stream().map(CategoryDTO::getId).collect(Collectors.toList());
+        Map<String, List<String>> mapProductIds = connector.getIdRelatedObjectsById(
+                Category.class.getAnnotation(Document.class).collection(),
+                categoryIds,
+                Course.class.getAnnotation(Document.class).collection(),
+                EnumConnectorType.COURSE_TO_CATEGORY.name());
+        if (!mapProductIds.isEmpty()) {
+            if (!mapProductIds.get(categoryId).isNullOrEmpty()) {
+                throw new ServiceException("Không thể xoá danh mục đã có khóa học");
+            }
+            mapProductIds.remove(categoryId);
+            if (!mapProductIds.isEmpty()) {
+                throw new ServiceException("Không thể xoá danh mục, do danh mục con đã có khóa học");
+            }
+        }
+        categoryRepository.deleteAllById(categoryIds);
     }
 
     private Category saveCategory(Category category) {
@@ -95,7 +135,8 @@ public class CategoryController extends BaseController{
         } else {
             category.setUpdatedAt(new Date());
         }
-        category.setSlug(StringUtils.getSlug(category.getName()) + "-" + category.getId());
+        category.setName(category.getName().trim());
+        category.setSlug(StringUtils.getSlug(category.getName().trim()) + "-" + category.getId());
         categoryRepository.save(category);
 
         if (category.getLevel() == 1) {
@@ -181,7 +222,23 @@ public class CategoryController extends BaseController{
         }
         return list;
     }
-
+    private List<CategoryDTO> buildCategoryList(List<CategoryDTO> input) {
+        List<CategoryDTO> categoryList = new ArrayList<>();
+        buildCategoryItem(input, categoryList);
+        return categoryList;
+    }
+    private void buildCategoryItem(List<CategoryDTO> categoryDTOS, List<CategoryDTO> categoryDTOReturn) {
+        if (categoryDTOS != null && !categoryDTOS.isEmpty()) {
+            for (CategoryDTO categoryDTO : categoryDTOS) {
+                if (!categoryDTOReturn.contains(categoryDTO)) {
+                    categoryDTOReturn.add(categoryDTO);
+                    if (!categoryDTO.getChildren().isNullOrEmpty()) {
+                        buildCategoryItem(categoryDTO.getChildren(), categoryDTOReturn);
+                    }
+                }
+            }
+        }
+    }
     public CategoryDTO toDTO(Category entity) {
         if (entity == null) return null;
         return CategoryDTO.builder()

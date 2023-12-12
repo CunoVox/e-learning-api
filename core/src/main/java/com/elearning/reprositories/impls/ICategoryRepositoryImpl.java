@@ -5,6 +5,7 @@ import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.reprositories.ICategoryRepositoryCustom;
 import com.elearning.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
@@ -29,15 +30,15 @@ public class ICategoryRepositoryImpl extends BaseRepositoryCustom implements ICa
             criteria.add(Criteria.where("parentId").in(parameterSearchCategory.getParentIds()));
         }
 
-        if (parameterSearchCategory.getIsDeleted() != null) {
-            criteria.add(Criteria.where("isDeleted").is(parameterSearchCategory.getIsDeleted()));
-        }
-        else {
+        if (parameterSearchCategory.getIsDeleted() != null && parameterSearchCategory.getIsDeleted()) {
+            criteria.add(Criteria.where("isDeleted").is(true));
+        } else if (parameterSearchCategory.getIsDeleted() != null) {
             criteria.add(Criteria.where("isDeleted").ne(true));
         }
-
         Query query = new Query();
-        query.addCriteria(new Criteria().andOperator(criteria));
+        if (!criteria.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteria.toArray(new Criteria[0])));
+        }
         return mongoTemplate.find(query, Category.class);
     }
 }

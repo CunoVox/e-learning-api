@@ -67,6 +67,8 @@ public class FileRelationshipController extends BaseController {
                 case COURSE_IMAGE:
                 case CATEGORY_IMAGE:
                 case USER_AVATAR:
+                case USER_PROFILE_DESCRIPTION:
+                case COURSE_DESCRIPTION:
                     return Constants.BASE_IMAGE_URL + fileId;
 
                 default:

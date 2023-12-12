@@ -79,7 +79,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
                 filterChain.doFilter(request, response);
             }else{
-                throw new SignatureException("Không có quyền truy cập 5");
+                throw new SignatureException("JWT_ERROR");
             }
         } catch (Exception ex) {
             exceptionResolver.resolveException(request, response, null, ex);

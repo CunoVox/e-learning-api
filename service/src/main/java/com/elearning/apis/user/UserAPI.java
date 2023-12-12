@@ -8,6 +8,7 @@ import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.UserEmailRequest;
 import com.elearning.models.searchs.ParameterSearchUser;
 import com.elearning.models.wrapper.ListWrapper;
+import com.elearning.utils.enumAttribute.EnumRole;
 import com.elearning.utils.enumAttribute.EnumUserStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,20 +37,32 @@ public class UserAPI {
     private VerificationCodeController verificationCodeController;
 
     @Operation(summary = "Cập nhật người dùng")
-    @PostMapping("/profile/update")
-    public UserDTO update(@RequestBody UpdateUserDTO dto){
-        var context = SecurityContextHolder.getContext().getAuthentication();
-        var email = context.getName();
+    @PatchMapping("/profile/update")
+    public UserDTO update(@RequestBody UserDTO dto) {
 
-        return userController.update(email, dto);
+        return userController.update(dto);
+    }
+
+    @Operation(summary = "Đăng kí làm giảng viên")
+    @PostMapping("/lecturer/register")
+    public UserDTO register(@RequestBody UserDTO dto) {
+        return userController.userLecturerUpdate(dto);
     }
 
     @Operation(summary = "Khoá và mở khoá người dùng")
-    @PostMapping("/lock/{id}/{lock}")
+    @PostMapping("/lock/{id}")
     @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
     public void lockAndUnLockUser(@PathVariable(value = "id") String id,
-                                  @PathVariable(value = "lock") boolean lock) {
+                                  @RequestParam(value = "lock") boolean lock) {
         userController.lockAndUnLockUser(id, lock);
+    }
+
+    @Operation(summary = "Cập nhật vai trò người dùng")
+    @PutMapping("/update-roles/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateRoles(@PathVariable("id") String id,
+                            @RequestParam(value = "roles", required = false) List<EnumRole> roles) {
+        userController.updateRoles(id, roles);
     }
 
     @Operation(summary = "Xin gửi mail reset password")
@@ -77,9 +90,10 @@ public class UserAPI {
                                         @RequestParam(value = "to_date", required = false) Long toDate,
                                         @RequestParam(value = "key_word", required = false) String multiValue,
                                         @RequestParam(value = "user_ids", required = false) List<String> userIds,
-                                        @RequestParam(value = "currentPage", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
-                                        @RequestParam(value = "maxResult", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn hoặc bằng 100") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult
-                                        ) {
+                                        @RequestParam(value = "roles", required = false) List<EnumRole> roles,
+                                        @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
+                                        @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn hoặc bằng 100") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult
+    ) {
         ParameterSearchUser parameterSearchUser = new ParameterSearchUser();
         parameterSearchUser.setStatus(status);
         if (currentPage == null || currentPage == 0) {
@@ -89,14 +103,15 @@ public class UserAPI {
             maxResult = 20;
         }
         Long startIndex = ((long) (currentPage - 1) * maxResult);
-        if (fromDate!=null){
+        if (fromDate != null) {
             parameterSearchUser.setFromDate(new Date(fromDate));
         }
-        if (toDate!=null){
+        if (toDate != null) {
             parameterSearchUser.setToDate(new Date(toDate));
         }
         parameterSearchUser.setMultiValue(multiValue);
         parameterSearchUser.setUserIds(userIds);
+        parameterSearchUser.setRoles(roles);
         parameterSearchUser.setStartIndex(startIndex);
         parameterSearchUser.setMaxResult(maxResult);
         return userController.searchUser(parameterSearchUser);

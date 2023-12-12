@@ -32,7 +32,6 @@ public class CategoryAPI {
 
     @Operation(summary = "Danh sách danh mục")
     @GetMapping
-//    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
     public List<CategoryDTO> getCategories(@RequestParam(value = "build_type") EnumCategoryBuildType buildType,
                                            @RequestParam(value = "level", required = false) Integer level,
                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
@@ -59,23 +58,30 @@ public class CategoryAPI {
 
     @Operation(summary = "Thêm danh mục")
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public CategoryDTO createCategory(@RequestBody CategoryDTO categoryDTO) {
         return categoryController.createCategory(categoryDTO);
     }
 
     @Operation(summary = "Sửa danh mục")
     @PutMapping("/update")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public void updateCategory(CategoryDTO categoryDTO) {
         categoryController.updateCategory(categoryDTO);
     }
 
+    @Operation(summary = "Cập nhật tên danh mục")
+    @PutMapping("/update-name/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    public void updateCategoryName(@PathVariable(value = "id") String id,
+                                   @RequestBody String name) {
+        categoryController.updateCategoryName(id, name);
+    }
+
     @Operation(summary = "Xoá danh mục")
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void deleteCategory(@PathVariable(value = "id") String id,
-                               @RequestParam(value = "delete_by") String deleteBy) {
-        categoryController.deleteCategory(id, deleteBy);
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    public void deleteCategory(@PathVariable(value = "id") String id) {
+        categoryController.deleteCategory(id);
     }
 }

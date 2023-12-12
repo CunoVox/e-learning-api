@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum EnumCategoryBuildType {
-    TREE("Dạng cây"),
-    LIST("Dạng list");
 
-    final String description;
+public enum EnumAttribute {
+    COURSE_SELL_PRICE("Giá tiền bán khoá học");
+
+    String description;
 }

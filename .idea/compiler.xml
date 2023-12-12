@@ -20,6 +20,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="core" options="-parameters" />
+      <module name="e-learning-api" options="" />
       <module name="models" options="-parameters" />
       <module name="service" options="-parameters" />
     </option>
