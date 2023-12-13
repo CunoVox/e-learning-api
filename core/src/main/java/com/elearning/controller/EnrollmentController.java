@@ -163,11 +163,12 @@ public class EnrollmentController extends BaseController {
 
         ParameterSearchCourse parameterSearchCourse = new ParameterSearchCourse();
         parameterSearchCourse.setIds(Collections.singletonList(enrollment.getCourseId()));
-        ListWrapper<Course> courseListWrapper = iCourseRepository.searchCourse(parameterSearchCourse);
+        parameterSearchCourse.setBuildChild(true);
+        ListWrapper<CourseDTO> courseListWrapper = courseController.searchCourseDTOS(parameterSearchCourse);
         if (courseListWrapper.getData().isEmpty()) {
             throw new ServiceException("Không tin thấy khóa học!");
         }
-        Course course = courseListWrapper.getData().get(0);
+        CourseDTO course = courseListWrapper.getData().get(0);
 
         // Kiểm tra user đã đăng kí khóa học này chưa
         Enrollment entity = iEnrollmentRepository.findByCourseIdAndUserId(course.getId(), enrollment.getUserId());
@@ -184,6 +185,11 @@ public class EnrollmentController extends BaseController {
 
             Enrollment e1 = iEnrollmentRepository.save(entity);
             return toDTO(e1, courseController.getCourseById(e1.getCourseId()));
+        } else {
+            //Lấy khoá học lv3 đầu tiên
+            CourseDTO courseLevel3 = course.getChildren().stream().flatMap(courseLevel2 -> courseLevel2.getChildren().stream())
+                    .filter(courseDTO -> courseDTO.getLevel() == 3).findFirst().orElse(null);
+            enrollment.setCurrentCourse(courseLevel3 != null ? courseLevel3.getId() : null);
         }
 
         if (course.getLevel() != 1) {
@@ -200,7 +206,7 @@ public class EnrollmentController extends BaseController {
         }
         Long sub = course.getSubscriptions();
         course.setSubscriptions((sub != null) ? sub + 1 : 1);
-        iCourseRepository.save(course);
+        iCourseRepository.updateCourseSubscriptions(course.getId(), course.getSubscriptions(), "system");
 
         enrollment.setId(iSequenceValueItemRepository.getSequence(Enrollment.class));
         enrollment.setCreatedBy(enrollment.getUserId());

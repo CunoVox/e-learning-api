@@ -248,4 +248,11 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         map.put("isDeleted", isDeleted);
         updateAttribute(courseId, map, updatedBy, Course.class);
     }
+
+    @Override
+    public void updateCourseSubscriptions(String courseId, Long subscriptions, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("subscriptions", subscriptions);
+        updateAttribute(courseId, map, updatedBy, Course.class);
+    }
 }

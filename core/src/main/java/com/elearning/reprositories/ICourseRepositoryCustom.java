@@ -10,4 +10,6 @@ public interface ICourseRepositoryCustom {
     ListWrapper<Course> searchCourse(ParameterSearchCourse parameterSearchCourse);
     void updateCourseType(String courseId, String courseType, String updateBy);
     void updateIsDeleted(String courseId, Boolean isDeleted, String updatedBy);
+
+    void updateCourseSubscriptions(String courseId, Long subscriptions, String updatedBy);
 }

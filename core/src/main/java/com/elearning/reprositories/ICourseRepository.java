@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ICourseRepository extends MongoRepository<Course, String>, ICourseRepositoryCustom {
-    List<Course> findAllByParentIdInAndIsDeletedNotIn(Collection<String> ids, boolean isDeleted);
+    List<Course> findAllByParentIdInAndIsDeletedNotIn(Collection<String> parentId, Collection<Boolean> isDeleted);
 
+    List<Course> findByIdIn(List<String> courseIds);
+
+    List<Course> findAllByCreatedByInAndLevel(Collection<String> createdBy, int level);
 }
