@@ -76,9 +76,12 @@ public class CourseController extends BaseController {
                         .findFirst()
                         .map(Collections::singletonList)
                         .orElseGet(Collections::emptyList));
-                course.setCourseType(EnumCourseType.CHANGE_PRICE);
+                if(course.getCourseType() != EnumCourseType.DRAFT)
+                    course.setCourseType(EnumCourseType.CHANGE_PRICE);
+//                course.setCourseType(EnumCourseType.CHANGE_PRICE);
+            } else {
             }
-            priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
+                priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
         }
         Course courseSaved = saveCourse(course);
         if (!dto.getCategoryIds().isNullOrEmpty()) {
@@ -93,6 +96,7 @@ public class CourseController extends BaseController {
             priceController.createPrice(dto.getPricePromotion());
         return getCourseById(course.getId());
     }
+
     public void changeCourseType(String courseId, EnumCourseType courseType, Boolean isRejected) {
         CourseDTO courseDTO = getCourseById(courseId);
         if (courseDTO != null) {
@@ -100,7 +104,7 @@ public class CourseController extends BaseController {
             if (courseDTO.getCourseType().equals(EnumCourseType.CHANGE_PRICE)
                     && courseType.equals(EnumCourseType.OFFICIAL)
                     && (isRejected == null || !isRejected)) {
-                priceController.updatePriceSell(courseId, courseDTO.getPriceSell());
+                priceController.updatePriceSell(courseId, new BigDecimal((String) courseDTO.getAttributes().get(0).getAttributeValue()));
             }
             if (!courseDTO.getChildren().isNullOrEmpty()) {
                 String userId = getUserIdFromContext();
@@ -279,7 +283,6 @@ public class CourseController extends BaseController {
                 .requirement(inputDTO.getRequirement())
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
-                .subscriptions(inputDTO.getSubscriptions())
                 .isDeleted(inputDTO.isDeleted())
                 .contentType(inputDTO.getType())
                 .build();
@@ -290,13 +293,17 @@ public class CourseController extends BaseController {
             }
             course.setCourseType(courseCheck.get().getCourseType());
             course.setDescription(courseCheck.get().getDescription());
-            if(!inputDTO.getDescription().isBlankOrNull()){
+            if (!inputDTO.getDescription().isBlankOrNull()) {
                 course.setDescription(inputDTO.getDescription());
             }
             course.setRequirement(courseCheck.get().getRequirement());
-            if(!inputDTO.getRequirement().isBlankOrNull()){
+            if (!inputDTO.getRequirement().isBlankOrNull()) {
                 course.setRequirement(inputDTO.getRequirement());
             }
+            course.setSubscriptions(courseCheck.get().getSubscriptions());
+//            if (inputDTO.getSubscriptions() != null) {
+//                course.setSubscriptions(inputDTO.getSubscriptions());
+//            }
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());
@@ -327,6 +334,7 @@ public class CourseController extends BaseController {
                 .level(entity.getLevel())
                 .subscriptions(entity.getSubscriptions())
                 .children(new ArrayList<>())
+                .attributes(toAttributesDTO(entity.getAttributes()))
                 .description(entity.getDescription())
                 .requirement(entity.getRequirement())
                 .type(entity.getContentType())
@@ -336,6 +344,18 @@ public class CourseController extends BaseController {
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .isDeleted(entity.getIsDeleted() != null ? entity.getIsDeleted() : false)
                 .build();
+    }
+
+    List<AttributeDTO> toAttributesDTO(List<Attribute> attributes) {
+        if (attributes.isNullOrEmpty()) return null;
+        List<AttributeDTO> attributeDTOS = new ArrayList<>();
+        for (Attribute attribute : attributes) {
+            attributeDTOS.add(AttributeDTO.builder()
+                    .attributeName(attribute.getAttributeName())
+                    .attributeValue(attribute.getAttributeValue())
+                    .build());
+        }
+        return attributeDTOS;
     }
 
     public List<CourseDTO> toDTOs(List<Course> entities) {
