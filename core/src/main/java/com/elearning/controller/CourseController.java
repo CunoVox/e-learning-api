@@ -93,11 +93,13 @@ public class CourseController extends BaseController {
             priceController.createPrice(dto.getPricePromotion());
         return getCourseById(course.getId());
     }
-    public void changeCourseType(String courseId, EnumCourseType courseType) {
+    public void changeCourseType(String courseId, EnumCourseType courseType, Boolean isRejected) {
         CourseDTO courseDTO = getCourseById(courseId);
         if (courseDTO != null) {
             courseRepository.updateCourseType(courseId, courseType.name(), getUserIdFromContext());
-            if (courseType.equals(EnumCourseType.CHANGE_PRICE)) {
+            if (courseDTO.getCourseType().equals(EnumCourseType.CHANGE_PRICE)
+                    && courseType.equals(EnumCourseType.OFFICIAL)
+                    && (isRejected == null || !isRejected)) {
                 priceController.updatePriceSell(courseId, courseDTO.getPriceSell());
             }
             if (!courseDTO.getChildren().isNullOrEmpty()) {
