@@ -49,17 +49,25 @@ public class IInvoiceRepositoryCustomImpl extends BaseRepositoryCustom implement
         if (!criteria.isEmpty()){
             query.addCriteria(new Criteria().andOperator(criteria));
         }
-
+        List<Invoice> invoices = mongoTemplate.find(query, Invoice.class);
         if (parameterSearchInvoice.getMaxResult() == null) {
             return ListWrapper.<Invoice>builder()
                     .data(mongoTemplate.find(query, Invoice.class))
                     .total(mongoTemplate.count(query, Invoice.class))
+                    .attribute(
+                            Attribute.builder()
+                                    .attributeName("total_price")
+                                    .attributeValue(invoices.stream()
+                                            .map(Invoice::getPricePurchase)
+                                            .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                    .build()
+                    )
                     .build();
         }
         if (parameterSearchInvoice.getCurrentPage() == null) {
             parameterSearchInvoice.setCurrentPage(1);
         }
-        List<Invoice> invoices = mongoTemplate.find(query, Invoice.class);
+
         return ListWrapper.<Invoice>builder()
                 .total(mongoTemplate.count(query, Invoice.class))
                 .data(mongoTemplate.find(query.skip((long) (parameterSearchInvoice.getCurrentPage() - 1) * parameterSearchInvoice.getMaxResult()).limit(parameterSearchInvoice.getMaxResult()), Invoice.class))
