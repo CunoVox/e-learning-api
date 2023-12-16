@@ -213,6 +213,7 @@ public class InvoiceController extends BaseController{
                 .total(invoices.getTotal())
                 .currentPage(invoices.getCurrentPage())
                 .maxResult(invoices.getMaxResult())
+                .attribute(invoices.getAttribute())
                 .build();
     }
 }

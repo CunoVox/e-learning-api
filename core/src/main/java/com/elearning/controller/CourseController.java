@@ -65,17 +65,18 @@ public class CourseController extends BaseController {
                 List<Attribute> attributes = course.getAttributes();
                 if (!attributes.isNullOrEmpty()) {
                     attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
-                    attributes.add(Attribute.builder()
-                            .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
-                            .attributeValue(dto.getPriceSell())
-                            .build());
-                    course.setAttributes(attributes.stream()
-                            .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
-                            .findFirst()
-                            .map(Collections::singletonList)
-                            .orElseGet(Collections::emptyList));
-                    course.setCourseType(EnumCourseType.CHANGE_PRICE);
                 }
+                if (attributes == null) attributes = new ArrayList<>();
+                attributes.add(Attribute.builder()
+                        .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
+                        .attributeValue(dto.getPriceSell())
+                        .build());
+                course.setAttributes(attributes.stream()
+                        .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
+                        .findFirst()
+                        .map(Collections::singletonList)
+                        .orElseGet(Collections::emptyList));
+                course.setCourseType(EnumCourseType.CHANGE_PRICE);
             }
             priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
         }

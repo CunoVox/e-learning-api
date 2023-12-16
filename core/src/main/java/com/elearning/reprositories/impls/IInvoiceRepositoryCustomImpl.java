@@ -1,5 +1,6 @@
 package com.elearning.reprositories.impls;
 
+import com.elearning.entities.Attribute;
 import com.elearning.entities.Course;
 import com.elearning.entities.Invoice;
 import com.elearning.models.searchs.ParameterSearchInvoice;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -57,11 +59,20 @@ public class IInvoiceRepositoryCustomImpl extends BaseRepositoryCustom implement
         if (parameterSearchInvoice.getCurrentPage() == null) {
             parameterSearchInvoice.setCurrentPage(1);
         }
+        List<Invoice> invoices = mongoTemplate.find(query, Invoice.class);
         return ListWrapper.<Invoice>builder()
-                .data(mongoTemplate.find(query.skip((long) (parameterSearchInvoice.getCurrentPage() - 1) * parameterSearchInvoice.getMaxResult()).limit(parameterSearchInvoice.getMaxResult()), Invoice.class))
                 .total(mongoTemplate.count(query, Invoice.class))
+                .data(mongoTemplate.find(query.skip((long) (parameterSearchInvoice.getCurrentPage() - 1) * parameterSearchInvoice.getMaxResult()).limit(parameterSearchInvoice.getMaxResult()), Invoice.class))
                 .currentPage(parameterSearchInvoice.getCurrentPage())
                 .maxResult(parameterSearchInvoice.getMaxResult())
+                .attribute(
+                        Attribute.builder()
+                                .attributeName("total_price")
+                                .attributeValue(invoices.stream()
+                                        .map(Invoice::getPricePurchase)
+                                        .reduce(BigDecimal.ZERO, BigDecimal::add))
+                                .build()
+                )
                 .build();
     }
 }
