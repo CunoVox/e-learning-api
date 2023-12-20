@@ -1,5 +1,6 @@
 package com.elearning.models.wrapper;
 
+import com.elearning.entities.Attribute;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,4 +28,5 @@ public class ListWrapper<T> {
 
     private List<T> data;
 
+    private Attribute attribute;
 }

@@ -2,12 +2,15 @@ package com.elearning.controller;
 
 import com.elearning.config.VnpayConfig;
 import com.elearning.entities.Category;
+import com.elearning.entities.Course;
 import com.elearning.entities.Invoice;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
 import com.elearning.models.dtos.InvoiceDTO;
+import com.elearning.models.searchs.ParameterSearchInvoice;
+import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IInvoiceRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
@@ -17,6 +20,7 @@ import com.elearning.utils.Extensions;
 import com.elearning.utils.enumAttribute.EnumCourseType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -148,6 +152,13 @@ public class InvoiceController extends BaseController{
 
     public InvoiceDTO toDTO(Invoice dto) {
         if (dto == null) return null;
+        Course course = courseRepository.findById(dto.getCourseId()).orElse(null);
+        if (course == null) return null;
+        User customer = userRepository.findById(dto.getCustomerId()).orElse(null);
+        if (customer == null) return null;
+        User seller = userRepository.findById(course.getCreatedBy()).orElse(null);
+        if (seller == null) return null;
+
         return InvoiceDTO.builder()
                 .id(dto.getId())
                 .createdBy(dto.getCreatedBy())
@@ -155,7 +166,54 @@ public class InvoiceController extends BaseController{
                 .courseId(dto.getCourseId())
                 .customerId(dto.getCustomerId())
                 .pricePurchase(dto.getPricePurchase())
+                .courseName(course.getName())
+                .courseSlug(course.getSlug())
+                .customerName(customer.getFullName())
+                .customerEmail(customer.getEmail())
+                .sellerName(seller.getFullName())
+                .sellerEmail(seller.getEmail())
                 .status(dto.getStatus())
+                .build();
+    }
+    public List<InvoiceDTO> toDTOs(List<Invoice> invoices) {
+        List<InvoiceDTO> results = new ArrayList<>();
+        List<String> courseIds = invoices.stream().map(Invoice::getCourseId).toList();
+        List<String> userIds = invoices.stream().map(Invoice::getCustomerId).toList();
+        List<Course> courses = courseRepository.findByIdIn(courseIds);
+        List<User> sellers = userRepository.findAllByIdIn(courses.stream().map(Course::getCreatedBy).toList());
+        List<User> customers = userRepository.findAllByIdIn(userIds);
+        Map<String, Course> courseMap = Extensions.toMap(courses.stream(), Course::getId);
+        Map<String, User> customerMap = Extensions.toMap(customers.stream(), User::getId);
+        Map<String, User> sellerMap = Extensions.toMap(sellers.stream(), User::getId);
+        for (Invoice entity : invoices) {
+            InvoiceDTO dto = InvoiceDTO.builder()
+                    .id(entity.getId())
+                    .createdBy(entity.getCreatedBy())
+                    .createdAt(entity.getCreatedAt())
+                    .courseId(entity.getCourseId())
+                    .customerId(entity.getCustomerId())
+                    .pricePurchase(entity.getPricePurchase())
+                    .courseName(courseMap.get(entity.getCourseId()).getName())
+                    .courseSlug(courseMap.get(entity.getCourseId()).getSlug())
+                    .customerName(customerMap.get(entity.getCustomerId()).getFullName())
+                    .customerEmail(customerMap.get(entity.getCustomerId()).getEmail())
+                    .sellerName(sellerMap.get(courseMap.get(entity.getCourseId()).getCreatedBy()).getFullName())
+                    .sellerEmail(sellerMap.get(courseMap.get(entity.getCourseId()).getCreatedBy()).getEmail())
+                    .status(entity.getStatus())
+                    .build();
+            results.add(dto);
+        }
+        return results;
+    }
+
+    public ListWrapper<InvoiceDTO> searchInvoice(ParameterSearchInvoice parameterSearchInvoice) {
+        ListWrapper<Invoice> invoices = invoiceRepository.searchInvoice(parameterSearchInvoice);
+        return ListWrapper.<InvoiceDTO>builder()
+                .data(toDTOs(invoices.getData()))
+                .total(invoices.getTotal())
+                .currentPage(invoices.getCurrentPage())
+                .maxResult(invoices.getMaxResult())
+                .attribute(invoices.getAttribute())
                 .build();
     }
 }

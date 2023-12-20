@@ -111,15 +111,16 @@ public class CourseAPI {
     @Operation(summary = "Thay đổi tình trạng khoá học")
     @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public void changeCourseType(@RequestParam("course_id") String courseId,
-                                 @RequestParam(value = "course_type") EnumCourseType course_type) {
-        courseController.changeCourseType(courseId, course_type);
+                                 @RequestParam(value = "course_type") EnumCourseType course_type,
+                                 @RequestParam(value = "is_rejected") Boolean isRejected) {
+        courseController.changeCourseType(courseId, course_type, isRejected);
     }
 
     @PutMapping("/lecturer/change-course-type")
     @Operation(summary = "Thay đổi tình trạng khoá học từ DRAFT -> WAITING")
     @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public void changeCourseToWaiting(@RequestParam("course_id") String courseId) {
-        courseController.changeCourseType(courseId, EnumCourseType.WAITING);
+        courseController.changeCourseType(courseId, EnumCourseType.WAITING, null);
     }
 
     @DeleteMapping("/delete/{id}")

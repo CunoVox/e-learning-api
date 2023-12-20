@@ -21,6 +21,14 @@ public class InvoiceDTO {
     @NotBlank(message = "Không được bỏ trống giá tiền")
     private BigDecimal pricePurchase;
     private String status;
+    //dùng để render ra view
+    private String courseName;
+    private String courseSlug;
+    private String customerName;
+    private String customerEmail;
+    private String sellerName;
+    private String sellerEmail;
+    //==================================================================
     private Date createdAt;
     private String createdBy;
     private Boolean isDeleted;
