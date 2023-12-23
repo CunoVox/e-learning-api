@@ -61,7 +61,7 @@ public class CourseController extends BaseController {
         //Price
         if (!dto.getId().isBlankOrNull()) {
             BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
-            if (!Objects.equals(currentPrice, dto.getPriceSell())) {
+            if (!Objects.equals(currentPrice, dto.getPriceSell()) && course.getCourseType() == EnumCourseType.OFFICIAL) {
                 List<Attribute> attributes = course.getAttributes();
                 if (!attributes.isNullOrEmpty()) {
                     attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
@@ -76,12 +76,11 @@ public class CourseController extends BaseController {
                         .findFirst()
                         .map(Collections::singletonList)
                         .orElseGet(Collections::emptyList));
-                if(course.getCourseType() != EnumCourseType.DRAFT)
-                    course.setCourseType(EnumCourseType.CHANGE_PRICE);
-//                course.setCourseType(EnumCourseType.CHANGE_PRICE);
+                course.setCourseType(EnumCourseType.CHANGE_PRICE);
             } else {
-            }
                 priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
+            }
+
         }
         Course courseSaved = saveCourse(course);
         if (!dto.getCategoryIds().isNullOrEmpty()) {
@@ -290,6 +289,9 @@ public class CourseController extends BaseController {
             Optional<Course> courseCheck = courseRepository.findById(inputDTO.getId());
             if (courseCheck.isEmpty()) {
                 throw new ServiceException("Khoá học không tồn tại trong hệ thống!");
+            }
+            if (!courseCheck.get().getCreatedBy().isBlankOrNull()) {
+                course.setCreatedBy(courseCheck.get().getCreatedBy());
             }
             course.setCourseType(courseCheck.get().getCourseType());
             course.setDescription(courseCheck.get().getDescription());
