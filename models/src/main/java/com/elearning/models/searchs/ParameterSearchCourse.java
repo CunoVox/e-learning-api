@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -14,19 +16,42 @@ import java.util.List;
 @AllArgsConstructor
 public class ParameterSearchCourse implements Serializable, Cloneable {
     private Integer level;
-    
-    private Boolean isDraft;
+
+    private String searchType;
     
     private Boolean isDeleted;
 
-    private Boolean buildCourses;
+    private String multiValue;
 
-    private String buildType;
+    private String createdBy;
 
-    private List<String> categoriesIds;
-    private List<String> courseIds;
+    //true là build, rỗng hoặc false thì k build
+    private Boolean buildChild;
+
+    private String name;
+
+    private String slug;
+
+    private Date fromDate;
+
+    private Date toDate;
+
+    private BigDecimal priceFrom;
+
+    private BigDecimal priceTo;
+
+    private String sortBy;
+
+    private List<String> ids;
 
     private List<String> parentIds;
+
+    private List<String> categoriesIds;
+
+    //  page
+    private Long startIndex;
+
+    private Integer maxResult;
     @Override
     public ParameterSearchCourse clone() throws CloneNotSupportedException {
         return (ParameterSearchCourse) super.clone();

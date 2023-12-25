@@ -15,12 +15,12 @@ import java.math.BigDecimal;
 @SuperBuilder
 public class FileRelationship extends IBaseEntity{
     private String parentId;
+    private String parentType;
     private String fileId;
-    private String fileType;
     private String mimeType;
     private String name;
     private Long size;
     private Long duration;
     private String webViewLink;
-    private String createBy;
+    private String pathFile;
 }

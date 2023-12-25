@@ -17,5 +17,7 @@ public abstract class IBaseEntity {
     private String id;
     private Date createdAt = new Date();
     private Date updatedAt = new Date();
+    private String createdBy;
+    private String updatedBy;
     private Boolean isDeleted = false;
 }

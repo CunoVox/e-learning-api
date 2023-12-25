@@ -2,6 +2,7 @@ package com.elearning.connector;
 
 import com.elearning.handler.ServiceException;
 import com.elearning.utils.QueryBuilderUtils;
+import com.elearning.utils.enumAttribute.EnumConnectorType;
 import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -102,11 +103,11 @@ public class Connector {
 
             List<Map> rs = this.mongoTemplate.find(Query.query(this.buildQuery(fromCollection, Collections.singletonList(fromId), toCollection, toId, type, EnumRelatedObjectsStatus.ACTIVE.getValue())), Map.class, "connector");
             if (!ObjectUtils.isEmpty(rs)) {
-                return (Map)rs.get(0);
+                return (Map) rs.get(0);
             }
         }
 
-        return (Map)(!ObjectUtils.isEmpty(map) ? this.createObject(map, updatedBy) : new HashMap<>());
+        return (Map) (!ObjectUtils.isEmpty(map) ? this.createObject(map, updatedBy) : new HashMap<>());
     }
 
     private void updateStatusConnector(String fromCollection, String fromId, String toCollection, String toId, String type, int status, String updateBy) {
@@ -116,6 +117,12 @@ public class Connector {
         update.set("status", status);
         Query query = Query.query(this.buildQuery(fromCollection, Collections.singletonList(fromId), toCollection, toId, type, null));
         this.mongoTemplate.updateFirst(query, update, "connector");
+    }
+
+
+    public void deleteConnector(String fromCollection, String fromId, String toCollection, String type) {
+        Query query = Query.query(this.buildQuery(fromCollection, ObjectUtils.isEmpty(fromId) ? new ArrayList() : Collections.singletonList(fromId), toCollection, "", type, EnumRelatedObjectsStatus.ACTIVE.getValue()));
+        this.mongoTemplate.remove(query, "connector");
     }
 
     private Map<String, Object> createObject(Map<String, Object> object, String updateBy) {

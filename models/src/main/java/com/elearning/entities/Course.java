@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document(collection = "course")
 @Data
 @NoArgsConstructor
@@ -18,22 +20,16 @@ public class Course extends IBaseEntity{
     private String partnerId;
     private EnumCourseType courseType;
     private EnumCourseStatus status;
-
-
-
     private String name;
     private String nameMode;
     private String slug;
-    private EnumCourseContentType contentType;
+    private String contentType;
     private String parentId;
     private int level;
     private String description;
     private String requirement;
     private Long duration;
-    private Long totalLesson;
     private Long subscriptions;
-    private String createdBy;
-
     private Boolean isPublished;
-
+    private List<Attribute> attributes;
 }
