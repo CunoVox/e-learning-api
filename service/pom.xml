@@ -89,16 +89,26 @@
 
     <distributionManagement>
         <repository>
-            <id>central</id>
-            <name>a0woqaeurzf4c-artifactory-primary-0-releases</name>
-            <url>https://elearningteam.jfrog.io/artifactory/e-learning-libs-release</url>
+            <id>Elearning</id>
+            <url>https://pkgs.dev.azure.com/20110472/Elearning/_packaging/Elearning/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
-            <id>central</id>
-            <name>a0woqaeurzf4c-artifactory-primary-0-releases</name>
-            <url>https://elearningteam.jfrog.io/artifactory/e-learning-libs-release</url>
+            <id>Elearning</id>
+            <url>https://pkgs.dev.azure.com/20110472/Elearning/_packaging/Elearning/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </repositories>
     <build>
