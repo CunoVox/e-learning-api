@@ -27,6 +27,16 @@
       <option name="url" value="https://elearningteam.jfrog.io/artifactory/e-learning-libs-snapshot" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="longvan-libs-release" />
+      <option name="url" value="https://artifacts.longvan.vn/artifactory/longvan-libs-release" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="snapshots" />
       <option name="name" value="e-learning-libs-snapshot" />
       <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot" />
@@ -43,11 +53,6 @@
     </remote-repository>
     <remote-repository>
       <option name="id" value="central" />
-      <option name="name" value="Maven Central repository" />
-      <option name="url" value="https://repo1.maven.org/maven2" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="central" />
       <option name="name" value="e-learning-libs-release" />
       <option name="url" value="https://elearningteam.jfrog.io/artifactory/e-learning-libs-release" />
     </remote-repository>
@@ -60,11 +65,6 @@
       <option name="id" value="snapshots" />
       <option name="name" value="longvan-libs-snapshot" />
       <option name="url" value="https://artifacts.longvan.vn/artifactory/longvan-libs-snapshot" />
-    </remote-repository>
-    <remote-repository>
-      <option name="id" value="central" />
-      <option name="name" value="longvan-libs-release" />
-      <option name="url" value="https://artifacts.longvan.vn/artifactory/longvan-libs-release" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="ossrh" />

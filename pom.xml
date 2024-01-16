@@ -47,15 +47,15 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0woqaeurzf4c-artifactory-primary-0-releases</name>
-            <url>https://elearningteam.jfrog.io/artifactory/e-learning-libs-release</url>
+            <name>a0mtdcwkslkce-artifactory-primary-0-releases</name>
+            <url>https://elearning1.jfrog.io/artifactory/elearning-api-libs-release</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>central</id>
-            <name>a0woqaeurzf4c-artifactory-primary-0-releases</name>
-            <url>https://elearningteam.jfrog.io/artifactory/e-learning-libs-release</url>
+            <name>a0mtdcwkslkce-artifactory-primary-0-releases</name>
+            <url>https://elearning1.jfrog.io/artifactory/elearning-api-libs-release</url>
         </repository>
     </repositories>
 </project>
