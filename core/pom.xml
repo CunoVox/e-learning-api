@@ -115,8 +115,8 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0mtdcwkslkce-artifactory-primary-0-releases</name>
-            <url>https://elearning1.jfrog.io/artifactory/elearning-api-libs-release</url>
+            <name>a0brebgdvv9ne-artifactory-primary-0-releases</name>
+            <url>https://elearningwisdom.jfrog.io/artifactory/elearning-libs-release</url>
         </repository>
     </distributionManagement>
     <build>
