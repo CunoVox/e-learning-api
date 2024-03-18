@@ -2,7 +2,7 @@ package com.elearning.utils;
 
 public class Constants {
 
-    public static final String SERVICE_URL = "https://e-learning.up.railway.app/e-learning";
+    public static final String SERVICE_URL = "https://elearning-api-elearning.koyeb.app/e-learning";
     public static final String WEB_URL = "https://e-learning-website.up.railway.app";
 
     public static final int ACCESS_TOKEN_EXPIRE_TIME_MILLIS = 100 * 60 * 1000; // ( 10' //100'
