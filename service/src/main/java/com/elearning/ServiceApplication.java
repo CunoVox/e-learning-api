@@ -17,8 +17,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 public class ServiceApplication { 
     public static void main(String[] args) { 
         SpringApplication.run(ServiceApplication.class, args);
-        log.info("-----------------------------------------------------------");
-        log.info("🚀 Api doc ready at : " + 
+        log.info("------------------------------------------------------------");
+        log.info("🚀 Api doc ready at : " +
                 Constants.SERVICE_URL + "/swagger-ui/index.html?configUrl=/e-learning/api-docs/swagger-config");
     }
 }
