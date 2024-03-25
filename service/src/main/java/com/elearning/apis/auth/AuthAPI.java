@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
@@ -51,6 +52,7 @@ public class AuthAPI {
     public ResponseEntity<?> sendEmailVerification(@RequestBody UserEmailRequest request) {
         return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(request.getEmail()));
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
@@ -60,6 +62,13 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
+
+    @PostMapping("/register/mobile")
+    public ResponseEntity<?> registerMobile(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
+        var authResponse = userController.register(userFormDTO);
+        return ResponseEntity.ok().body(authResponse);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
@@ -68,6 +77,12 @@ public class AuthAPI {
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(rs);
+    }
+
+    @PostMapping("/login/mobile")
+    public ResponseEntity<?> loginMobile(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
+        AuthResponse rs = userController.login(userFormDTO);
+        return ResponseEntity.ok().body(rs);
     }
 
     @PostMapping("/refresh-token")
@@ -81,10 +96,16 @@ public class AuthAPI {
                 .body(authResponse);
     }
 
+    @PostMapping("/refresh-token/mobile")
+    public ResponseEntity<?> refreshTokenMobile(@RequestBody String refreshToken) throws SignatureException {
+        AuthResponse authResponse = jwtController.refreshToken(refreshToken);
+        return ResponseEntity.ok().body(authResponse);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SignatureException {
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
-        if(requestCookie != null){
+        if (requestCookie != null) {
             refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
             Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
             delete.setHttpOnly(true);
@@ -95,10 +116,15 @@ public class AuthAPI {
             SecurityContextHolder.clearContext();
 
         }
-
-
         return ResponseEntity.ok()
                 .body(null);
+    }
+
+    @PostMapping("/logout/mobile")
+    public ResponseEntity<?> logoutMobile(@RequestBody String refreshToken) throws SignatureException {
+        refreshTokenController.deleteRefreshTokenBranch(refreshToken);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().body(null);
     }
 
     private ResponseCookie createRefreshCookie(String refreshToken) {
