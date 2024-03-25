@@ -166,6 +166,7 @@ public class UserController extends BaseController {
         if (userId == null) {
             throw new ServiceException("Vui lòng đăng nhập.");
         }
+        validateUser(dto);
         Optional<User> entity = userRepository.findById(userId);
         if (entity.isEmpty()) {
             throw new ServiceException("User not found");
@@ -189,6 +190,25 @@ public class UserController extends BaseController {
         entity.get().setUpdatedAt(new Date());
         userRepository.save(entity.get());
         return toDto(entity.get());
+    }
+
+    public void updateFullName(String userId, String fullName) {
+        findUserById(userId);
+        userRepository.updateFullName(userId, fullName, userId);
+    }
+
+    public void updatePhoneNumber(String userId, String phoneNumber) {
+        findUserById(userId);
+        phoneNumber = phoneNumber.trim();
+        if (!StringUtils.isPhoneVietnamValid(phoneNumber)) {
+            throw new ServiceException("Số điện thoại không hợp lệ");
+        }
+        userRepository.updatePhoneNumber(userId, phoneNumber, userId);
+    }
+
+    public void updateAddress(String userId, String address) {
+        findUserById(userId);
+        userRepository.updateAddress(userId, address.trim(), userId);
     }
 
     public UserDTO userLecturerUpdate(UserDTO dto) {
@@ -354,6 +374,22 @@ public class UserController extends BaseController {
 
     public User dtoToUser(UserDTO dto) {
         return modelMapper.map(dto, User.class);
+    }
+
+    private void validateUser(UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        if (!userDTO.getEmail().isBlankOrNull()) {
+            if (!StringUtils.isEmailValid(userDTO.getEmail())) {
+                throw new ServiceException("Email không hợp lệ");
+            }
+        }
+        if (!userDTO.getPhoneNumber().isBlankOrNull()) {
+            if (!StringUtils.isPhoneVietnamValid(userDTO.getPhoneNumber())) {
+                throw new ServiceException("Số điện thoại không hợp lệ");
+            }
+        }
     }
 
     public UserDTO toDto(User user) {

@@ -8,6 +8,7 @@ import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.VerificationCodeDTO;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.reprositories.IVerificationCodeRepository;
+import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,7 +77,7 @@ public class VerificationCodeController {
         }
         revokeAllUserEmailVerificationCodeByEmail(email);
 
-        String digit = getRandomNumberString();
+        String digit = StringUtils.randomNumber(6);
 
         VerificationCode code = build(null, email, digit, EnumVerificationCode.EMAIL_CONFIRM);
         create(code);
@@ -85,7 +86,7 @@ public class VerificationCodeController {
     }
 
     public VerificationCodeDTO createResetPasswordCode(String email) {
-        String digit = getRandomNumberString();
+        String digit = StringUtils.randomNumber(6);
         UserDTO dto = userController.findByEmail(email);
 //        if (!dto.getIsEmailConfirmed()) {
 //            throw new ServiceException("Email chưa được xác nhận");
@@ -208,13 +209,4 @@ public class VerificationCodeController {
                 .build();
     }
 
-    private String getRandomNumberString() {
-        // It will generate 6 digit random Number.
-        // from 0 to 999999
-        Random rnd = new Random();
-        int number = rnd.nextInt(999999);
-
-        // this will convert any number sequence into 6 character.
-        return String.format("%06d", number);
-    }
 }

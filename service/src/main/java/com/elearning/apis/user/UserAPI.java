@@ -64,6 +64,30 @@ public class UserAPI {
         userController.updateRoles(id, roles);
     }
 
+    @Operation(summary = "Cập nhật tên người dùng")
+    @PutMapping("/update-full-name/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateFullName(@PathVariable("id") String id,
+                               @RequestParam(value = "full_name") String fullName) {
+        userController.updateFullName(id, fullName);
+    }
+
+    @Operation(summary = "Cập nhật số điện thoại người dùng")
+    @PutMapping("/update-phone-number/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updatePhoneNumber(@PathVariable("id") String id,
+                                  @RequestParam(value = "phone_number") String phoneNumber) {
+        userController.updatePhoneNumber(id, phoneNumber);
+    }
+
+    @Operation(summary = "Cập nhật địa chỉ người dùng")
+    @PutMapping("/update-address/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateAddress(@PathVariable("id") String id,
+                              @RequestParam(value = "address") String address) {
+        userController.updateAddress(id, address);
+    }
+
     @Operation(summary = "Xin gửi mail reset password")
     @PostMapping(value = "/password/reset")
     public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {
