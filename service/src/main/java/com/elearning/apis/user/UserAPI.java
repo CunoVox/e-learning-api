@@ -2,8 +2,8 @@ package com.elearning.apis.user;
 
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
+import com.elearning.models.dtos.ChangePasswordDTO;
 import com.elearning.models.dtos.ResetPasswordDTO;
-import com.elearning.models.dtos.UpdateUserDTO;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.UserEmailRequest;
 import com.elearning.models.searchs.ParameterSearchUser;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -86,6 +85,13 @@ public class UserAPI {
     public void updateAddress(@PathVariable("id") String id,
                               @RequestParam(value = "address") String address) {
         userController.updateAddress(id, address);
+    }
+    @Operation(summary = "Cập nhật mật khẩu người dùng")
+    @PutMapping("/update-password/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updatePassword(@PathVariable("id") String id,
+                              @RequestBody ChangePasswordDTO changePasswordDTO) {
+        userController.updatePassword(id, changePasswordDTO);
     }
 
     @Operation(summary = "Xin gửi mail reset password")

@@ -3,7 +3,10 @@ package com.elearning.controller;
 import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
-import com.elearning.models.dtos.*;
+import com.elearning.models.dtos.ChangePasswordDTO;
+import com.elearning.models.dtos.FileRelationshipDTO;
+import com.elearning.models.dtos.ResetPasswordDTO;
+import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
@@ -23,7 +26,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -334,7 +336,25 @@ public class UserController extends BaseController {
         }
         return map;
     }
+    public void updatePassword(String userId, ChangePasswordDTO dto) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.get().getPassword())) {
+            throw new ServiceException("Mật khẩu hiện tại không chính xác");
+        }
+        if (dto.getNewPassword().length() < 8) {
+            throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
+        }
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new ServiceException("Mật khẩu xác nhận không đúng");
+        }
+        user.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        user.get().setUpdatedAt(new Date());
 
+        userRepository.save(user.get());
+    }
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
