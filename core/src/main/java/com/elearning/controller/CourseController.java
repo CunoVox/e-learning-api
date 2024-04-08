@@ -130,6 +130,12 @@ public class CourseController extends BaseController {
         courseRepository.updateIsDeleted(courseId, isDeleted, getUserIdFromContext());
     }
 
+    public void updateIsPreview(String courseId, Boolean isPreview) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isEmpty()) throw new ServiceException("Khoá học không tồn tại trong hệ thống");
+        courseRepository.updateIsPreview(courseId, isPreview, getUserIdFromContext());
+    }
+
     public CourseDTO getCourseById(String courseId) {
         ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).buildChild(Boolean.TRUE).build());
         if (!listWrapper.getData().isNullOrEmpty()) {
@@ -280,6 +286,7 @@ public class CourseController extends BaseController {
                 .contentType(inputDTO.getType())
                 .description(inputDTO.getDescription())
                 .requirement(inputDTO.getRequirement())
+                .isPreview(inputDTO.getIsPreview())
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
                 .isDeleted(inputDTO.isDeleted())
@@ -303,9 +310,6 @@ public class CourseController extends BaseController {
                 course.setRequirement(inputDTO.getRequirement());
             }
             course.setSubscriptions(courseCheck.get().getSubscriptions());
-//            if (inputDTO.getSubscriptions() != null) {
-//                course.setSubscriptions(inputDTO.getSubscriptions());
-//            }
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());
@@ -341,6 +345,7 @@ public class CourseController extends BaseController {
                 .requirement(entity.getRequirement())
                 .type(entity.getContentType())
                 .courseType(entity.getCourseType())
+                .isPreview(entity.getIsPreview())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
