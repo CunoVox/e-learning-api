@@ -30,6 +30,6 @@ public class Course extends IBaseEntity{
     private String requirement;
     private Long duration;
     private Long subscriptions;
-    private Boolean isPublished;
+    private Boolean isPreview;
     private List<Attribute> attributes;
 }

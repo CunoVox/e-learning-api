@@ -123,6 +123,14 @@ public class CourseAPI {
         courseController.changeCourseType(courseId, EnumCourseType.WAITING, null);
     }
 
+    @PutMapping("/update-is-preview")
+    @Operation(summary = "Cập nhật trạng thái xem trước của khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateIsPreview(@RequestParam("course_id") String courseId,
+                                @RequestParam("is_preview") Boolean isPreview) {
+        courseController.updateIsPreview(courseId, isPreview);
+    }
+
     @DeleteMapping("/delete/{id}")
     @Operation(summary = "Ẩn hoặc bỏ ẩn khoá học")
     @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")

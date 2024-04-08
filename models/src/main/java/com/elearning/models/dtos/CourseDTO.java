@@ -73,6 +73,9 @@ public class CourseDTO {
 
     private List<AttributeDTO> attributes;
 
+    @JsonProperty("is_preview")
+    private Boolean isPreview;
+
     @JsonProperty("created_at")
     private Date createAt;
 
