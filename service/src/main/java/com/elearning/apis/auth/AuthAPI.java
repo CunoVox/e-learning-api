@@ -5,10 +5,11 @@ import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.RefreshTokenDTO;
 import com.elearning.models.dtos.UserEmailRequest;
+import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
-import com.elearning.models.dtos.auth.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,15 +17,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import java.security.SignatureException;
 
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
@@ -97,8 +99,9 @@ public class AuthAPI {
     }
 
     @PostMapping("/refresh-token/mobile")
-    public ResponseEntity<?> refreshTokenMobile(@RequestBody String refreshToken) throws SignatureException {
-        AuthResponse authResponse = jwtController.refreshToken(refreshToken);
+    public ResponseEntity<?> refreshTokenMobile(@RequestBody RefreshTokenDTO refreshToken) throws SignatureException {
+        System.out.println("refreshToken------------------" + refreshToken);
+        AuthResponse authResponse = jwtController.refreshToken(refreshToken.getRefreshToken());
         return ResponseEntity.ok().body(authResponse);
     }
 
