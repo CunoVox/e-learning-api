@@ -3,10 +3,7 @@ package com.elearning.controller;
 import com.elearning.email.EmailSender;
 import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
-import com.elearning.models.dtos.ChangePasswordDTO;
-import com.elearning.models.dtos.FileRelationshipDTO;
-import com.elearning.models.dtos.ResetPasswordDTO;
-import com.elearning.models.dtos.UserDTO;
+import com.elearning.models.dtos.*;
 import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
@@ -336,6 +333,7 @@ public class UserController extends BaseController {
         }
         return map;
     }
+
     public void updatePassword(String userId, ChangePasswordDTO dto) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
@@ -452,5 +450,15 @@ public class UserController extends BaseController {
                     .build());
         }
         return userDTOS;
+    }
+
+    public UserProfileDTO toUserProfileDTO(UserDTO userDTO) {
+        if (userDTO == null) return null;
+        return UserProfileDTO.builder()
+                .id(userDTO.getId())
+                .fullName(userDTO.getFullName())
+                .email(userDTO.getEmail())
+                .avatar(userDTO.getAvatar())
+                .build();
     }
 }

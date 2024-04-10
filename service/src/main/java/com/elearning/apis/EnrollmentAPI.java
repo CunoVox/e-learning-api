@@ -4,7 +4,6 @@ import com.elearning.controller.EnrollmentController;
 import com.elearning.models.dtos.EnrollmentDTO;
 import com.elearning.models.searchs.ParameterSearchEnrollment;
 import com.elearning.models.wrapper.ListWrapper;
-import com.elearning.utils.enumAttribute.EnumCourseType;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping("/api/enrollment")
@@ -103,6 +100,7 @@ public class EnrollmentAPI {
         }
         parameterSearchEnrollment.setIsDeleted(isDeleted);
         parameterSearchEnrollment.setBuildCourseChild(buildCourseChild);
+        parameterSearchEnrollment.setStartIndex(startIndex);
         parameterSearchEnrollment.setMaxResult(maxResult);
         parameterSearchEnrollment.setStartIndex(startIndex);
 
