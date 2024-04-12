@@ -43,55 +43,56 @@ public class CommentController extends BaseController {
     public Comment buildEntity(CommentDTO commentDTO) {
         Comment comment = null;
         boolean isUpdate = false;
-        if(!commentDTO.getId().isBlankOrNull()){
+        if (!commentDTO.getId().isBlankOrNull()) {
             comment = commentRepository.findById(commentDTO.getId()).orElse(null);
-            if(comment == null){
+            if (comment == null) {
                 commentDTO.setId(null);
-            }else{
+            } else {
                 isUpdate = true;
             }
         }
-        if (commentDTO.getContent().isBlankOrNull()) {
-            throw new RuntimeException("Content is invalid");
-        }
-        if (commentDTO.getContent().isBlankOrNull()) {
-            throw new ServiceException("nội dung không được để trống!");
-        }
-        if (commentDTO.getType() == null) {
-            throw new ServiceException("Type không được để trống!");
-        }
-        if (commentDTO.getReferenceId().isBlankOrNull()) {
-            throw new ServiceException("ReferenceId không được để trống!");
-        }
-        if(!commentDTO.getParentId().isBlankOrNull()){
-            Comment parentComment = commentRepository.findById(commentDTO.getParentId()).orElse(null);
-            if (parentComment == null) {
-                throw new ServiceException("Bình luận cha không tồn tại!");
+
+        if (isUpdate) {
+            comment.setContent(commentDTO.getContent());
+//            comment.setLevel(commentDTO.getLevel());
+//            comment.setParentId(commentDTO.getParentId());
+//            comment.setReferenceId(commentDTO.getReferenceId());
+//            comment.setType(commentDTO.getType());
+//            comment.setUserId(commentDTO.getUserId());
+        } else {
+            if (commentDTO.getContent().isBlankOrNull()) {
+                throw new RuntimeException("Content is invalid");
             }
+            if (commentDTO.getContent().isBlankOrNull()) {
+                throw new ServiceException("nội dung không được để trống!");
+            }
+            if (commentDTO.getType() == null) {
+                throw new ServiceException("Type không được để trống!");
+            }
+            if (commentDTO.getReferenceId().isBlankOrNull()) {
+                throw new ServiceException("ReferenceId không được để trống!");
+            }
+            if (!commentDTO.getParentId().isBlankOrNull()) {
+                Comment parentComment = commentRepository.findById(commentDTO.getParentId()).orElse(null);
+                if (parentComment == null) {
+                    throw new ServiceException("Bình luận cha không tồn tại!");
+                }
 //            if (parentComment.getLevel() == 2) {
 //                throw new ServiceException("Bình luận cha không thể là bình luận cấp 2!");
 //            }
-            commentDTO.setLevel(parentComment.getLevel() + 1);
-            commentDTO.setParentId(parentComment.getId());
-        }else{
-            commentDTO.setLevel(1);
-        }
-        if(commentDTO.getType().equals(EnumCommentType.COURSE)){
-            Course course = courseRepository.findById(commentDTO.getReferenceId()).orElse(null);
-            if(course == null){
-                throw new ServiceException("Khóa học không tồn tại!");
+                commentDTO.setLevel(parentComment.getLevel() + 1);
+                commentDTO.setParentId(parentComment.getId());
+            } else {
+                commentDTO.setLevel(1);
             }
-        }else{
-            //TODO: check other type
-        }
-        if(isUpdate){
-            comment.setContent(commentDTO.getContent());
-            comment.setLevel(commentDTO.getLevel());
-            comment.setParentId(commentDTO.getParentId());
-            comment.setReferenceId(commentDTO.getReferenceId());
-            comment.setType(commentDTO.getType());
-            comment.setUserId(commentDTO.getUserId());
-        }else {
+            if (commentDTO.getType().equals(EnumCommentType.COURSE)) {
+                Course course = courseRepository.findById(commentDTO.getReferenceId()).orElse(null);
+                if (course == null) {
+                    throw new ServiceException("Khóa học không tồn tại!");
+                }
+            } else {
+                //TODO: check other type
+            }
             comment = Comment.builder()
 //                .id(commentDTO.getId())
                     .content(commentDTO.getContent())
@@ -121,7 +122,19 @@ public class CommentController extends BaseController {
 
         return toDTO(comment);
     }
-
+    public void deleteComment(String id) {
+        Comment comment = commentRepository.findById(id).orElse(null);
+        if (comment == null) {
+            throw new ServiceException("Bình luận không tồn tại!");
+        }
+        String userId = getUserIdFromContext();
+        if (!userId.equals(comment.getUserId())) {
+            throw new ServiceException("Bạn không có quyền xóa bình luận này!");
+        }
+        commentRepository.delete(comment);
+//        comment.setIsDeleted(true);
+//        commentRepository.save(comment);
+    }
     public Comment saveComment(Comment comment) {
         if (comment.getLevel() > 2 || comment.getLevel() < 1) {
             throw new ServiceException("Cấp bình luận phải từ 1 đến 2");
@@ -134,6 +147,7 @@ public class CommentController extends BaseController {
         comment = commentRepository.save(comment);
         return comment;
     }
+
     public ListWrapper<CommentDTO> searchCommentDTOs(ParameterSearchComment parameterSearchComment) {
         ListWrapper<Comment> listWrapper = commentRepository.searchComments(parameterSearchComment);
         List<CommentDTO> commentDTOS = buildCommentDTO(listWrapper.getData(), parameterSearchComment);
@@ -145,12 +159,19 @@ public class CommentController extends BaseController {
                 .data(commentDTOS)
                 .build();
     }
+
     private List<CommentDTO> buildCommentDTO(List<Comment> comments, ParameterSearchComment parameterSearchComment) {
         List<CommentDTO> commentDTOS = new ArrayList<>();
         //Chi tiết người tạo comment
+        List<String> commentIds = comments.stream().map(Comment::getId).collect(Collectors.toList());
+        List<Comment> commentLevel2 = commentRepository.findAllByParentIdInAndIsDeletedNotIn(commentIds, Collections.singletonList(true));
+        List<String> level2Ids;
+        if (!commentLevel2.isNullOrEmpty()) {
+//            level2Ids = commentLevel2.stream().map(Comment::getId).collect(Collectors.toList());
+            comments.addAll(commentLevel2);
+        }
         List<String> createdUserIds = comments.stream().map(Comment::getUserId).collect(Collectors.toList());
         Map<String, UserDTO> userDTOMap = userController.getUserByIds(createdUserIds);
-
         for (Comment comment : comments) {
             CommentDTO commentDTO = toDTO(comment);
             commentDTO.setReply(new ArrayList<>());
@@ -160,12 +181,12 @@ public class CommentController extends BaseController {
 
         List<CommentDTO> commentsWithReplies = new ArrayList<>();
 
-        for(CommentDTO commentDTO : commentDTOS){
-            if(commentDTO.getLevel() == 1){
+        for (CommentDTO commentDTO : commentDTOS) {
+            if (commentDTO.getLevel() == 1) {
                 commentsWithReplies.add(commentDTO);
-            }else{
-                for(CommentDTO commentDTO1 : commentDTOS){
-                    if(commentDTO1.getId().equals(commentDTO.getParentId())){
+            } else {
+                for (CommentDTO commentDTO1 : commentDTOS) {
+                    if (commentDTO1.getId().equals(commentDTO.getParentId())) {
                         commentDTO1.getReply().add(commentDTO);
                     }
                 }
@@ -187,6 +208,7 @@ public class CommentController extends BaseController {
                 .avatar(!fileRelationshipDTO.isNullOrEmpty() ? fileRelationshipDTO.get(fileRelationshipDTO.size() - 1).getPathFile() : null)
                 .build();
     }
+
     public CommentDTO toDTO(Comment comment) {
         if (comment == null) return null;
 

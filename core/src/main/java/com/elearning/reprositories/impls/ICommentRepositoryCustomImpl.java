@@ -1,7 +1,6 @@
 package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Comment;
-import com.elearning.entities.Enrollment;
 import com.elearning.models.searchs.ParameterSearchComment;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICommentRepositoryCustom;
@@ -45,6 +44,11 @@ public class ICommentRepositoryCustomImpl  extends BaseRepositoryCustom implemen
         if(!parameterSearchComment.getReferenceId().isBlankOrNull()){
             criteria.add(Criteria.where("referenceId").is(parameterSearchComment.getReferenceId()));
         }
+        if(parameterSearchComment.getLevel() != null){
+            criteria.add(Criteria.where("level").is(parameterSearchComment.getLevel()));
+        }else{
+            criteria.add(Criteria.where("level").is(1));
+        }
         if (parameterSearchComment.getIsDeleted() != null) {
             criteria.add(Criteria.where("isDeleted").is(parameterSearchComment.getIsDeleted()));
         } else {
@@ -65,7 +69,7 @@ public class ICommentRepositoryCustomImpl  extends BaseRepositoryCustom implemen
         List<Criteria> pageableCriteria = new ArrayList<>(criteria);
         Query pageableQuery = new Query();
         pageableQuery.addCriteria(new Criteria().andOperator(pageableCriteria));
-        totalResult = mongoTemplate.count(pageableQuery, Enrollment.class);
+        totalResult = mongoTemplate.count(pageableQuery, Comment.class);
         if (parameterSearchComment.getStartIndex() != null && parameterSearchComment.getStartIndex() >= 0) {
             query.skip(parameterSearchComment.getStartIndex());
         }

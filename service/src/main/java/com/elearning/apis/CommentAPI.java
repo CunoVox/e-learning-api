@@ -24,7 +24,10 @@ import javax.validation.constraints.Min;
 public class CommentAPI {
     @Autowired
     private CommentController commentController;
-
+    @DeleteMapping("/{id}")
+    public void deleteComment(@PathVariable String id) {
+        commentController.deleteComment(id);
+    }
     @PostMapping("")
     public CommentDTO createComment(@RequestBody CommentDTO commentDTO) {
         return commentController.createComment(commentDTO);
@@ -47,6 +50,8 @@ public class CommentAPI {
         Long startIndex = ((long) (currentPage - 1) * maxResult);
 
         ParameterSearchComment parameterSearchComment = new ParameterSearchComment();
+        parameterSearchComment.setStartIndex(startIndex);
+        parameterSearchComment.setMaxResult(maxResult);
         if (level != null) {
             parameterSearchComment.setLevel(level);
         }
