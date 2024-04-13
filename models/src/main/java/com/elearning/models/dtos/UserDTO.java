@@ -36,5 +36,10 @@ public class UserDTO {
     @JsonProperty("description")
     private String description;
     public List<EnumRole> roles = new ArrayList<>();
-
+    @JsonProperty("total_course")
+    public int totalCourse;
+    @JsonProperty("total_subscriptions")
+    public Long totalSubscriptions;
+    @JsonProperty("average_rating")
+    public double averageRating;
 }

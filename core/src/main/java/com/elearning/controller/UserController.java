@@ -9,6 +9,8 @@ import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.searchs.ParameterSearchUser;
 import com.elearning.models.wrapper.ListWrapper;
+import com.elearning.reprositories.ICourseRepository;
+import com.elearning.reprositories.IRatingRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
@@ -39,6 +41,8 @@ public class UserController extends BaseController {
     private final IUserRepository userRepository;
     private final JwtController jwtController;
     private final UserDetailsService userDetailsService;
+    private final ICourseRepository courseRepository;
+    private final IRatingRepository rattingRepository;
     @Autowired
     private VerificationCodeController verificationCodeController;
     @Autowired
@@ -93,7 +97,18 @@ public class UserController extends BaseController {
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
         }
-        return toDto(user.get());
+        List<String> ids = Collections.singletonList(user.get().getId());
+        Map<String, Integer> countCourse = courseRepository.countAllByCreatedBy(ids);
+        Map<String, Long> sumSubscriptions = courseRepository.sumSubscriptionsByCreatedBy(ids);
+        Map<String, Double> avgRatting = rattingRepository.avgRattingByCourseCreatedByIn(ids);
+
+        UserDTO userDTO = toDto(user.get());
+
+        userDTO.setTotalCourse(countCourse.get(user.get().getId()) != null ? countCourse.get(user.get().getId()) : 0);
+        userDTO.setTotalSubscriptions(sumSubscriptions.get(user.get().getId()) != null ? sumSubscriptions.get(user.get().getId()) : 0);
+        userDTO.setAverageRating(avgRatting.get(user.get().getId()) != null ? avgRatting.get(user.get().getId()) : 0);
+
+        return userDTO;
     }
 
     public User create(UserDTO dto) {
@@ -436,6 +451,9 @@ public class UserController extends BaseController {
         List<String> ids = users.stream().map(User::getId).collect(Collectors.toList());
         List<FileRelationshipDTO> fileRelationshipDTOS = fileRelationshipController.getFileRelationships(ids, EnumParentFileType.USER_AVATAR.name());
         Map<String, String> fileRelationshipDTOMap = fileRelationshipController.getUrlOfFile(fileRelationshipDTOS);
+        Map<String, Integer> countCourse = courseRepository.countAllByCreatedBy(ids);
+        Map<String, Long> sumSubscriptions = courseRepository.sumSubscriptionsByCreatedBy(ids);
+        Map<String, Double> avgRatting = rattingRepository.avgRattingByCourseCreatedByIn(ids);
         List<UserDTO> userDTOS = new ArrayList<>();
         for (User user : users) {
             userDTOS.add(UserDTO.builder()
@@ -444,7 +462,10 @@ public class UserController extends BaseController {
                     .email(user.getEmail())
                     .roles(user.getRoles())
                     .avatar(fileRelationshipDTOMap.get(user.getId()))
+                    .totalCourse(countCourse.get(user.getId()) != null ? countCourse.get(user.getId()) : 0)
+                    .totalSubscriptions(sumSubscriptions.get(user.getId()) != null ? sumSubscriptions.get(user.getId()) : 0)
                     .address(user.getAddress())
+                    .averageRating(avgRatting.get(user.getId()) != null ? avgRatting.get(user.getId()) : 0)
                     .isDeleted(user.getIsDeleted())
                     .isEmailConfirmed(user.isEmailConfirmed)
                     .build());

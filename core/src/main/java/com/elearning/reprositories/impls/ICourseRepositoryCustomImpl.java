@@ -2,7 +2,6 @@ package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepositoryCustom;
@@ -261,5 +260,48 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         Map<String, Object> map = new HashMap<>();
         map.put("subscriptions", subscriptions);
         updateAttribute(courseId, map, updatedBy, Course.class);
+    }
+
+
+    @Override
+    public Map<String, Long> sumSubscriptionsByCreatedBy(List<String> createdBy) {
+        List<Course> courses = mongoTemplate.find(
+                Query.query(
+                        Criteria.where("createdBy").in(createdBy)
+                                .and("courseType").in(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()))
+                                .and("level").is(1)
+                                .and("isDeleted").nin(true)
+                ),
+                Course.class);
+        Map<String, Long> result = new HashMap<>();
+        courses.forEach(course -> {
+            if (result.containsKey(course.getCreatedBy())) {
+                result.put(course.getCreatedBy(), result.get(course.getCreatedBy()) + (course.getSubscriptions() == null ? 0 : course.getSubscriptions()));
+            } else {
+                result.put(course.getCreatedBy(), course.getSubscriptions() == null ? 0 : course.getSubscriptions());
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public Map<String, Integer> countAllByCreatedBy(List<String> createdBy) {
+        List<Course> courses = mongoTemplate.find(
+                Query.query(
+                        Criteria.where("createdBy").in(createdBy)
+                                .and("courseType").in(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()))
+                                .and("level").is(1)
+                                .and("isDeleted").nin(true)
+                ),
+                Course.class);
+        Map<String, Integer> result = new HashMap<>();
+        courses.forEach(course -> {
+            if (result.containsKey(course.getCreatedBy())) {
+                result.put(course.getCreatedBy(), result.get(course.getCreatedBy()) + 1);
+            } else {
+                result.put(course.getCreatedBy(), 1);
+            }
+        });
+        return result;
     }
 }
