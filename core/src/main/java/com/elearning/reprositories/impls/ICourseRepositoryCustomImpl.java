@@ -43,7 +43,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
 
         if (parameterSearchCourse.getSearchType() != null && !parameterSearchCourse.getSearchType().equals(EnumCourseType.OFFICIAL.name())) {
             criteria.add(Criteria.where("courseType").is(parameterSearchCourse.getSearchType()));
-        } else if (parameterSearchCourse.getSearchType() != null) {
+        } else if (parameterSearchCourse.getSearchType() == null) {
             criteria.add(Criteria.where("courseType").in(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()));
         }
         if (parameterSearchCourse.getIsDeleted() != null) {

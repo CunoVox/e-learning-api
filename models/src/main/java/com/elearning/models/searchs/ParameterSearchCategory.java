@@ -18,6 +18,7 @@ public class ParameterSearchCategory implements Serializable, Cloneable{
     private Boolean isDeleted;
 
     private String buildType;
+    private Boolean countTotalCourse;
 
     private List<String> categoriesIds;
 

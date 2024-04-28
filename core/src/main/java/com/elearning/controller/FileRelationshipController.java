@@ -1,12 +1,8 @@
 package com.elearning.controller;
 
-import com.elearning.entities.Category;
-import com.elearning.entities.Course;
 import com.elearning.entities.FileRelationship;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.FileRelationshipDTO;
-import com.elearning.reprositories.ICategoryRepository;
-import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IFileRelationshipRepository;
 import com.elearning.utils.Constants;
 import com.elearning.utils.Extensions;
@@ -18,7 +14,6 @@ import com.google.api.services.drive.model.Permission;
 import lombok.experimental.ExtensionMethod;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 

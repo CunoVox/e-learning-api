@@ -5,16 +5,19 @@ import com.elearning.entities.Category;
 import com.elearning.entities.Course;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CategoryDTO;
+import com.elearning.models.dtos.CourseDTO;
+import com.elearning.models.dtos.FileRelationshipDTO;
 import com.elearning.models.searchs.ParameterSearchCategory;
+import com.elearning.models.searchs.ParameterSearchCourse;
+import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
-import com.elearning.security.SecurityUserDetail;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.StringUtils;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
 import com.elearning.utils.enumAttribute.EnumConnectorType;
+import com.elearning.utils.enumAttribute.EnumParentFileType;
 import lombok.experimental.ExtensionMethod;
-import org.apache.commons.lang3.builder.Diff;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Component;
@@ -24,15 +27,18 @@ import java.util.stream.Collectors;
 
 @Component
 @ExtensionMethod(Extensions.class)
-public class CategoryController extends BaseController{
+public class CategoryController extends BaseController {
     @Autowired
     private ICategoryRepository categoryRepository;
 
     @Autowired
     private ISequenceValueItemRepository sequenceValueItemRepository;
-
+    @Autowired
+    private FileRelationshipController fileRelationshipController;
     @Autowired
     private Connector connector;
+    @Autowired
+    private CourseController courseController;
 
     public CategoryDTO getCategoryById(String categoryId) {
         Optional<Category> categories = categoryRepository.findById(categoryId);
@@ -50,7 +56,7 @@ public class CategoryController extends BaseController{
             parameterSearchCategory.setLevel(1);
         }
         List<Category> categoriesEntities = categoryRepository.searchCategories(parameterSearchCategory);
-        List<CategoryDTO> categories = toDTOs(categoriesEntities);
+        List<CategoryDTO> categories = toDTOs(categoriesEntities, parameterSearchCategory.getCountTotalCourse());
         if (categories.isNullOrEmpty()) {
             return new ArrayList<>();
         }
@@ -69,7 +75,7 @@ public class CategoryController extends BaseController{
             categoryDTO.setCreatedBy(userId);
             categoryDTO.setUpdateBy(userId);
             Category category = buildEntity(categoryDTO);
-            return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
+            return this.toDTOs(Collections.singletonList(this.saveCategory(category)), false).get(0);
         }
         return null;
     }
@@ -81,8 +87,9 @@ public class CategoryController extends BaseController{
         }
         Category category = buildEntity(categoryDTO);
         //TODO: chưa có cập nhật image
-        return this.toDTOs(Collections.singletonList(this.saveCategory(category))).get(0);
+        return this.toDTOs(Collections.singletonList(this.saveCategory(category)), false).get(0);
     }
+
     public void updateCategoryName(String categoryId, String name) {
         Optional<Category> validateCate = categoryRepository.findById(categoryId);
         if (validateCate.isEmpty()) {
@@ -199,7 +206,7 @@ public class CategoryController extends BaseController{
         try {
             ParameterSearchCategory parameterSearchCategoryGt = parameterSearchCategory.clone();
             parameterSearchCategoryGt.setLevel(null);
-            List<CategoryDTO> categoryGT = toDTOs(categoryRepository.searchCategories(parameterSearchCategoryGt));
+            List<CategoryDTO> categoryGT = toDTOs(categoryRepository.searchCategories(parameterSearchCategoryGt), parameterSearchCategory.getCountTotalCourse());
             Stack<CategoryDTO> stack = new Stack<>();
             for (CategoryDTO categoryDTO : categoryDTOS) {
                 stack.push(categoryDTO);
@@ -222,11 +229,13 @@ public class CategoryController extends BaseController{
         }
         return list;
     }
+
     private List<CategoryDTO> buildCategoryList(List<CategoryDTO> input) {
         List<CategoryDTO> categoryList = new ArrayList<>();
         buildCategoryItem(input, categoryList);
         return categoryList;
     }
+
     private void buildCategoryItem(List<CategoryDTO> categoryDTOS, List<CategoryDTO> categoryDTOReturn) {
         if (categoryDTOS != null && !categoryDTOS.isEmpty()) {
             for (CategoryDTO categoryDTO : categoryDTOS) {
@@ -239,6 +248,7 @@ public class CategoryController extends BaseController{
             }
         }
     }
+
     public CategoryDTO toDTO(Category entity) {
         if (entity == null) return null;
         return CategoryDTO.builder()
@@ -253,15 +263,52 @@ public class CategoryController extends BaseController{
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)
                 .updateBy(entity.getUpdatedBy() != null ? entity.getUpdatedBy() : null)
                 .isDeleted(entity.getIsDeleted() != null ? entity.getIsDeleted() : false)
+//                .totalCourse(0)
                 .build();
     }
 
-    public List<CategoryDTO> toDTOs(List<Category> entities) {
+    public List<CategoryDTO> toDTOs(List<Category> entities, Boolean countCourses) {
         if (entities.isNullOrEmpty()) return null;
         List<CategoryDTO> categoryDTOS = new ArrayList<>();
+        //Ảnh
+        List<String> allIds = entities.stream().map(Category::getId).collect(Collectors.toList());
+        List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.CATEGORY_IMAGE.name());
+        Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
+        Map<String, List<CourseDTO>> mapCourses = new HashMap<>();
+        if (countCourses != null && countCourses) {
+            ListWrapper<CourseDTO> courses = courseController.searchCourseDTOS(ParameterSearchCourse.builder()
+                    .categoriesIds(entities.stream().map(Category::getId).collect(Collectors.toList()))
+                    .buildChild(false)
+                    .isDeleted(false)
+                    .build());
+            for (CourseDTO courseDTO : courses.getData()) {
+                for (String categoryId : courseDTO.getCategoryIds()) {
+                    List<CourseDTO> courseDTOS = mapCourses.get(categoryId);
+                    if (courseDTOS == null) {
+                        courseDTOS = new ArrayList<>();
+                    }
+                    courseDTOS.add(courseDTO);
+                    mapCourses.put(categoryId, courseDTOS);
+                }
+            }
+        }
+
         for (Category entity : entities) {
-            categoryDTOS.add(toDTO(entity));
+            CategoryDTO dto = toDTO(entity);
+            List<CourseDTO> coursesDTO = mapCourses.get(entity.getId());
+            if(coursesDTO != null) {
+                dto.setTotalCourse(coursesDTO.size());
+            }
+            dto.setImage(mapImageUrl.get(entity.getId()));
+//            int totalCourses = (coursesDTO != null) ? coursesDTO.size() : 0;
+//            dto.setTotalCourse(totalCourses);
+            categoryDTOS.add(dto);
         }
         return categoryDTOS;
+    }
+
+    public List<CategoryDTO> getTopCategories(Integer top) {
+        List<CategoryDTO> categories = this.searchCategoryDTOS(ParameterSearchCategory.builder().isDeleted(false).countTotalCourse(true).buildType(EnumCategoryBuildType.LIST.name()).build());
+        return categories.stream().limit(top != null ? top : 6).sorted(Comparator.comparingInt(CategoryDTO::getTotalCourse).reversed()).collect(Collectors.toList());
     }
 }
