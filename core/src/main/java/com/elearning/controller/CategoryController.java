@@ -60,8 +60,7 @@ public class CategoryController extends BaseController {
         if (categories.isNullOrEmpty()) {
             return new ArrayList<>();
         }
-        ParameterSearchCategory searchCategory = ParameterSearchCategory.builder().level(parameterSearchCategory.getLevel()).build();
-        List<CategoryDTO> categoryDTOS = buildCategoryTree(categories, searchCategory);
+        List<CategoryDTO> categoryDTOS = buildCategoryTree(categories, parameterSearchCategory);
         if (parameterSearchCategory.getBuildType() == null ||
                 parameterSearchCategory.getBuildType().equals(EnumCategoryBuildType.TREE.name())) {
             return categoryDTOS;
@@ -233,6 +232,9 @@ public class CategoryController extends BaseController {
     private List<CategoryDTO> buildCategoryList(List<CategoryDTO> input) {
         List<CategoryDTO> categoryList = new ArrayList<>();
         buildCategoryItem(input, categoryList);
+        for (CategoryDTO categoryDTO : categoryList) {
+            categoryDTO.setChildren(new ArrayList<>());
+        }
         return categoryList;
     }
 
@@ -309,6 +311,7 @@ public class CategoryController extends BaseController {
 
     public List<CategoryDTO> getTopCategories(Integer top) {
         List<CategoryDTO> categories = this.searchCategoryDTOS(ParameterSearchCategory.builder().isDeleted(false).countTotalCourse(true).buildType(EnumCategoryBuildType.LIST.name()).build());
-        return categories.stream().limit(top != null ? top : 6).sorted(Comparator.comparingInt(CategoryDTO::getTotalCourse).reversed()).collect(Collectors.toList());
+        categories.sort(Comparator.comparing(CategoryDTO::getTotalCourse).reversed());
+        return categories.stream().limit(top != null ? top : 6).collect(Collectors.toList());
     }
 }
