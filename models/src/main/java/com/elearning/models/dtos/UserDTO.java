@@ -33,6 +33,8 @@ public class UserDTO {
     private String phoneNumber;
     @JsonProperty("profile_link")
     private String profileLink;
+    @JsonProperty("specialization")
+    private String specialization;
     @JsonProperty("description")
     private String description;
     public List<EnumRole> roles = new ArrayList<>();

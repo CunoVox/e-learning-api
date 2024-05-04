@@ -195,6 +195,9 @@ public class UserController extends BaseController {
         if (!dto.getPhoneNumber().isBlankOrNull()) {
             entity.get().setPhoneNumber(dto.getPhoneNumber());
         }
+        if(!dto.getSpecialization().isBlankOrNull()){
+            entity.get().setSpecialization(dto.getSpecialization());
+        }
         if (!dto.getProfileLink().isBlankOrNull()) {
             entity.get().setProfileLink(dto.getProfileLink());
         }
@@ -237,6 +240,9 @@ public class UserController extends BaseController {
         }
         if (!dto.getProfileLink().isBlankOrNull()) {
             newUser.setProfileLink(dto.getProfileLink());
+        }
+        if(!dto.getSpecialization().isBlankOrNull()){
+            newUser.setSpecialization(dto.getSpecialization());
         }
         if (!dto.getDescription().isBlankOrNull()) {
             newUser.setDescription(dto.getDescription());
@@ -440,6 +446,7 @@ public class UserController extends BaseController {
                 .isDeleted(user.getIsDeleted())
                 .phoneNumber(user.getPhoneNumber())
                 .profileLink(user.getProfileLink())
+                .specialization(user.getSpecialization())
                 .description(user.getDescription())
                 .isEmailConfirmed(user.isEmailConfirmed)
                 .build();
