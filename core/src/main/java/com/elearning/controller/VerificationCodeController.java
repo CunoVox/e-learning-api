@@ -17,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static com.elearning.utils.Constants.EMAIL_VERIFICATION_CODE_EXPIRE_TIME_MILLIS;
@@ -168,32 +167,47 @@ public class VerificationCodeController {
             }
         }
     }
-
-    public void resetPasswordConfirmCode(String userId, String resetCode) {
+    public Boolean checkEmailConfirmCode(String email, String verifyCode) {
+        Optional<VerificationCode> code = verificationCodeRepository.findBySendToAndCode(email, verifyCode);
+        if (code.isEmpty()) {
+            throw new ServiceException("Confirm code is invalid");
+        } else {
+            VerificationCode vCode = code.get();
+            if (!vCode.getType().equals(EnumVerificationCode.EMAIL_CONFIRM)) {
+                throw new ServiceException("Confirm code is invalid");
+            } else {
+                if (vCode.getIsDeleted()) {
+                    throw new ServiceException("Confirm code is invalid");
+                }
+                if (vCode.getIsConfirmed() || vCode.getConfirmedAt() != null) {
+                    throw new ServiceException("Confirm code is invalid");
+                }
+                if (vCode.getExpiredAt().before(new Date())) {
+                    throw new ServiceException("Confirm code is expired");
+                }
+                return true;
+            }
+        }
+    }
+    public Boolean resetPasswordConfirmCode(String userId, String resetCode) {
         Optional<VerificationCode> code = verificationCodeRepository.findByParentIdAndCode(userId, resetCode);
         if (code.isEmpty()) {
-            throw new ServiceException("Mã xác nhận không hợp lệ 1.");
+            throw new ServiceException("Mã xác nhận không hợp lệ.");
         } else {
             VerificationCode vCode = code.get();
             if (!vCode.getType().equals(EnumVerificationCode.RESET_PASSWORD_CONFIRM)) {
-                throw new ServiceException("Mã xác nhận không hợp lệ 2.");
+                throw new ServiceException("Mã xác nhận không hợp lệ.");
             } else {
                 if (vCode.getIsDeleted()) {
-                    throw new ServiceException("Mã xác nhận không hợp lệ 3.");
+                    throw new ServiceException("Mã xác nhận không hợp lệ.");
                 }
                 if (vCode.getIsConfirmed() || vCode.getConfirmedAt() != null) {
-                    throw new ServiceException("Mã xác nhận không hợp lệ 4.");
+                    throw new ServiceException("Mã xác nhận không hợp lệ.");
                 }
                 if (vCode.getExpiredAt().before(new Date())) {
                     throw new ServiceException("Mã xác nhận đã hết hạn.");
                 }
-
-//                vCode.setIsConfirmed(true);
-//                vCode.setIsDeleted(true);
-//                vCode.setConfirmedAt(new Date());
-//                vCode.setUpdatedAt(new Date());
-//
-//                verificationCodeRepository.save(vCode);
+                return true;
             }
         }
     }

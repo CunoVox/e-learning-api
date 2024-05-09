@@ -99,13 +99,15 @@ public class UserAPI {
     public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {
         return ResponseEntity.ok().body(verificationCodeController.createResetPasswordCode(request.getEmail()));
     }
-
+    @PostMapping(value = "/password/reset/mobile/{email}/{code}")
+    public ResponseEntity<?> verifyEmail(@PathVariable(value = "email") String email, @PathVariable(value = "code") String code) {
+        return ResponseEntity.ok().body(userController.checkPasswordConfirmCode(email, code));
+    }
     @Operation(summary = "Reset mật khẩu")
     @PatchMapping(value = "/password/reset")
     public void resetPassword(@RequestBody ResetPasswordDTO dto) {
         userController.userResetPassword(dto.getEmail(), dto);
     }
-
     @Operation(summary = "Chi tiết người dùng")
     @GetMapping(value = "/detail/{id}")
     public UserDTO userDetail(@PathVariable(value = "id") String id) {

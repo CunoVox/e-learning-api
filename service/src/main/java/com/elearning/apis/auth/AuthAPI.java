@@ -17,10 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.Cookie;
@@ -64,13 +61,16 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
+    @PostMapping("/register/mobile/{email}/{code}")
+    public ResponseEntity<?> verifyEmail(@PathVariable(value = "email") String email, @PathVariable(value = "code") String code) {
+        return ResponseEntity.ok().body(verificationCodeController.checkEmailConfirmCode(email, code));
+    }
 
     @PostMapping("/register/mobile")
     public ResponseEntity<?> registerMobile(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
         return ResponseEntity.ok().body(authResponse);
     }
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);

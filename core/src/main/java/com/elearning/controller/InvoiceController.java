@@ -20,7 +20,6 @@ import com.elearning.utils.Extensions;
 import com.elearning.utils.enumAttribute.EnumCourseType;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
@@ -62,6 +61,7 @@ public class InvoiceController extends BaseController{
         vnp_Params.put("vnp_Locale", "vn");
         vnp_Params.put("vnp_ReturnUrl", Constants.VNP_RETURN_URL);
         vnp_Params.put("vnp_IpAddr", "13.160.92.202");
+        vnp_Params.put("vnp_BankCode", "NCB");
 
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");

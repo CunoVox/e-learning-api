@@ -302,7 +302,13 @@ public class UserController extends BaseController {
             throw new ServiceException("Không tìm thấy người dùng");
         }
     }
-
+    public Boolean checkPasswordConfirmCode(String email, String code) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        return verificationCodeController.resetPasswordConfirmCode(user.getId(), code);
+    }
     public void updateRoles(String userId, List<EnumRole> roles) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
