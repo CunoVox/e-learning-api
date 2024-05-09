@@ -1,24 +1,18 @@
 package com.elearning.apis;
 
-import com.elearning.annotation.validator.ValuesAllowed;
 import com.elearning.controller.CategoryController;
 import com.elearning.models.dtos.CategoryDTO;
 import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.utils.Extensions;
 import com.elearning.utils.enumAttribute.EnumCategoryBuildType;
-import io.swagger.annotations.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Role;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import java.util.List;
 
 @RestController
@@ -35,8 +29,8 @@ public class CategoryAPI {
     public List<CategoryDTO> getCategories(@RequestParam(value = "build_type") EnumCategoryBuildType buildType,
                                            @RequestParam(value = "level", required = false) Integer level,
                                            @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
-                                           @RequestParam(value = "build_courses", required = false) Boolean buildCourses,
                                            @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds,
+                                           @RequestParam(value = "count_courses", required = false) Boolean countCourses,
                                            @RequestParam(value = "parent_ids", required = false) List<String> parentIds) {
         ParameterSearchCategory parameterSearchCategory = new ParameterSearchCategory();
         if (buildType != null) {
@@ -48,37 +42,49 @@ public class CategoryAPI {
         if (isDeleted != null) {
             parameterSearchCategory.setIsDeleted(isDeleted);
         }
-        if (buildCourses != null) {
-            parameterSearchCategory.setBuildCourses(buildCourses);
-        }
         if (!categoriesIds.isNullOrEmpty()) {
             parameterSearchCategory.setCategoriesIds(categoriesIds);
         }
         if (!parentIds.isNullOrEmpty()) {
             parameterSearchCategory.setParentIds(parentIds);
         }
+        if(countCourses != null && countCourses){
+            parameterSearchCategory.setCountTotalCourse(true);
+        }else{
+            parameterSearchCategory.setCountTotalCourse(false);
+        }
         return categoryController.searchCategoryDTOS(parameterSearchCategory);
     }
-
+    @GetMapping("/top-{value}-categories")
+    public List<CategoryDTO> getTopCategories(@PathVariable(value = "value") int top) {
+        return categoryController.getTopCategories(top);
+    }
     @Operation(summary = "Thêm danh mục")
     @PostMapping("/create")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public CategoryDTO createCategory(@RequestBody CategoryDTO categoryDTO) {
         return categoryController.createCategory(categoryDTO);
     }
 
     @Operation(summary = "Sửa danh mục")
     @PutMapping("/update")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
     public void updateCategory(CategoryDTO categoryDTO) {
         categoryController.updateCategory(categoryDTO);
     }
 
+    @Operation(summary = "Cập nhật tên danh mục")
+    @PutMapping("/update-name/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    public void updateCategoryName(@PathVariable(value = "id") String id,
+                                   @RequestBody String name) {
+        categoryController.updateCategoryName(id, name);
+    }
+
     @Operation(summary = "Xoá danh mục")
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void deleteCategory(@PathVariable(value = "id") String id,
-                               @RequestParam(value = "delete_by") String deleteBy) {
-        categoryController.deleteCategory(id, deleteBy);
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')")
+    public void deleteCategory(@PathVariable(value = "id") String id) {
+        categoryController.deleteCategory(id);
     }
 }

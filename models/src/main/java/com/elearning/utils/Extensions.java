@@ -1,5 +1,6 @@
 package com.elearning.utils;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -7,7 +8,9 @@ import java.util.stream.Stream;
 
 
 public class Extensions {
-
+    public static boolean isNullOrZero(BigDecimal number) {
+        return number == null || number.compareTo(BigDecimal.ZERO) == 0;
+    }
     public static boolean isBlankOrNull(String str) {
         return str == null || str.isEmpty() || str.isBlank();
     }

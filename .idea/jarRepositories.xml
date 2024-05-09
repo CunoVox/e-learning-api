@@ -12,6 +12,26 @@
       <option name="url" value="https://repo.maven.apache.org/maven2" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="snapshots" />
+      <option name="name" value="e-learning-libs-snapshot" />
+      <option name="url" value="https://elearningteam.jfrog.io/artifactory/e-learning-libs-snapshot" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="snapshots" />
+      <option name="name" value="e-learning-libs-snapshot" />
+      <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-snapshot" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="a0brebgdvv9ne-artifactory-primary-0-releases" />
+      <option name="url" value="https://elearningwisdom.jfrog.io/artifactory/elearning-libs-release" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="e-learning-libs-release" />
+      <option name="url" value="https://elearning.jfrog.io/artifactory/e-learning-libs-release" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="central" />
       <option name="name" value="libs-release" />
       <option name="url" value="https://eleaning.jfrog.io/artifactory/libs-release" />
@@ -20,6 +40,11 @@
       <option name="id" value="central" />
       <option name="name" value="Maven Central repository" />
       <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="e-learning-libs-release" />
+      <option name="url" value="https://elearningteam.jfrog.io/artifactory/e-learning-libs-release" />
     </remote-repository>
     <remote-repository>
       <option name="id" value="jboss.community" />

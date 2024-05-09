@@ -58,10 +58,10 @@ public class JwtController {
     public String generateToken(Map<String, Object> extraClaims, SecurityUserDetail userDetails){
         extraClaims.put("uId", userDetails.getId());
         extraClaims.put("fullName", userDetails.getFullName());
-        extraClaims.put("roles", userDetails
-                .getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
+//        extraClaims.put("roles", userDetails
+//                .getAuthorities()
+//                .stream()
+//                .map(GrantedAuthority::getAuthority).collect(Collectors.toList()));
         return buildToken(extraClaims, userDetails, ACCESS_TOKEN_EXPIRE_TIME_MILLIS);
     }
     public String generateRefreshToken(SecurityUserDetail userDetails){
@@ -94,15 +94,15 @@ public class JwtController {
     public AuthResponse refreshToken(String token) throws ServiceException {
         var storedToken = refreshTokenController.findById(token);
         if(storedToken.isEmpty()){
-            throw new ServiceException("Không có quyền truy cập 1");
+            throw new ServiceException("JWT_ERROR");
         }
         if(storedToken.get().getIsDeleted()){
             refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
-            throw new ServiceException("Không có quyền truy cập 2");
+            throw new ServiceException("JWT_ERROR");
         }
         if(storedToken.get().getExpiredAt().before(new Date())){
             refreshTokenController.deleteRefreshTokenBranch(storedToken.get().getId());
-            throw new ServiceException("Không có quyền truy cập 3");
+            throw new ServiceException("JWT_ERROR");
         }
         storedToken.get().setIsDeleted(true);
         refreshTokenController.save(storedToken.get());
@@ -128,7 +128,7 @@ public class JwtController {
 
     public AuthResponse refreshToken(Cookie cookie) throws ServiceException{
         if(cookie == null){
-            throw new ServiceException("Không có quyền truy cập 4");
+            throw new ServiceException("JWT_ERROR");
         }
         return refreshToken(cookie.getValue());
     }

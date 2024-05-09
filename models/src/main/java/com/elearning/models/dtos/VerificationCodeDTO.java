@@ -1,6 +1,7 @@
 package com.elearning.models.dtos;
 
 import com.elearning.utils.enumAttribute.EnumVerificationCode;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,7 @@ public class VerificationCodeDTO {
 
     private String id;
 
+    @JsonIgnore
     private String code;
 
     private EnumVerificationCode type;

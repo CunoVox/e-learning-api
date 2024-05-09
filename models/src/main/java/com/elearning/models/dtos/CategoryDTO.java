@@ -43,4 +43,6 @@ public class CategoryDTO {
 
     @JsonProperty("is_deleted")
     private boolean isDeleted;
+    @JsonProperty("total_course")
+    private int totalCourse;
 }

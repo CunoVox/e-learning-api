@@ -18,4 +18,6 @@ public class UpdateUserDTO {
     @JsonProperty("full_name")
     private String fullName;
     private String address;
+
+
 }

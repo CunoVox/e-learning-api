@@ -1,9 +1,9 @@
 //package com.elearning.controller;
 //
+//import com.elearning.utils.Constants;
 //import com.google.api.client.http.FileContent;
 //import com.google.api.services.drive.Drive;
 //import com.google.api.services.drive.model.File;
-//import com.google.api.services.drive.model.FileList;
 //import com.google.api.services.drive.model.Permission;
 //import org.bson.types.ObjectId;
 //import org.junit.jupiter.api.Assertions;
@@ -50,12 +50,12 @@
 //
 //    @Test
 //    public void getAllFile() throws IOException {
-//        String query = "'" + "10kTLDsugv7nvEUERus8oV12CHwSm8vWq" + "' in parents";
+//        String query = "'" + Constants.FOLDER_TO_UPLOAD + "' in parents";
 ////        FileList result = googleDrive.files().list()
 ////                .setQ(query)
 ////                .setFields("nextPageToken, files(id, name, size, thumbnailLink, shared)") // get field of google drive folder
 ////                .execute();
-//        File result = googleDrive.files().get("1oncLG4CpWfNWDzxtWtDYlPY3WbRO5EyY")
+//        File result = googleDrive.files().get("1EjTLKjisTQH8ZzF99IDqJRe_KHKJfAVR")
 //                .setFields("id, name,mimeType, size, webViewLink, thumbnailLink, shared, videoMediaMetadata") // get field of google drive folder
 //                .execute();
 //        Assertions.assertNotNull(result);

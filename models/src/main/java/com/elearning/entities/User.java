@@ -19,9 +19,18 @@ import java.util.List;
 @Document(collection = "user")
 public class User extends IBaseEntity {
     private String fullName;
+    private String fullNameMod;
     private String password;
     private String email;
     public String address;
     public Boolean isEmailConfirmed = false;
+
+
+    //lecturer
+    private String phoneNumber;
+    private String profileLink;
+    private String specialization;
+    private String description;
+
     public List<EnumRole> roles = new ArrayList<>();
 }

@@ -14,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResetPasswordDTO {
-//    private String userId;
+    private String email;
     private String code;
     @NotNull(message = "Mật khẩu chưa được nhập")
     @NotBlank(message = "Mật khẩu chưa được nhập")
