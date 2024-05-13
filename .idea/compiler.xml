@@ -9,14 +9,19 @@
         <outputRelativeToContentRoot value="true" />
         <module name="core" />
         <module name="models" />
+        <module name="file" />
         <module name="service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="file-service" target="11" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="core" options="-parameters" />
       <module name="e-learning-api" options="" />
+      <module name="file" options="-parameters" />
       <module name="models" options="-parameters" />
       <module name="service" options="-parameters" />
     </option>

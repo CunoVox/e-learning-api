@@ -219,7 +219,6 @@ public class CourseController extends BaseController {
                     courseIds,
                     Category.class.getAnnotation(Document.class).collection(),
                     EnumConnectorType.COURSE_TO_CATEGORY.name());
-
             List<String> allIds = allCourse.stream().map(Course::getId).collect(Collectors.toList());
 
             //Video
@@ -228,6 +227,8 @@ public class CourseController extends BaseController {
             //Ảnh
             List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.COURSE_IMAGE.name());
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
+            //attachments
+            Map<String, List<FileRelationshipDTO>> mapAttachments = fileRelationshipController.mapFileRelationships(allIds, EnumParentFileType.COURSE_ATTACHMENT.name());
             //Chi tiết người tạo khoá học
             List<String> createdUserIds = courses.stream().map(Course::getCreatedBy).collect(Collectors.toList());
             Map<String, UserDTO> userDTOMap = userController.getUserByIds(createdUserIds);
