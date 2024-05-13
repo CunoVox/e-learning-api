@@ -39,9 +39,9 @@ vnpay:
   version: "2.1.0"
   command: "pay"
 server:
-  port: 8080
+  port: 8181
   servlet:
-    context-path: /e-learning
+    context-path: /file-service
   max-http-header-size: 10MB
 logging:
   pattern:

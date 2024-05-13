@@ -31,7 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 @Component
 @ExtensionMethod(Extensions.class)
-public class InvoiceController extends BaseController{
+public class InvoiceController extends BaseController {
     @Autowired
     private ISequenceValueItemRepository sequenceValueItemRepository;
     @Autowired
@@ -44,6 +44,16 @@ public class InvoiceController extends BaseController{
     private CourseController courseController;
     @Autowired
     private EnrollmentController enrollmentController;
+    @Value("${vnpay.url}")
+    private String VNP_PAY_URL;
+    @Value("${vnpay.secretKey}")
+    private String VNP_SECRET_KEY;
+    @Value("${vnpay.command}")
+    private String VNP_COMMAND;
+    @Value("${vnpay.tmnCode}")
+    private String VNP_TMN_CODE;
+    @Value("${vnpay.version}")
+    private String VNP_VERSION;
     public String getUrlPayment(String courseId, String customerId) throws UnsupportedEncodingException {
         validateInvoice(courseId, customerId);
         CourseDTO courseDTO = courseController.getCourseById(courseId);
@@ -51,9 +61,9 @@ public class InvoiceController extends BaseController{
 
         Map<String, String> vnp_Params = new HashMap<>();
 
-        vnp_Params.put("vnp_Version", Constants.VNP_VERSION);
-        vnp_Params.put("vnp_Command", Constants.VNP_COMMAND);
-        vnp_Params.put("vnp_TmnCode", Constants.VNP_TMN_CODE);
+        vnp_Params.put("vnp_Version", VNP_VERSION);
+        vnp_Params.put("vnp_Command", VNP_COMMAND);
+        vnp_Params.put("vnp_TmnCode", VNP_TMN_CODE);
         vnp_Params.put("vnp_Amount", String.valueOf(courseDTO.getPriceSell().intValue() * 100));
         vnp_Params.put("vnp_CurrCode", "VND");
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
@@ -96,9 +106,9 @@ public class InvoiceController extends BaseController{
             }
         }
         String queryUrl = query.toString();
-        String vnp_SecureHash = VnpayConfig.hmacSHA512(Constants.VNP_SECRET_KEY, hashData.toString());
+        String vnp_SecureHash = VnpayConfig.hmacSHA512(VNP_SECRET_KEY, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
-        return Constants.VNP_PAY_URL + "?" + queryUrl;
+        return VNP_PAY_URL + "?" + queryUrl;
     }
 
     public InvoiceDTO createInvoice(InvoiceDTO invoiceDTO) {
