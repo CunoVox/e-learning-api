@@ -4,10 +4,8 @@ import com.elearning.connector.Connector;
 import com.elearning.entities.Attribute;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
-import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
@@ -215,7 +213,6 @@ public class CourseController extends BaseController {
                     courseIds,
                     Category.class.getAnnotation(Document.class).collection(),
                     EnumConnectorType.COURSE_TO_CATEGORY.name());
-
             List<String> allIds = allCourse.stream().map(Course::getId).collect(Collectors.toList());
 
             //Video
@@ -224,6 +221,8 @@ public class CourseController extends BaseController {
             //Ảnh
             List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.COURSE_IMAGE.name());
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
+            //attachments
+            Map<String, List<FileRelationshipDTO>> mapAttachments = fileRelationshipController.mapFileRelationships(allIds, EnumParentFileType.COURSE_ATTACHMENT.name());
             //Chi tiết người tạo khoá học
             List<String> createdUserIds = courses.stream().map(Course::getCreatedBy).collect(Collectors.toList());
             Map<String, UserDTO> userDTOMap = userController.getUserByIds(createdUserIds);

@@ -1,4 +1,4 @@
-package com.elearning.config;
+package com.elearning.configs.drive;
 
 import com.elearning.utils.Constants;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
