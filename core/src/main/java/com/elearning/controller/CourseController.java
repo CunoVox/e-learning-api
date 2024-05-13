@@ -4,10 +4,8 @@ import com.elearning.connector.Connector;
 import com.elearning.entities.Attribute;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
-import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
@@ -93,7 +91,7 @@ public class CourseController extends BaseController {
         }
         if (dto.getPricePromotion() != null && dto.getPricePromotion().getPrice() != null)
             priceController.createPrice(dto.getPricePromotion());
-        return getCourseById(course.getId());
+        return getCourseById(courseSaved.getId());
     }
 
     public void changeCourseType(String courseId, EnumCourseType courseType, Boolean isRejected) {
@@ -137,7 +135,13 @@ public class CourseController extends BaseController {
     }
 
     public CourseDTO getCourseById(String courseId) {
-        ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).buildChild(Boolean.TRUE).build());
+        ListWrapper<CourseDTO> listWrapper =
+                searchCourseDTOS(ParameterSearchCourse.builder()
+                        .ids(Collections.singletonList(courseId))
+                        .buildChild(Boolean.TRUE)
+                        .searchType(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name(), EnumCourseType.WAITING.name(), EnumCourseType.DRAFT.name()))
+                        .build()
+                );
         if (!listWrapper.getData().isNullOrEmpty()) {
             return listWrapper.getData().get(0);
         }

@@ -44,7 +44,7 @@ public class CourseAPI {
                                             @RequestParam(value = "created_by", required = false) String createdBy,
                                             @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
                                             @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
-                                            @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
+                                            @RequestParam(value = "search_type", required = false) List<EnumCourseType> searchType,
                                             @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
@@ -85,7 +85,7 @@ public class CourseAPI {
             parameterSearchCourse.setPriceTo(priceTo);
         }
         if (searchType != null) {
-            parameterSearchCourse.setSearchType(searchType.name());
+            parameterSearchCourse.setSearchType(searchType.stream().map(EnumCourseType::name).toList());
         }
         parameterSearchCourse.setMaxResult(Objects.requireNonNullElse(maxResult, 20));
 
