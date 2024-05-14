@@ -37,6 +37,9 @@ public class CourseDTO {
 
     private String description;
 
+    @JsonProperty("short_description")
+    private String shortDescription;
+
     private String requirement;
 
     private Long duration;

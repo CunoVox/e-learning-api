@@ -17,4 +17,5 @@ public class ParameterSearchInvoice {
     private Integer currentPage;
     private Integer maxResult;
     private String sellerId;
+    private String userId;
 }

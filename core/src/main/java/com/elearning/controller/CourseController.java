@@ -290,6 +290,7 @@ public class CourseController extends BaseController {
                 .nameMode(StringUtils.stripAccents(inputDTO.getName()))
                 .contentType(inputDTO.getType())
                 .description(inputDTO.getDescription())
+                .shortDescription(inputDTO.getShortDescription())
                 .requirement(inputDTO.getRequirement())
                 .isPreview(inputDTO.getIsPreview())
                 .createdBy(inputDTO.getCreatedBy())
@@ -309,6 +310,9 @@ public class CourseController extends BaseController {
             course.setDescription(courseCheck.get().getDescription());
             if (!inputDTO.getDescription().isBlankOrNull()) {
                 course.setDescription(inputDTO.getDescription());
+            }
+            if (!inputDTO.getShortDescription().isBlankOrNull()) {
+                course.setShortDescription(inputDTO.getShortDescription());
             }
             course.setRequirement(courseCheck.get().getRequirement());
             if (!inputDTO.getRequirement().isBlankOrNull()) {
@@ -347,6 +351,7 @@ public class CourseController extends BaseController {
                 .children(new ArrayList<>())
                 .attributes(toAttributesDTO(entity.getAttributes()))
                 .description(entity.getDescription())
+                .shortDescription(entity.getShortDescription())
                 .requirement(entity.getRequirement())
                 .type(entity.getContentType())
                 .courseType(entity.getCourseType())
