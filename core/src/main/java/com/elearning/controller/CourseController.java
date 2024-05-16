@@ -56,30 +56,30 @@ public class CourseController extends BaseController {
             dto.setCreatedBy(userId);
         }
         Course course = buildEntity(dto);
-        //Price
-        if (!dto.getId().isBlankOrNull()) {
-            BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
-            if (!Objects.equals(currentPrice, dto.getPriceSell()) && course.getCourseType() == EnumCourseType.OFFICIAL) {
-                List<Attribute> attributes = course.getAttributes();
-                if (!attributes.isNullOrEmpty()) {
-                    attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
-                }
-                if (attributes == null) attributes = new ArrayList<>();
-                attributes.add(Attribute.builder()
-                        .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
-                        .attributeValue(dto.getPriceSell())
-                        .build());
-                course.setAttributes(attributes.stream()
-                        .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
-                        .findFirst()
-                        .map(Collections::singletonList)
-                        .orElseGet(Collections::emptyList));
-                course.setCourseType(EnumCourseType.CHANGE_PRICE);
-            } else {
-                priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
-            }
-
-        }
+//        //Price
+//        if (!dto.getId().isBlankOrNull()) {
+//            BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
+//            if (!Objects.equals(currentPrice, dto.getPriceSell()) && course.getCourseType() == EnumCourseType.OFFICIAL) {
+//                List<Attribute> attributes = course.getAttributes();
+//                if (!attributes.isNullOrEmpty()) {
+//                    attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
+//                }
+//                if (attributes == null) attributes = new ArrayList<>();
+//                attributes.add(Attribute.builder()
+//                        .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
+//                        .attributeValue(dto.getPriceSell())
+//                        .build());
+//                course.setAttributes(attributes.stream()
+//                        .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
+//                        .findFirst()
+//                        .map(Collections::singletonList)
+//                        .orElseGet(Collections::emptyList));
+//                course.setCourseType(EnumCourseType.CHANGE_PRICE);
+//            } else {
+//                priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
+//            }
+//
+//        }
         Course courseSaved = saveCourse(course);
         if (!dto.getCategoryIds().isNullOrEmpty()) {
             connector.deleteConnector(
@@ -92,6 +92,32 @@ public class CourseController extends BaseController {
         if (dto.getPricePromotion() != null && dto.getPricePromotion().getPrice() != null)
             priceController.createPrice(dto.getPricePromotion());
         return getCourseById(courseSaved.getId());
+    }
+    @Transactional
+    public void changeCoursePrice(String courseId, BigDecimal price) {
+        //Price
+        CourseDTO dto = getCourseById(courseId);
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (dto == null || course == null) {
+            throw new ServiceException("Khoá học không tồn tại trong hệ thống");
+        }
+        BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
+        if (!Objects.equals(currentPrice, price) && dto.getCourseType() == EnumCourseType.OFFICIAL) {
+            List<Attribute> attributes = new ArrayList<>();
+            attributes.add(Attribute.builder()
+                    .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
+                    .attributeValue(price)
+                    .build());
+            course.setAttributes(attributes.stream()
+                    .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
+                    .findFirst()
+                    .map(Collections::singletonList)
+                    .orElseGet(Collections::emptyList));
+            course.setCourseType(EnumCourseType.CHANGE_PRICE);
+        } else {
+            priceController.updatePriceSell(dto.getId(), price);
+        }
+        saveCourse(course);
     }
 
     public void changeCourseType(String courseId, EnumCourseType courseType, Boolean isRejected) {
