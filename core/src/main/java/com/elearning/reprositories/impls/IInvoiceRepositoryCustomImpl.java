@@ -8,7 +8,6 @@ import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepository;
 import com.elearning.reprositories.IInvoiceRepositoryCustom;
 import com.elearning.utils.Extensions;
-import com.elearning.utils.enumAttribute.EnumSortCourse;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -40,6 +39,9 @@ public class IInvoiceRepositoryCustomImpl extends BaseRepositoryCustom implement
         }
         if (null != parameterSearchInvoice.getToDate()) {
             criteria.add(Criteria.where("createdAt").lte(parameterSearchInvoice.getToDate()));
+        }
+        if(parameterSearchInvoice.getUserId() != null){
+            criteria.add(Criteria.where("customerId").is(parameterSearchInvoice.getUserId()));
         }
         if (!courseIds.isNullOrEmpty()) {
             criteria.add(Criteria.where("courseId").in(courseIds));

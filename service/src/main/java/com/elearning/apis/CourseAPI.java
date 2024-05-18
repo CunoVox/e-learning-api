@@ -115,6 +115,13 @@ public class CourseAPI {
                                  @RequestParam(value = "is_rejected") Boolean isRejected) {
         courseController.changeCourseType(courseId, course_type, isRejected);
     }
+    @PutMapping("/change-price-sell")
+    @Operation(summary = "Cập nhật giá bán của khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void changePriceSell(@RequestParam("course_id") String courseId,
+                                @RequestParam("price_sell") BigDecimal priceSell) {
+        courseController.changeCoursePrice(courseId, priceSell);
+    }
 
     @PutMapping("/lecturer/change-course-type")
     @Operation(summary = "Thay đổi tình trạng khoá học từ DRAFT -> WAITING")

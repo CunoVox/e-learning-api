@@ -34,7 +34,7 @@ springdoc:
     disable-swagger-default-url: true
 
 server:
-  port: 8080
+  port: 8181
   servlet:
     context-path: /file-service
   max-http-header-size: 10MB
