@@ -230,6 +230,7 @@ public class FileRelationshipController extends BaseController {
                 .size(entity.getSize())
                 .duration(entity.getDuration())
                 .webViewLink(entity.getWebViewLink())
+                .downloadLink(entity.getDownloadLink())
                 .pathFile(entity.getPathFile())
                 .build();
     }

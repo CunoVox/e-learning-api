@@ -44,7 +44,7 @@ public class FileController extends BaseController {
             throw new ServiceException("File is null");
         }
         File fileMetadata = new File();
-        String name = fileToUpload.getOriginalFilename() + sequenceValueItemRepository.getSequence(FileDTO.class);
+        String name = sequenceValueItemRepository.getSequence(FileDTO.class) + "-" + fileToUpload.getOriginalFilename();
         fileMetadata.setParents(Collections.singletonList(Constants.FOLDER_TO_UPLOAD));
         fileMetadata.setName(name);
         File uploadFile = googleDrive

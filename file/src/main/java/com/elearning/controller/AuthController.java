@@ -92,12 +92,10 @@ public class AuthController extends BaseController {
     }
 
 
-    public String getAccessToken() {
+    public String getAccessTokenFromDB() {
+        accessToken = getToken();
         if (StringUtils.isBlankOrNull(accessToken)) {
-            accessToken = getToken();
-            if (StringUtils.isBlankOrNull(accessToken)) {
-                throw new ServiceException("Chưa cấu hình upload video");
-            }
+            throw new ServiceException("Chưa cấu hình upload video");
         }
         return accessToken;
     }

@@ -36,7 +36,7 @@ public class YoutubeController {
     public static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     public static final JsonFactory JSON_FACTORY = new JacksonFactory();
     public FileDTO uploadVideo(MultipartFile file) {
-        String accessToken = authController.getAccessToken();
+        String accessToken = authController.getAccessTokenFromDB();
         String VIDEO_FILE_FORMAT = "video/*";
         try {
             GoogleCredential credential = new GoogleCredential().setAccessToken(accessToken);
@@ -86,7 +86,7 @@ public class YoutubeController {
                 .id(file.getId())
                 .name(file.getSnippet().getTitle())
                 .videoMediaMetadata(file.getContentDetails().getDuration())
-                .webViewLink("https://www.youtube.com/watch?v=" + file.getId())
+                .webViewLink("https://www.youtube-nocookie.com/embed/" + file.getId() + "?rel=0")
                 .build();
     }
 

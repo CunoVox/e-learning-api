@@ -248,6 +248,7 @@ public class CourseController extends BaseController {
                 courseDTO.setCourseRatings(ratingController.calcRating(courseDTO.getId()));
                 courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                 courseDTO.setImagePath(mapImageUrl.get(course.getId()));
+                courseDTO.setAttachments(mapAttachments.get(course.getId()));
                 courseDTOS.add(courseDTO);
             }
             //build child
@@ -257,6 +258,7 @@ public class CourseController extends BaseController {
                     CourseDTO courseDTO = toDTO(course);
                     courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                     courseDTO.setImagePath(mapImageUrl.get(course.getId()));
+                    courseDTO.setAttachments(mapAttachments.get(course.getId()));
                     allChildDTOS.add(courseDTO);
                 }
                 //Build TREE
