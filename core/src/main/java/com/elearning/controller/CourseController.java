@@ -299,6 +299,8 @@ public class CourseController extends BaseController {
                                         course.getLevel() == courseParent.getLevel() + 1
                         )).collect(Collectors.toList());
                         if (!courseChild.isEmpty()) {
+                            //sắp xếp theo thứ tự tăng dần
+                            courseChild.sort(Comparator.comparing(CourseDTO::getCreateAt));
                             courseParent.setChildren(courseChild);
                             courseChild.forEach(stack::push);
                         }
