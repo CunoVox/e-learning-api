@@ -143,15 +143,15 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0brebgdvv9ne-artifactory-primary-0-releases</name>
-            <url>https://elearningwisdom.jfrog.io/artifactory/elearning-libs-release</url>
+            <name>a0zj3tsiiitfu-artifactory-primary-0-releases</name>
+            <url>https://wisdom1.jfrog.io/artifactory/elearning-libs-release</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>central</id>
-            <name>a0brebgdvv9ne-artifactory-primary-0-releases</name>
-            <url>https://elearningwisdom.jfrog.io/artifactory/elearning-libs-release</url>
+            <name>a0zj3tsiiitfu-artifactory-primary-0-releases</name>
+            <url>https://wisdom1.jfrog.io/artifactory/elearning-libs-release</url>
         </repository>
     </repositories>
     <build>
