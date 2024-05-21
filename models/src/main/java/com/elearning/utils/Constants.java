@@ -31,7 +31,7 @@ public class Constants {
 //    public static final String VNP_COMMAND= "pay";
 
     //FILE
-    public static final String FILE_SERVICE_URL = "http://localhost:8181/file-service";
+    public static final String FILE_SERVICE_URL = "https://elearning-api-elearning.koyeb.app/file-service";
     public static final String REDIRECT_URL  = WEB_URL + "/google-return";
 
 }
