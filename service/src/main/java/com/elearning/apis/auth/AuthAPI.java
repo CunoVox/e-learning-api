@@ -5,10 +5,11 @@ import com.elearning.controller.RefreshTokenController;
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
 import com.elearning.handler.ServiceException;
+import com.elearning.models.dtos.RefreshTokenDTO;
 import com.elearning.models.dtos.UserEmailRequest;
+import com.elearning.models.dtos.auth.AuthResponse;
 import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
-import com.elearning.models.dtos.auth.AuthResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-
 import java.security.SignatureException;
 
 import static com.elearning.utils.Constants.REFRESH_TOKEN_COOKIE_NAME;
@@ -51,6 +51,7 @@ public class AuthAPI {
     public ResponseEntity<?> sendEmailVerification(@RequestBody UserEmailRequest request) {
         return ResponseEntity.ok().body(verificationCodeController.createEmailConfirmCode(request.getEmail()));
     }
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
         var authResponse = userController.register(userFormDTO);
@@ -60,6 +61,16 @@ public class AuthAPI {
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(authResponse);
     }
+    @PostMapping("/register/mobile/{email}/{code}")
+    public ResponseEntity<?> verifyEmail(@PathVariable(value = "email") String email, @PathVariable(value = "code") String code) {
+        return ResponseEntity.ok().body(verificationCodeController.checkEmailConfirmCode(email, code));
+    }
+
+    @PostMapping("/register/mobile")
+    public ResponseEntity<?> registerMobile(@Valid @RequestBody UserRegisterDTO userFormDTO) throws ServiceException {
+        var authResponse = userController.register(userFormDTO);
+        return ResponseEntity.ok().body(authResponse);
+    }
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
         AuthResponse rs = userController.login(userFormDTO);
@@ -68,6 +79,12 @@ public class AuthAPI {
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(rs);
+    }
+
+    @PostMapping("/login/mobile")
+    public ResponseEntity<?> loginMobile(@Valid @RequestBody UserLoginDTO userFormDTO) throws ServiceException {
+        AuthResponse rs = userController.login(userFormDTO);
+        return ResponseEntity.ok().body(rs);
     }
 
     @PostMapping("/refresh-token")
@@ -81,10 +98,17 @@ public class AuthAPI {
                 .body(authResponse);
     }
 
+    @PostMapping("/refresh-token/mobile")
+    public ResponseEntity<?> refreshTokenMobile(@RequestBody RefreshTokenDTO refreshToken) throws SignatureException {
+        System.out.println("refreshToken------------------" + refreshToken);
+        AuthResponse authResponse = jwtController.refreshToken(refreshToken.getRefreshToken());
+        return ResponseEntity.ok().body(authResponse);
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) throws SignatureException {
         Cookie requestCookie = WebUtils.getCookie(request, REFRESH_TOKEN_COOKIE_NAME);
-        if(requestCookie != null){
+        if (requestCookie != null) {
             refreshTokenController.deleteRefreshTokenBranch(requestCookie.getValue());
             Cookie delete = new Cookie(REFRESH_TOKEN_COOKIE_NAME, null);
             delete.setHttpOnly(true);
@@ -95,10 +119,15 @@ public class AuthAPI {
             SecurityContextHolder.clearContext();
 
         }
-
-
         return ResponseEntity.ok()
                 .body(null);
+    }
+
+    @PostMapping("/logout/mobile")
+    public ResponseEntity<?> logoutMobile(@RequestBody String refreshToken) throws SignatureException {
+        refreshTokenController.deleteRefreshTokenBranch(refreshToken);
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().body(null);
     }
 
     private ResponseCookie createRefreshCookie(String refreshToken) {

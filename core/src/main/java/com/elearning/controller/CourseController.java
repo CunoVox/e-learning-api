@@ -4,10 +4,8 @@ import com.elearning.connector.Connector;
 import com.elearning.entities.Attribute;
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.Price;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.*;
-import com.elearning.models.searchs.ParameterSearchCategory;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICategoryRepository;
@@ -58,30 +56,30 @@ public class CourseController extends BaseController {
             dto.setCreatedBy(userId);
         }
         Course course = buildEntity(dto);
-        //Price
-        if (!dto.getId().isBlankOrNull()) {
-            BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
-            if (!Objects.equals(currentPrice, dto.getPriceSell()) && course.getCourseType() == EnumCourseType.OFFICIAL) {
-                List<Attribute> attributes = course.getAttributes();
-                if (!attributes.isNullOrEmpty()) {
-                    attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
-                }
-                if (attributes == null) attributes = new ArrayList<>();
-                attributes.add(Attribute.builder()
-                        .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
-                        .attributeValue(dto.getPriceSell())
-                        .build());
-                course.setAttributes(attributes.stream()
-                        .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
-                        .findFirst()
-                        .map(Collections::singletonList)
-                        .orElseGet(Collections::emptyList));
-                course.setCourseType(EnumCourseType.CHANGE_PRICE);
-            } else {
-                priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
-            }
-
-        }
+//        //Price
+//        if (!dto.getId().isBlankOrNull()) {
+//            BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
+//            if (!Objects.equals(currentPrice, dto.getPriceSell()) && course.getCourseType() == EnumCourseType.OFFICIAL) {
+//                List<Attribute> attributes = course.getAttributes();
+//                if (!attributes.isNullOrEmpty()) {
+//                    attributes.removeIf(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()));
+//                }
+//                if (attributes == null) attributes = new ArrayList<>();
+//                attributes.add(Attribute.builder()
+//                        .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
+//                        .attributeValue(dto.getPriceSell())
+//                        .build());
+//                course.setAttributes(attributes.stream()
+//                        .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
+//                        .findFirst()
+//                        .map(Collections::singletonList)
+//                        .orElseGet(Collections::emptyList));
+//                course.setCourseType(EnumCourseType.CHANGE_PRICE);
+//            } else {
+//                priceController.updatePriceSell(dto.getId(), dto.getPriceSell());
+//            }
+//
+//        }
         Course courseSaved = saveCourse(course);
         if (!dto.getCategoryIds().isNullOrEmpty()) {
             connector.deleteConnector(
@@ -93,7 +91,33 @@ public class CourseController extends BaseController {
         }
         if (dto.getPricePromotion() != null && dto.getPricePromotion().getPrice() != null)
             priceController.createPrice(dto.getPricePromotion());
-        return getCourseById(course.getId());
+        return getCourseById(courseSaved.getId());
+    }
+    @Transactional
+    public void changeCoursePrice(String courseId, BigDecimal price) {
+        //Price
+        CourseDTO dto = getCourseById(courseId);
+        Course course = courseRepository.findById(courseId).orElse(null);
+        if (dto == null || course == null) {
+            throw new ServiceException("Khoá học không tồn tại trong hệ thống");
+        }
+        BigDecimal currentPrice = priceController.getPriceByParentId(dto.getId(), EnumPriceType.SELL.name());
+        if (!Objects.equals(currentPrice, price) && dto.getCourseType() == EnumCourseType.OFFICIAL) {
+            List<Attribute> attributes = new ArrayList<>();
+            attributes.add(Attribute.builder()
+                    .attributeName(EnumAttribute.COURSE_SELL_PRICE.name())
+                    .attributeValue(price)
+                    .build());
+            course.setAttributes(attributes.stream()
+                    .filter(p -> p.getAttributeName().equals(EnumAttribute.COURSE_SELL_PRICE.name()))
+                    .findFirst()
+                    .map(Collections::singletonList)
+                    .orElseGet(Collections::emptyList));
+            course.setCourseType(EnumCourseType.CHANGE_PRICE);
+        } else {
+            priceController.updatePriceSell(dto.getId(), price);
+        }
+        saveCourse(course);
     }
 
     public void changeCourseType(String courseId, EnumCourseType courseType, Boolean isRejected) {
@@ -130,8 +154,20 @@ public class CourseController extends BaseController {
         courseRepository.updateIsDeleted(courseId, isDeleted, getUserIdFromContext());
     }
 
+    public void updateIsPreview(String courseId, Boolean isPreview) {
+        Optional<Course> course = courseRepository.findById(courseId);
+        if (course.isEmpty()) throw new ServiceException("Khoá học không tồn tại trong hệ thống");
+        courseRepository.updateIsPreview(courseId, isPreview, getUserIdFromContext());
+    }
+
     public CourseDTO getCourseById(String courseId) {
-        ListWrapper<CourseDTO> listWrapper = searchCourseDTOS(ParameterSearchCourse.builder().ids(Collections.singletonList(courseId)).buildChild(Boolean.TRUE).build());
+        ListWrapper<CourseDTO> listWrapper =
+                searchCourseDTOS(ParameterSearchCourse.builder()
+                        .ids(Collections.singletonList(courseId))
+                        .buildChild(Boolean.TRUE)
+                        .searchType(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name(), EnumCourseType.WAITING.name(), EnumCourseType.DRAFT.name()))
+                        .build()
+                );
         if (!listWrapper.getData().isNullOrEmpty()) {
             return listWrapper.getData().get(0);
         }
@@ -209,7 +245,6 @@ public class CourseController extends BaseController {
                     courseIds,
                     Category.class.getAnnotation(Document.class).collection(),
                     EnumConnectorType.COURSE_TO_CATEGORY.name());
-
             List<String> allIds = allCourse.stream().map(Course::getId).collect(Collectors.toList());
 
             //Video
@@ -218,6 +253,8 @@ public class CourseController extends BaseController {
             //Ảnh
             List<FileRelationshipDTO> images = fileRelationshipController.getFileRelationships(allIds, EnumParentFileType.COURSE_IMAGE.name());
             Map<String, String> mapImageUrl = fileRelationshipController.getUrlOfFile(images);
+            //attachments
+            Map<String, List<FileRelationshipDTO>> mapAttachments = fileRelationshipController.mapFileRelationships(allIds, EnumParentFileType.COURSE_ATTACHMENT.name());
             //Chi tiết người tạo khoá học
             List<String> createdUserIds = courses.stream().map(Course::getCreatedBy).collect(Collectors.toList());
             Map<String, UserDTO> userDTOMap = userController.getUserByIds(createdUserIds);
@@ -237,6 +274,7 @@ public class CourseController extends BaseController {
                 courseDTO.setCourseRatings(ratingController.calcRating(courseDTO.getId()));
                 courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                 courseDTO.setImagePath(mapImageUrl.get(course.getId()));
+                courseDTO.setAttachments(mapAttachments.get(course.getId()));
                 courseDTOS.add(courseDTO);
             }
             //build child
@@ -246,6 +284,7 @@ public class CourseController extends BaseController {
                     CourseDTO courseDTO = toDTO(course);
                     courseDTO.setVideoPath(mapVideoUrl.get(course.getId()));
                     courseDTO.setImagePath(mapImageUrl.get(course.getId()));
+                    courseDTO.setAttachments(mapAttachments.get(course.getId()));
                     allChildDTOS.add(courseDTO);
                 }
                 //Build TREE
@@ -260,6 +299,8 @@ public class CourseController extends BaseController {
                                         course.getLevel() == courseParent.getLevel() + 1
                         )).collect(Collectors.toList());
                         if (!courseChild.isEmpty()) {
+                            //sắp xếp theo thứ tự tăng dần
+                            courseChild.sort(Comparator.comparing(CourseDTO::getCreateAt));
                             courseParent.setChildren(courseChild);
                             courseChild.forEach(stack::push);
                         }
@@ -279,7 +320,9 @@ public class CourseController extends BaseController {
                 .nameMode(StringUtils.stripAccents(inputDTO.getName()))
                 .contentType(inputDTO.getType())
                 .description(inputDTO.getDescription())
+                .shortDescription(inputDTO.getShortDescription())
                 .requirement(inputDTO.getRequirement())
+                .isPreview(inputDTO.getIsPreview())
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
                 .isDeleted(inputDTO.isDeleted())
@@ -298,14 +341,14 @@ public class CourseController extends BaseController {
             if (!inputDTO.getDescription().isBlankOrNull()) {
                 course.setDescription(inputDTO.getDescription());
             }
+            if (!inputDTO.getShortDescription().isBlankOrNull()) {
+                course.setShortDescription(inputDTO.getShortDescription());
+            }
             course.setRequirement(courseCheck.get().getRequirement());
             if (!inputDTO.getRequirement().isBlankOrNull()) {
                 course.setRequirement(inputDTO.getRequirement());
             }
             course.setSubscriptions(courseCheck.get().getSubscriptions());
-//            if (inputDTO.getSubscriptions() != null) {
-//                course.setSubscriptions(inputDTO.getSubscriptions());
-//            }
             course.setId(inputDTO.getId());
             course.setUpdatedAt(inputDTO.getUpdatedAt() != null ? inputDTO.getUpdatedAt() : null);
             course.setUpdatedBy(getUserIdFromContext());
@@ -338,9 +381,11 @@ public class CourseController extends BaseController {
                 .children(new ArrayList<>())
                 .attributes(toAttributesDTO(entity.getAttributes()))
                 .description(entity.getDescription())
+                .shortDescription(entity.getShortDescription())
                 .requirement(entity.getRequirement())
                 .type(entity.getContentType())
                 .courseType(entity.getCourseType())
+                .isPreview(entity.getIsPreview())
                 .createdBy(entity.getCreatedBy())
                 .createAt(entity.getCreatedAt())
                 .updatedAt(entity.getUpdatedAt() != null ? entity.getUpdatedAt() : null)

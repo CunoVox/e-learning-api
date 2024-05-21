@@ -29,4 +29,7 @@ public class FileRelationshipDTO {
     private Long duration;
     @JsonProperty("web_view_link")
     private String webViewLink;
+
+    @JsonProperty("download_link")
+    private String downloadLink;
 }

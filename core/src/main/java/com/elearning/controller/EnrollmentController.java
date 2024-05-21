@@ -1,9 +1,7 @@
 package com.elearning.controller;
 
-import com.elearning.entities.Course;
 import com.elearning.entities.Enrollment;
 import com.elearning.entities.Price;
-import com.elearning.entities.User;
 import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
@@ -16,18 +14,14 @@ import com.elearning.reprositories.IEnrollmentRepository;
 import com.elearning.reprositories.IPriceRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.utils.Extensions;
-import com.elearning.utils.enumAttribute.EnumConnectorType;
 import com.elearning.utils.enumAttribute.EnumPriceType;
-import com.elearning.utils.enumAttribute.EnumRelatedObjectsStatus;
 import lombok.experimental.ExtensionMethod;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Controller
@@ -234,6 +228,7 @@ public class EnrollmentController extends BaseController {
                 .currentMillis(entity.getCurrentMillis())
                 .percentComplete(entity.getPercentComplete())
                 .courseDTO(courseDTO)
+                .pricePurchase(entity.getPricePurchase())
                 .ratingDTO(ratingController.userRating(courseDTO.getId(), entity.getUserId()))
                 .completedCourseIds(entity.getCompletedCourse() != null ?
                         entity.getCompletedCourse().stream().sorted().collect(Collectors.toList()) :

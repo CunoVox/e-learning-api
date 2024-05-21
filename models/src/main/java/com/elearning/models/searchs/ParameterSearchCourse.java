@@ -17,7 +17,7 @@ import java.util.List;
 public class ParameterSearchCourse implements Serializable, Cloneable {
     private Integer level;
 
-    private String searchType;
+    private List<String> searchType;
     
     private Boolean isDeleted;
 

@@ -9,6 +9,8 @@ import com.elearning.models.dtos.auth.UserLoginDTO;
 import com.elearning.models.dtos.auth.UserRegisterDTO;
 import com.elearning.models.searchs.ParameterSearchUser;
 import com.elearning.models.wrapper.ListWrapper;
+import com.elearning.reprositories.ICourseRepository;
+import com.elearning.reprositories.IRatingRepository;
 import com.elearning.reprositories.ISequenceValueItemRepository;
 import com.elearning.reprositories.IUserRepository;
 import com.elearning.security.SecurityUserDetail;
@@ -23,7 +25,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,8 @@ public class UserController extends BaseController {
     private final IUserRepository userRepository;
     private final JwtController jwtController;
     private final UserDetailsService userDetailsService;
+    private final ICourseRepository courseRepository;
+    private final IRatingRepository rattingRepository;
     @Autowired
     private VerificationCodeController verificationCodeController;
     @Autowired
@@ -94,7 +97,18 @@ public class UserController extends BaseController {
         if (user.isEmpty()) {
             throw new ServiceException("Không tìm thấy người dùng trong hệ thống!");
         }
-        return toDto(user.get());
+        List<String> ids = Collections.singletonList(user.get().getId());
+        Map<String, Integer> countCourse = courseRepository.countAllByCreatedBy(ids);
+        Map<String, Long> sumSubscriptions = courseRepository.sumSubscriptionsByCreatedBy(ids);
+        Map<String, Double> avgRatting = rattingRepository.avgRattingByCourseCreatedByIn(ids);
+
+        UserDTO userDTO = toDto(user.get());
+
+        userDTO.setTotalCourse(countCourse.get(user.get().getId()) != null ? countCourse.get(user.get().getId()) : 0);
+        userDTO.setTotalSubscriptions(sumSubscriptions.get(user.get().getId()) != null ? sumSubscriptions.get(user.get().getId()) : 0);
+        userDTO.setAverageRating(avgRatting.get(user.get().getId()) != null ? avgRatting.get(user.get().getId()) : 0);
+
+        return userDTO;
     }
 
     public User create(UserDTO dto) {
@@ -166,6 +180,7 @@ public class UserController extends BaseController {
         if (userId == null) {
             throw new ServiceException("Vui lòng đăng nhập.");
         }
+        validateUser(dto);
         Optional<User> entity = userRepository.findById(userId);
         if (entity.isEmpty()) {
             throw new ServiceException("User not found");
@@ -180,6 +195,9 @@ public class UserController extends BaseController {
         if (!dto.getPhoneNumber().isBlankOrNull()) {
             entity.get().setPhoneNumber(dto.getPhoneNumber());
         }
+        if(!dto.getSpecialization().isBlankOrNull()){
+            entity.get().setSpecialization(dto.getSpecialization());
+        }
         if (!dto.getProfileLink().isBlankOrNull()) {
             entity.get().setProfileLink(dto.getProfileLink());
         }
@@ -189,6 +207,25 @@ public class UserController extends BaseController {
         entity.get().setUpdatedAt(new Date());
         userRepository.save(entity.get());
         return toDto(entity.get());
+    }
+
+    public void updateFullName(String userId, String fullName) {
+        findUserById(userId);
+        userRepository.updateFullName(userId, fullName, userId);
+    }
+
+    public void updatePhoneNumber(String userId, String phoneNumber) {
+        findUserById(userId);
+        phoneNumber = phoneNumber.trim();
+        if (!StringUtils.isPhoneVietnamValid(phoneNumber)) {
+            throw new ServiceException("Số điện thoại không hợp lệ");
+        }
+        userRepository.updatePhoneNumber(userId, phoneNumber, userId);
+    }
+
+    public void updateAddress(String userId, String address) {
+        findUserById(userId);
+        userRepository.updateAddress(userId, address.trim(), userId);
     }
 
     public UserDTO userLecturerUpdate(UserDTO dto) {
@@ -203,6 +240,9 @@ public class UserController extends BaseController {
         }
         if (!dto.getProfileLink().isBlankOrNull()) {
             newUser.setProfileLink(dto.getProfileLink());
+        }
+        if(!dto.getSpecialization().isBlankOrNull()){
+            newUser.setSpecialization(dto.getSpecialization());
         }
         if (!dto.getDescription().isBlankOrNull()) {
             newUser.setDescription(dto.getDescription());
@@ -262,7 +302,13 @@ public class UserController extends BaseController {
             throw new ServiceException("Không tìm thấy người dùng");
         }
     }
-
+    public Boolean checkPasswordConfirmCode(String email, String code) {
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        return verificationCodeController.resetPasswordConfirmCode(user.getId(), code);
+    }
     public void updateRoles(String userId, List<EnumRole> roles) {
         Optional<User> user = userRepository.findById(userId);
         if (user.isEmpty()) {
@@ -315,6 +361,25 @@ public class UserController extends BaseController {
         return map;
     }
 
+    public void updatePassword(String userId, ChangePasswordDTO dto) {
+        Optional<User> user = userRepository.findById(userId);
+        if (user.isEmpty()) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.get().getPassword())) {
+            throw new ServiceException("Mật khẩu hiện tại không chính xác");
+        }
+        if (dto.getNewPassword().length() < 8) {
+            throw new ServiceException("Mật khẩu phải có 8 kí tự trở lên");
+        }
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new ServiceException("Mật khẩu xác nhận không đúng");
+        }
+        user.get().setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        user.get().setUpdatedAt(new Date());
+
+        userRepository.save(user.get());
+    }
 
     protected User findUserById(String id) {
         Optional<User> user = userRepository.findById(id);
@@ -356,6 +421,22 @@ public class UserController extends BaseController {
         return modelMapper.map(dto, User.class);
     }
 
+    private void validateUser(UserDTO userDTO) {
+        if (userDTO == null) {
+            throw new ServiceException("Không tìm thấy người dùng");
+        }
+        if (!userDTO.getEmail().isBlankOrNull()) {
+            if (!StringUtils.isEmailValid(userDTO.getEmail())) {
+                throw new ServiceException("Email không hợp lệ");
+            }
+        }
+        if (!userDTO.getPhoneNumber().isBlankOrNull()) {
+            if (!StringUtils.isPhoneVietnamValid(userDTO.getPhoneNumber())) {
+                throw new ServiceException("Số điện thoại không hợp lệ");
+            }
+        }
+    }
+
     public UserDTO toDto(User user) {
         if (user == null) {
             return null;
@@ -371,6 +452,7 @@ public class UserController extends BaseController {
                 .isDeleted(user.getIsDeleted())
                 .phoneNumber(user.getPhoneNumber())
                 .profileLink(user.getProfileLink())
+                .specialization(user.getSpecialization())
                 .description(user.getDescription())
                 .isEmailConfirmed(user.isEmailConfirmed)
                 .build();
@@ -382,6 +464,9 @@ public class UserController extends BaseController {
         List<String> ids = users.stream().map(User::getId).collect(Collectors.toList());
         List<FileRelationshipDTO> fileRelationshipDTOS = fileRelationshipController.getFileRelationships(ids, EnumParentFileType.USER_AVATAR.name());
         Map<String, String> fileRelationshipDTOMap = fileRelationshipController.getUrlOfFile(fileRelationshipDTOS);
+        Map<String, Integer> countCourse = courseRepository.countAllByCreatedBy(ids);
+        Map<String, Long> sumSubscriptions = courseRepository.sumSubscriptionsByCreatedBy(ids);
+        Map<String, Double> avgRatting = rattingRepository.avgRattingByCourseCreatedByIn(ids);
         List<UserDTO> userDTOS = new ArrayList<>();
         for (User user : users) {
             userDTOS.add(UserDTO.builder()
@@ -390,11 +475,24 @@ public class UserController extends BaseController {
                     .email(user.getEmail())
                     .roles(user.getRoles())
                     .avatar(fileRelationshipDTOMap.get(user.getId()))
+                    .totalCourse(countCourse.get(user.getId()) != null ? countCourse.get(user.getId()) : 0)
+                    .totalSubscriptions(sumSubscriptions.get(user.getId()) != null ? sumSubscriptions.get(user.getId()) : 0)
                     .address(user.getAddress())
+                    .averageRating(avgRatting.get(user.getId()) != null ? avgRatting.get(user.getId()) : 0)
                     .isDeleted(user.getIsDeleted())
                     .isEmailConfirmed(user.isEmailConfirmed)
                     .build());
         }
         return userDTOS;
+    }
+
+    public UserProfileDTO toUserProfileDTO(UserDTO userDTO) {
+        if (userDTO == null) return null;
+        return UserProfileDTO.builder()
+                .id(userDTO.getId())
+                .fullName(userDTO.getFullName())
+                .email(userDTO.getEmail())
+                .avatar(userDTO.getAvatar())
+                .build();
     }
 }

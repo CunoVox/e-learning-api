@@ -2,8 +2,8 @@ package com.elearning.apis.user;
 
 import com.elearning.controller.UserController;
 import com.elearning.controller.VerificationCodeController;
+import com.elearning.models.dtos.ChangePasswordDTO;
 import com.elearning.models.dtos.ResetPasswordDTO;
-import com.elearning.models.dtos.UpdateUserDTO;
 import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.dtos.UserEmailRequest;
 import com.elearning.models.searchs.ParameterSearchUser;
@@ -17,7 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -65,18 +64,51 @@ public class UserAPI {
         userController.updateRoles(id, roles);
     }
 
+    @Operation(summary = "Cập nhật tên người dùng")
+    @PutMapping("/update-full-name/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateFullName(@PathVariable("id") String id,
+                               @RequestParam(value = "full_name") String fullName) {
+        userController.updateFullName(id, fullName);
+    }
+
+    @Operation(summary = "Cập nhật số điện thoại người dùng")
+    @PutMapping("/update-phone-number/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updatePhoneNumber(@PathVariable("id") String id,
+                                  @RequestParam(value = "phone_number") String phoneNumber) {
+        userController.updatePhoneNumber(id, phoneNumber);
+    }
+
+    @Operation(summary = "Cập nhật địa chỉ người dùng")
+    @PutMapping("/update-address/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateAddress(@PathVariable("id") String id,
+                              @RequestParam(value = "address") String address) {
+        userController.updateAddress(id, address);
+    }
+    @Operation(summary = "Cập nhật mật khẩu người dùng")
+    @PutMapping("/update-password/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updatePassword(@PathVariable("id") String id,
+                              @RequestBody ChangePasswordDTO changePasswordDTO) {
+        userController.updatePassword(id, changePasswordDTO);
+    }
+
     @Operation(summary = "Xin gửi mail reset password")
     @PostMapping(value = "/password/reset")
     public ResponseEntity<?> sendEmailResetPassword(@RequestBody @Valid UserEmailRequest request) {
         return ResponseEntity.ok().body(verificationCodeController.createResetPasswordCode(request.getEmail()));
     }
-
+    @PostMapping(value = "/password/reset/mobile/{email}/{code}")
+    public ResponseEntity<?> verifyEmail(@PathVariable(value = "email") String email, @PathVariable(value = "code") String code) {
+        return ResponseEntity.ok().body(userController.checkPasswordConfirmCode(email, code));
+    }
     @Operation(summary = "Reset mật khẩu")
     @PatchMapping(value = "/password/reset")
     public void resetPassword(@RequestBody ResetPasswordDTO dto) {
         userController.userResetPassword(dto.getEmail(), dto);
     }
-
     @Operation(summary = "Chi tiết người dùng")
     @GetMapping(value = "/detail/{id}")
     public UserDTO userDetail(@PathVariable(value = "id") String id) {

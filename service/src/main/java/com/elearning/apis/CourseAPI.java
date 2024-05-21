@@ -44,11 +44,11 @@ public class CourseAPI {
                                             @RequestParam(value = "created_by", required = false) String createdBy,
                                             @RequestParam(value = "current_page", required = false) @Min(value = 1, message = "currentPage phải lớn hơn 0") @Parameter(description = "Default: 1") Integer currentPage,
                                             @RequestParam(value = "max_result", required = false) @Min(value = 1, message = "maxResult phải lớn hơn 0") @Max(value = 100, message = "maxResult phải bé hơn 101") @Parameter(description = "Default: 20; Size range: 1-100") Integer maxResult,
-                                            @RequestParam(value = "search_type", required = false) EnumCourseType searchType,
+                                            @RequestParam(value = "search_type", required = false) List<EnumCourseType> searchType,
                                             @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
-                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
+                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB", "PRICE_DESC"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
                                             @RequestParam(value = "parent_ids", required = false) List<String> parentIds,
                                             @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds) {
         if (currentPage == null || currentPage == 0) {
@@ -85,7 +85,7 @@ public class CourseAPI {
             parameterSearchCourse.setPriceTo(priceTo);
         }
         if (searchType != null) {
-            parameterSearchCourse.setSearchType(searchType.name());
+            parameterSearchCourse.setSearchType(searchType.stream().map(EnumCourseType::name).toList());
         }
         parameterSearchCourse.setMaxResult(Objects.requireNonNullElse(maxResult, 20));
 
@@ -115,12 +115,27 @@ public class CourseAPI {
                                  @RequestParam(value = "is_rejected") Boolean isRejected) {
         courseController.changeCourseType(courseId, course_type, isRejected);
     }
+    @PutMapping("/change-price-sell")
+    @Operation(summary = "Cập nhật giá bán của khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void changePriceSell(@RequestParam("course_id") String courseId,
+                                @RequestParam("price_sell") BigDecimal priceSell) {
+        courseController.changeCoursePrice(courseId, priceSell);
+    }
 
     @PutMapping("/lecturer/change-course-type")
     @Operation(summary = "Thay đổi tình trạng khoá học từ DRAFT -> WAITING")
     @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
     public void changeCourseToWaiting(@RequestParam("course_id") String courseId) {
         courseController.changeCourseType(courseId, EnumCourseType.WAITING, null);
+    }
+
+    @PutMapping("/update-is-preview")
+    @Operation(summary = "Cập nhật trạng thái xem trước của khoá học")
+    @PreAuthorize("hasAnyRole('ROLE_LECTURE', 'ROLE_MANAGER', 'ROLE_ADMIN')")
+    public void updateIsPreview(@RequestParam("course_id") String courseId,
+                                @RequestParam("is_preview") Boolean isPreview) {
+        courseController.updateIsPreview(courseId, isPreview);
     }
 
     @DeleteMapping("/delete/{id}")

@@ -1,6 +1,5 @@
 package com.elearning.reprositories.impls;
 
-import com.elearning.entities.Course;
 import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchUser;
 import com.elearning.models.wrapper.ListWrapper;
@@ -14,7 +13,10 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @ExtensionMethod(Extensions.class)
 public class IUserRepositoryCustomImpl extends BaseRepositoryCustom implements IUserRepositoryCustom {
@@ -105,6 +107,28 @@ public class IUserRepositoryCustomImpl extends BaseRepositoryCustom implements I
         Map<String, Object> map = new HashMap<>();
         map.put("isDeleted", deleted);
         updateAttribute(id, map, updateBy, User.class);
+    }
+
+    @Override
+    public void updateFullName(String id, String fullName, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("fullName", fullName);
+        map.put("fullNameMod", StringUtils.stripAccents(fullName));
+        updateAttribute(id, map, updatedBy, User.class);
+    }
+
+    @Override
+    public void updatePhoneNumber(String id, String phoneNumber, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("phoneNumber", phoneNumber);
+        updateAttribute(id, map, updatedBy, User.class);
+    }
+
+    @Override
+    public void updateAddress(String id, String address, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("address", address);
+        updateAttribute(id, map, updatedBy, User.class);
     }
 
     @Override

@@ -1,0 +1,48 @@
+spring:
+  main:
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+  data:
+    mongodb:
+      uri: mongodb+srv://root:root@cluster0.dzjqyet.mongodb.net/e-learning
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: thomsonbel12@gmail.com
+    password: alcjlxnqrngukuky
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connection-timeout: 5000
+          timeout: 5000
+          write-timeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+springdoc:
+  packagesToScan: com.elearning.apis
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+vnpay:
+  url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  tmnCode: "FV2FPW0B"
+  secretKey: "TSYFMBEBBUSUVSBPNQCWEFQDIMEBKFBD"
+  version: "2.1.0"
+  command: "pay"
+server:
+  port: 8181
+  servlet:
+    context-path: /file-service
+  max-http-header-size: 10MB
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} [E-LEARNING] %m%n%wEx"

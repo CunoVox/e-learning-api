@@ -32,7 +32,12 @@ springdoc:
   swagger-ui:
     path: /swagger-ui
     disable-swagger-default-url: true
-
+vnpay:
+  url: "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+  tmnCode: "FV2FPW0B"
+  secretKey: "TSYFMBEBBUSUVSBPNQCWEFQDIMEBKFBD"
+  version: "2.1.0"
+  command: "pay"
 server:
   port: 8080
   servlet:

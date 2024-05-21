@@ -1,6 +1,5 @@
 package com.elearning.entities;
 
-import com.elearning.utils.enumAttribute.EnumCourseContentType;
 import com.elearning.utils.enumAttribute.EnumCourseStatus;
 import com.elearning.utils.enumAttribute.EnumCourseType;
 import lombok.AllArgsConstructor;
@@ -27,9 +26,10 @@ public class Course extends IBaseEntity{
     private String parentId;
     private int level;
     private String description;
+    private String shortDescription;
     private String requirement;
     private Long duration;
     private Long subscriptions;
-    private Boolean isPublished;
+    private Boolean isPreview;
     private List<Attribute> attributes;
 }

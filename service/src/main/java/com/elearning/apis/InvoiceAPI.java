@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Date;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoice")
@@ -44,12 +43,16 @@ public class InvoiceAPI {
                                                @RequestParam(value = "to_date", required = false) Long toDate,
                                                @RequestParam(value = "current_page", required = false) Integer currentPage,
                                                @RequestParam(value = "max_result", required = false) Integer maxResult,
+                                               @RequestParam(value = "user_id", required = false) String userId,
                                                @RequestParam(value = "is_current_user", required = false) Boolean isCurrentUser) {
         ParameterSearchInvoice parameterSearchInvoice = ParameterSearchInvoice.builder()
                 .currentPage(currentPage)
                 .maxResult(maxResult)
                 .sellerId(isCurrentUser!=null && isCurrentUser ? invoiceController.getUserIdFromContext() : null)
                 .build();
+        if(userId != null) {
+            parameterSearchInvoice.setUserId(userId);
+        }
         if (fromDate != null) {
             parameterSearchInvoice.setFromDate(new Date(fromDate));
         }

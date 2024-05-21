@@ -6,10 +6,7 @@ import com.elearning.models.dtos.RatingDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/rating")
@@ -22,5 +19,9 @@ public class RatingAPI {
     @PostMapping("/")
     public RatingDTO saveRating(@RequestBody RatingDTO dto){
         return ratingController.createRating(dto);
+    }
+    @GetMapping("/{courseId}/{userId}")
+    public RatingDTO getRating(@PathVariable String courseId, @PathVariable String userId){
+        return ratingController.userRating(courseId, userId);
     }
 }

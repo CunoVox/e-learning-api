@@ -4,7 +4,7 @@ spring:
     allow-bean-definition-overriding: true
   data:
     mongodb:
-      uri: mongodb+srv://root:root@cluster0.dzjqyet.mongodb.net/e-learning
+      uri: mongodb+srv://root:root@cluster0.dzjqyet.mongodb.net/e-learning-live
   mail:
     host: smtp.gmail.com
     port: 587
@@ -34,6 +34,7 @@ springdoc:
     disable-swagger-default-url: true
 
 server:
+  port: 8080
   servlet:
     context-path: /e-learning
   max-http-header-size: 10MB

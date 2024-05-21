@@ -1,7 +1,5 @@
 package com.elearning.models.dtos;
 
-import com.elearning.utils.enumAttribute.EnumCourseContentType;
-import com.elearning.utils.enumAttribute.EnumCourseStatus;
 import com.elearning.utils.enumAttribute.EnumCourseType;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -39,6 +37,9 @@ public class CourseDTO {
 
     private String description;
 
+    @JsonProperty("short_description")
+    private String shortDescription;
+
     private String requirement;
 
     private Long duration;
@@ -73,6 +74,9 @@ public class CourseDTO {
 
     private List<AttributeDTO> attributes;
 
+    @JsonProperty("is_preview")
+    private Boolean isPreview;
+
     @JsonProperty("created_at")
     private Date createAt;
 
@@ -80,6 +84,8 @@ public class CourseDTO {
     private CourseRatingDTO courseRatings;
     @JsonProperty("update_by")
     private String updateBy;
+
+    private List<FileRelationshipDTO> attachments;
 
     @JsonProperty("update_at")
     private Date updatedAt;

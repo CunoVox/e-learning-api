@@ -2,7 +2,6 @@ package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.User;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepositoryCustom;
@@ -42,9 +41,14 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             criteria.add(Criteria.where("_id").in(parameterSearchCourse.getIds()));
         }
 
-        if (parameterSearchCourse.getSearchType() != null && !parameterSearchCourse.getSearchType().equals(EnumCourseType.OFFICIAL.name())) {
-            criteria.add(Criteria.where("courseType").is(parameterSearchCourse.getSearchType()));
-        } else if (parameterSearchCourse.getSearchType() != null) {
+//        if (parameterSearchCourse.getSearchType() != null && !parameterSearchCourse.getSearchType().equals(EnumCourseType.OFFICIAL.name())) {
+//            criteria.add(Criteria.where("courseType").is(parameterSearchCourse.getSearchType()));
+//        } else if (parameterSearchCourse.getSearchType() == null) {
+//            criteria.add(Criteria.where("courseType").in(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()));
+//        }
+        if(!parameterSearchCourse.getSearchType().isNullOrEmpty()){
+            criteria.add(Criteria.where("courseType").in(parameterSearchCourse.getSearchType()));
+        }else{
             criteria.add(Criteria.where("courseType").in(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()));
         }
         if (parameterSearchCourse.getIsDeleted() != null) {
@@ -109,51 +113,98 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
         }
 
         //sort theo rating
-        if (!parameterSearchCourse.getSortBy().isBlankOrNull() && parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_RATING.name())) {
-            Aggregation aggregation = Aggregation.newAggregation(
-                    Aggregation.match(new Criteria().andOperator(criteria)),
-                    Aggregation.lookup("rating", "_id", "courseId", "rating"),
-                    Aggregation.unwind("rating", true),
-                    Aggregation.group("_id")
-                            .first("partnerId").as("partnerId")
-                            .first("courseType").as("courseType")
-                            .first("status").as("status")
-                            .first("name").as("name")
-                            .first("nameMod").as("nameMod")
-                            .first("slug").as("slug")
-                            .first("contentType").as("contentType")
-                            .first("parentId").as("parentId")
-                            .first("level").as("level")
-                            .first("description").as("description")
-                            .first("requirement").as("requirement")
-                            .first("duration").as("duration")
-                            .first("subscriptions").as("subscriptions")
-                            .first("isPublished").as("isPublished")
-                            .first("attributes").as("attributes")
-                            .first("createdAt").as("createdAt")
-                            .first("updatedAt").as("updatedAt")
-                            .first("createdBy").as("createdBy")
-                            .first("updatedBy").as("updatedBy")
-                            .first("isDeleted").as("isDeleted")
-                            .avg("rating.rate").as("averageRating")
-                            .count().as("totalRating"),
-                    Aggregation.sort(Sort.Direction.DESC, "averageRating", "totalRating"),
-                    Aggregation.skip(parameterSearchCourse.getStartIndex()),
-                    Aggregation.limit(parameterSearchCourse.getMaxResult())
-            );
-            AggregationResults<Course> results = mongoTemplate.aggregate(aggregation, Course.class, Course.class);
-            List<Course> courses = results.getMappedResults();
-            return ListWrapper.<Course>builder()
-                    .total(courses.size())
-                    .totalPage((courses.size() - 1) / parameterSearchCourse.getMaxResult() + 1)
-                    .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
-                    .maxResult(parameterSearchCourse.getMaxResult())
-                    .data(courses)
-                    .build();
+        if (!parameterSearchCourse.getSortBy().isBlankOrNull()) {
+            if (parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_RATING.name())) {
+                Aggregation aggregation = Aggregation.newAggregation(
+                        Aggregation.match(new Criteria().andOperator(criteria)),
+                        Aggregation.lookup("rating", "_id", "courseId", "rating"),
+                        Aggregation.unwind("rating", true),
+                        Aggregation.group("_id")
+                                .first("partnerId").as("partnerId")
+                                .first("courseType").as("courseType")
+                                .first("status").as("status")
+                                .first("name").as("name")
+                                .first("nameMod").as("nameMod")
+                                .first("slug").as("slug")
+                                .first("contentType").as("contentType")
+                                .first("parentId").as("parentId")
+                                .first("level").as("level")
+                                .first("description").as("description")
+                                .first("requirement").as("requirement")
+                                .first("duration").as("duration")
+                                .first("subscriptions").as("subscriptions")
+                                .first("isPublished").as("isPublished")
+                                .first("attributes").as("attributes")
+                                .first("createdAt").as("createdAt")
+                                .first("updatedAt").as("updatedAt")
+                                .first("createdBy").as("createdBy")
+                                .first("updatedBy").as("updatedBy")
+                                .first("isDeleted").as("isDeleted")
+                                .avg("rating.rate").as("averageRating")
+                                .count().as("totalRating"),
+                        Aggregation.sort(Sort.Direction.DESC, "averageRating", "totalRating"),
+                        Aggregation.skip(parameterSearchCourse.getStartIndex()),
+                        Aggregation.limit(parameterSearchCourse.getMaxResult())
+                );
+                AggregationResults<Course> results = mongoTemplate.aggregate(aggregation, Course.class, Course.class);
+                List<Course> courses = results.getMappedResults();
+                return ListWrapper.<Course>builder()
+                        .total(courses.size())
+                        .totalPage((courses.size() - 1) / parameterSearchCourse.getMaxResult() + 1)
+                        .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
+                        .maxResult(parameterSearchCourse.getMaxResult())
+                        .data(courses)
+                        .build();
+            }
+
+            //sort theo giá PRICE_DESC
+            if (parameterSearchCourse.getSortBy().equals(EnumSortCourse.PRICE_DESC.name())) {
+                // price nằm ở bảng khác
+                Aggregation aggregation = Aggregation.newAggregation(
+                        Aggregation.match(new Criteria().andOperator(criteria)),
+                        Aggregation.lookup("price", "_id", "parentId", "price"),
+                        Aggregation.unwind("price", true),
+                        Aggregation.group("_id")
+                                .first("partnerId").as("partnerId")
+                                .first("courseType").as("courseType")
+                                .first("status").as("status")
+                                .first("name").as("name")
+                                .first("nameMod").as("nameMod")
+                                .first("slug").as("slug")
+                                .first("contentType").as("contentType")
+                                .first("parentId").as("parentId")
+                                .first("level").as("level")
+                                .first("description").as("description")
+                                .first("requirement").as("requirement")
+                                .first("duration").as("duration")
+                                .first("subscriptions").as("subscriptions")
+                                .first("isPublished").as("isPublished")
+                                .first("attributes").as("attributes")
+                                .first("createdAt").as("createdAt")
+                                .first("updatedAt").as("updatedAt")
+                                .first("createdBy").as("createdBy")
+                                .first("updatedBy").as("updatedBy")
+                                .first("isDeleted").as("isDeleted")
+                                .first("price.price").as("priceSell"),
+                        Aggregation.sort(Sort.Direction.DESC, "priceSell"),
+                        Aggregation.skip(parameterSearchCourse.getStartIndex()),
+                        Aggregation.limit(parameterSearchCourse.getMaxResult())
+                );
+                AggregationResults<Course> results = mongoTemplate.aggregate(aggregation, Course.class, Course.class);
+                List<Course> courses = results.getMappedResults();
+                return ListWrapper.<Course>builder()
+                        .total(courses.size())
+                        .totalPage((courses.size() - 1) / parameterSearchCourse.getMaxResult() + 1)
+                        .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
+                        .maxResult(parameterSearchCourse.getMaxResult())
+                        .data(courses)
+                        .build();
+            }
         }
 
+
         Query query = new Query();
-//        query.with(Sort.by("createdAt").descending());
+        query.with(Sort.by("createdAt").descending());
         if (!parameterSearchCourse.getSortBy().isBlankOrNull() && parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_SUB.name())) {
             query.with(Sort.by("subscriptions").descending());
         }
@@ -250,9 +301,59 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
     }
 
     @Override
+    public void updateIsPreview(String courseId, Boolean isPreview, String updatedBy) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("isPreview", isPreview);
+        updateAttribute(courseId, map, updatedBy, Course.class);
+    }
+
+    @Override
     public void updateCourseSubscriptions(String courseId, Long subscriptions, String updatedBy) {
         Map<String, Object> map = new HashMap<>();
         map.put("subscriptions", subscriptions);
         updateAttribute(courseId, map, updatedBy, Course.class);
+    }
+
+
+    @Override
+    public Map<String, Long> sumSubscriptionsByCreatedBy(List<String> createdBy) {
+        List<Course> courses = mongoTemplate.find(
+                Query.query(
+                        Criteria.where("createdBy").in(createdBy)
+                                .and("courseType").in(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()))
+                                .and("level").is(1)
+                                .and("isDeleted").nin(true)
+                ),
+                Course.class);
+        Map<String, Long> result = new HashMap<>();
+        courses.forEach(course -> {
+            if (result.containsKey(course.getCreatedBy())) {
+                result.put(course.getCreatedBy(), result.get(course.getCreatedBy()) + (course.getSubscriptions() == null ? 0 : course.getSubscriptions()));
+            } else {
+                result.put(course.getCreatedBy(), course.getSubscriptions() == null ? 0 : course.getSubscriptions());
+            }
+        });
+        return result;
+    }
+
+    @Override
+    public Map<String, Integer> countAllByCreatedBy(List<String> createdBy) {
+        List<Course> courses = mongoTemplate.find(
+                Query.query(
+                        Criteria.where("createdBy").in(createdBy)
+                                .and("courseType").in(List.of(EnumCourseType.OFFICIAL.name(), EnumCourseType.CHANGE_PRICE.name()))
+                                .and("level").is(1)
+                                .and("isDeleted").nin(true)
+                ),
+                Course.class);
+        Map<String, Integer> result = new HashMap<>();
+        courses.forEach(course -> {
+            if (result.containsKey(course.getCreatedBy())) {
+                result.put(course.getCreatedBy(), result.get(course.getCreatedBy()) + 1);
+            } else {
+                result.put(course.getCreatedBy(), 1);
+            }
+        });
+        return result;
     }
 }
