@@ -82,8 +82,8 @@ public class FileRelationshipController extends BaseController {
     public String getUrlFileService() {
         if (StringUtils.isBlankOrNull(urlFileService)) {
             ConfigProperty configProperty = configPropertyRepository.findByName("url_file_service");
-            if (configProperty !=null ) {
-                urlFileService= configProperty.getValue();
+            if (configProperty != null) {
+                urlFileService = configProperty.getValue();
             }
         }
         return urlFileService;
@@ -94,7 +94,8 @@ public class FileRelationshipController extends BaseController {
             switch (EnumParentFileType.valueOf(parentType)) {
                 // Case 1 - Video
                 case COURSE_VIDEO:
-                    return Constants.BASE_VIDEO_URL + fileId + "/preview";
+//                    return Constants.BASE_VIDEO_URL + fileId + "/preview";
+                    return Constants.BASE_VIDEO_URL + fileId + "?rel=0";
 
                 // Case 2 - Image
                 case COURSE_IMAGE:

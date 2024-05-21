@@ -33,9 +33,9 @@ public class FileController extends BaseController {
 
     public FileDTO uploadFile(MultipartFile file, String type) throws IOException {
         //nếu là video thì upload lên youtube
-//        if (Objects.requireNonNull(file.getContentType()).contains("video") && !type.equals(EnumParentFileType.COURSE_ATTACHMENT.name())) {
-//            return youtubeController.uploadVideo(file);
-//        }
+        if (Objects.requireNonNull(file.getContentType()).contains("video") && !type.equals(EnumParentFileType.COURSE_ATTACHMENT.name())) {
+            return youtubeController.uploadVideo(file);
+        }
         return sendFileToGoogleDrive(file);
     }
 

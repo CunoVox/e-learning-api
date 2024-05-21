@@ -16,8 +16,8 @@ public class Constants {
     public static final String SERVICE_ACCOUNT_ID = "e-learning@e-learning-399406.iam.gserviceaccount.com";
 
     public static final String BASE_IMAGE_URL = "https://lh3.googleusercontent.com/d/";
-//    public static final String BASE_VIDEO_URL = "http://www.youtube.com/embed/";
-    public static final String BASE_VIDEO_URL = "https://drive.google.com/file/d/";
+    public static final String BASE_VIDEO_URL = "https://www.youtube-nocookie.com/embed/";
+//    public static final String BASE_VIDEO_URL = "https://drive.google.com/file/d/";
 
 
 
