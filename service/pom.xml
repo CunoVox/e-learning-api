@@ -96,15 +96,15 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>a0zj3tsiiitfu-artifactory-primary-0-releases</name>
-            <url>https://wisdom1.jfrog.io/artifactory/elearning-libs-release</url>
+            <name>a0l03blnmic44-artifactory-primary-0-releases</name>
+            <url>https://wisdom2.jfrog.io/artifactory/wisdom-libs-release</url>
         </repository>
     </distributionManagement>
     <repositories>
         <repository>
             <id>central</id>
-            <name>a0zj3tsiiitfu-artifactory-primary-0-releases</name>
-            <url>https://wisdom1.jfrog.io/artifactory/elearning-libs-release</url>
+            <name>a0l03blnmic44-artifactory-primary-0-releases</name>
+            <url>https://wisdom2.jfrog.io/artifactory/wisdom-libs-release</url>
         </repository>
     </repositories>
     <build>
