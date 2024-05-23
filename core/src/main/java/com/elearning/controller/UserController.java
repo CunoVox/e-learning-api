@@ -23,6 +23,7 @@ import lombok.experimental.ExtensionMethod;
 import org.apache.commons.validator.EmailValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -34,7 +35,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @ExtensionMethod(Extensions.class)
 public class UserController extends BaseController {
     private final ModelMapper modelMapper;
@@ -43,8 +43,22 @@ public class UserController extends BaseController {
     private final UserDetailsService userDetailsService;
     private final ICourseRepository courseRepository;
     private final IRatingRepository rattingRepository;
+
+    private final VerificationCodeController verificationCodeController;
+
     @Autowired
-    private VerificationCodeController verificationCodeController;
+    public UserController(ModelMapper modelMapper, IUserRepository userRepository, JwtController jwtController, UserDetailsService userDetailsService, ICourseRepository courseRepository, IRatingRepository rattingRepository, @Lazy VerificationCodeController verificationCodeController, AuthenticationManager authManager, PasswordEncoder passwordEncoder) {
+        this.modelMapper = modelMapper;
+        this.userRepository = userRepository;
+        this.jwtController = jwtController;
+        this.userDetailsService = userDetailsService;
+        this.courseRepository = courseRepository;
+        this.rattingRepository = rattingRepository;
+        this.verificationCodeController = verificationCodeController;
+        this.authManager = authManager;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Autowired
     private FileRelationshipController fileRelationshipController;
     @Autowired
