@@ -86,7 +86,7 @@ public class YoutubeController {
                 .id(file.getId())
                 .name(file.getSnippet().getTitle())
                 .videoMediaMetadata(file.getContentDetails().getDuration())
-                .webViewLink("https://www.youtube-nocookie.com/embed/" + file.getId() + "?rel=0")
+                .webViewLink("https://www.youtube.com/watch?v="+ file.getId())
                 .build();
     }
 

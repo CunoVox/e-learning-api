@@ -2,8 +2,8 @@ package com.elearning.utils;
 
 public class Constants {
 
-    public static final String SERVICE_URL = "https://elearning-api-elearning.koyeb.app/e-learning";
-    public static final String WEB_URL = "https://e-learning-website.up.railway.app";
+    public static final String SERVICE_URL = "https://haovo.id.vn/e-learning";
+    public static final String WEB_URL = "https://wisdom.io.vn";
 
     public static final int ACCESS_TOKEN_EXPIRE_TIME_MILLIS = 100 * 60 * 1000; // ( 10' //100'
     public static final int REFRESH_TOKEN_EXPIRE_TIME_MILLIS = 24 * 60 * 60 * 7 * 1000; // 7 days
@@ -16,7 +16,7 @@ public class Constants {
     public static final String SERVICE_ACCOUNT_ID = "e-learning@e-learning-399406.iam.gserviceaccount.com";
 
     public static final String BASE_IMAGE_URL = "https://lh3.googleusercontent.com/d/";
-//    public static final String BASE_VIDEO_URL = "http://www.youtube.com/embed/";
+//    public static final String BASE_VIDEO_URL = "https://www.youtube-nocookie.com/embed/";
     public static final String BASE_VIDEO_URL = "https://drive.google.com/file/d/";
 
 
@@ -31,7 +31,7 @@ public class Constants {
 //    public static final String VNP_COMMAND= "pay";
 
     //FILE
-    public static final String FILE_SERVICE_URL = "https://elearning-api-elearning.koyeb.app/file-service";
+    public static final String FILE_SERVICE_URL = "http://localhost:8181/file-service";
     public static final String REDIRECT_URL  = WEB_URL + "/google-return";
 
 }

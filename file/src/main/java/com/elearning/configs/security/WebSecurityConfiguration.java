@@ -13,6 +13,9 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
@@ -26,11 +29,19 @@ public class WebSecurityConfiguration {
     private HandlerExceptionResolver exceptionResolver;
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthFilter(){
+    public JwtAuthenticationFilter jwtAuthFilter() {
         return new JwtAuthenticationFilter(exceptionResolver);
     }
+
     private final AuthenticationProvider authenticationProvider;
-//    private final LogoutHandler logoutHandler;
+
+    //    private final LogoutHandler logoutHandler;
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", new CorsConfiguration().applyPermitDefaultValues());
+        return source;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

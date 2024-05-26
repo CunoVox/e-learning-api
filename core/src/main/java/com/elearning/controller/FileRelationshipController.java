@@ -95,6 +95,7 @@ public class FileRelationshipController extends BaseController {
                 // Case 1 - Video
                 case COURSE_VIDEO:
                     return Constants.BASE_VIDEO_URL + fileId + "/preview";
+//                    return Constants.BASE_VIDEO_URL + fileId + "?rel=0";
 
                 // Case 2 - Image
                 case COURSE_IMAGE:
