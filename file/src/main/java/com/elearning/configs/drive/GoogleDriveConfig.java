@@ -42,7 +42,7 @@ public class GoogleDriveConfig {
                 .setJsonFactory(jsonFactory)
                 .setServiceAccountId(Constants.SERVICE_ACCOUNT_ID)
                 .setServiceAccountScopes(elenco)
-                .setServiceAccountPrivateKeyFromP12File(new File(classLoader.getResource("credentials.p12").getFile()))
+                .setServiceAccountPrivateKeyFromP12File(new File(classLoader.getResource("credentialsv2.p12").getFile()))
                 .build();
     }
 }

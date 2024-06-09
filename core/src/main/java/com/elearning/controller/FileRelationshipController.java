@@ -94,8 +94,8 @@ public class FileRelationshipController extends BaseController {
             switch (EnumParentFileType.valueOf(parentType)) {
                 // Case 1 - Video
                 case COURSE_VIDEO:
-//                    return Constants.BASE_VIDEO_URL + fileId + "/preview";
-                    return Constants.BASE_VIDEO_URL + fileId + "?rel=0";
+                    return Constants.BASE_VIDEO_URL + fileId + "/preview";
+//                    return Constants.BASE_VIDEO_URL + fileId + "?rel=0";
 
                 // Case 2 - Image
                 case COURSE_IMAGE:
