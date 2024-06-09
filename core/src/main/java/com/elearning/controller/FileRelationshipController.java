@@ -82,8 +82,8 @@ public class FileRelationshipController extends BaseController {
     public String getUrlFileService() {
         if (StringUtils.isBlankOrNull(urlFileService)) {
             ConfigProperty configProperty = configPropertyRepository.findByName("url_file_service");
-            if (configProperty !=null ) {
-                urlFileService= configProperty.getValue();
+            if (configProperty != null) {
+                urlFileService = configProperty.getValue();
             }
         }
         return urlFileService;

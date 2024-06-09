@@ -2,6 +2,7 @@ package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
+import com.elearning.entities.IBaseEntity;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepositoryCustom;
@@ -13,12 +14,12 @@ import com.elearning.utils.enumAttribute.EnumCourseType;
 import com.elearning.utils.enumAttribute.EnumSortCourse;
 import lombok.experimental.ExtensionMethod;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.aggregation.Aggregation;
-import org.springframework.data.mongodb.core.aggregation.AggregationResults;
+import org.springframework.data.mongodb.core.aggregation.*;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
+import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -159,54 +160,90 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
 
             //sort theo giá PRICE_DESC
             if (parameterSearchCourse.getSortBy().equals(EnumSortCourse.PRICE_DESC.name())) {
-                // price nằm ở bảng khác
-                Aggregation aggregation = Aggregation.newAggregation(
-                        Aggregation.match(new Criteria().andOperator(criteria)),
-                        Aggregation.lookup("price", "_id", "parentId", "price"),
-                        Aggregation.unwind("price", true),
-                        Aggregation.group("_id")
-                                .first("partnerId").as("partnerId")
-                                .first("courseType").as("courseType")
-                                .first("status").as("status")
-                                .first("name").as("name")
-                                .first("nameMod").as("nameMod")
-                                .first("slug").as("slug")
-                                .first("contentType").as("contentType")
-                                .first("parentId").as("parentId")
-                                .first("level").as("level")
-                                .first("description").as("description")
-                                .first("requirement").as("requirement")
-                                .first("duration").as("duration")
-                                .first("subscriptions").as("subscriptions")
-                                .first("isPublished").as("isPublished")
-                                .first("attributes").as("attributes")
-                                .first("createdAt").as("createdAt")
-                                .first("updatedAt").as("updatedAt")
-                                .first("createdBy").as("createdBy")
-                                .first("updatedBy").as("updatedBy")
-                                .first("isDeleted").as("isDeleted")
-                                .first("price.price").as("priceSell"),
-                        Aggregation.sort(Sort.Direction.DESC, "priceSell"),
-                        Aggregation.skip(parameterSearchCourse.getStartIndex()),
-                        Aggregation.limit(parameterSearchCourse.getMaxResult())
-                );
-                AggregationResults<Course> results = mongoTemplate.aggregate(aggregation, Course.class, Course.class);
-                List<Course> courses = results.getMappedResults();
+                MatchOperation matchPartyId = Aggregation.match(new Criteria().andOperator(criteria));
+                LookupOperation lookupOperation = Aggregation.lookup("price", "_id", "parentId", "price");
+                UnwindOperation unwindOperation = Aggregation.unwind("price");
+                ProjectionOperation projectionOperation = Aggregation.project(Fields.UNDERSCORE_ID)
+                        .and("partnerId").as("partnerId")
+                        .and("courseType").as("courseType")
+                        .and("status").as("status")
+                        .and("name").as("name")
+                        .and("nameMode").as("nameMode")
+                        .and("slug").as("slug")
+                        .and("contentType").as("contentType")
+                        .and("parentId").as("parentId")
+                        .and("level").as("level")
+                        .and("description").as("description")
+                        .and("shortDescription").as("shortDescription")
+                        .and("isPreview").as("isPreview")
+                        .and("requirement").as("requirement")
+                        .and("duration").as("duration")
+                        .and("subscriptions").as("subscriptions")
+                        .and("attributes").as("attributes")
+                        .and("createdAt").as("createdAt")
+                        .and("updatedAt").as("updatedAt")
+                        .and("createdBy").as("createdBy")
+                        .and("updatedBy").as("updatedBy")
+                        .and("isDeleted").as("isDeleted")
+                        .and("price").as("price");
+                GroupOperation groupOperation = Aggregation.group(Fields.UNDERSCORE_ID)
+                        .first("partnerId").as("partnerId")
+                        .first("courseType").as("courseType")
+                        .first("status").as("status")
+                        .first("name").as("name")
+                        .first("nameMode").as("nameMode")
+                        .first("slug").as("slug")
+                        .first("contentType").as("contentType")
+                        .first("parentId").as("parentId")
+                        .first("level").as("level")
+                        .first("description").as("description")
+                        .first("shortDescription").as("shortDescription")
+                        .first("isPreview").as("isPreview")
+                        .first("requirement").as("requirement")
+                        .first("duration").as("duration")
+                        .first("subscriptions").as("subscriptions")
+                        .first("attributes").as("attributes")
+                        .first("createdAt").as("createdAt")
+                        .first("updatedAt").as("updatedAt")
+                        .first("createdBy").as("createdBy")
+                        .first("updatedBy").as("updatedBy")
+                        .first("isDeleted").as("isDeleted")
+                        .max("price.price").as("priceSell");
+
+                SortOperation sortOperation = Aggregation.sort(Sort.by("priceSell").ascending());
+                SkipOperation skipOperation = null;
+                LimitOperation limitOperation = null;
+                if (parameterSearchCourse.getStartIndex() >= 0) {
+                    skipOperation = Aggregation.skip(parameterSearchCourse.getStartIndex());
+                }
+                if (parameterSearchCourse.getMaxResult() > 0) {
+                    limitOperation = Aggregation.limit(parameterSearchCourse.getMaxResult());
+                }
+
+                Aggregation aggregation = Aggregation.newAggregation(matchPartyId, lookupOperation, unwindOperation, projectionOperation,
+                        groupOperation, sortOperation, skipOperation, limitOperation);
+
+                AggregationResults<Course> output
+                        = mongoTemplate.aggregate(aggregation,  Course.class, Course.class);
+
                 return ListWrapper.<Course>builder()
-                        .total(courses.size())
-                        .totalPage((courses.size() - 1) / parameterSearchCourse.getMaxResult() + 1)
+                        .total(output.getMappedResults().size())
+                        .totalPage((output.getMappedResults().size() - 1) / parameterSearchCourse.getMaxResult() + 1)
                         .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
-                        .maxResult(parameterSearchCourse.getMaxResult())
-                        .data(courses)
+                        .data(output.getMappedResults())
                         .build();
             }
         }
 
 
         Query query = new Query();
-        query.with(Sort.by("createdAt").descending());
+
         if (!parameterSearchCourse.getSortBy().isBlankOrNull() && parameterSearchCourse.getSortBy().equals(EnumSortCourse.HIGHEST_SUB.name())) {
-            query.with(Sort.by("subscriptions").descending());
+            //sort theo subscriptions (số lượng đăng ký) giảm dần và createdAt giảm dần
+            query.with(Sort.by("subscriptions").descending().and(Sort.by("createdAt").descending()));
+        }
+        if (parameterSearchCourse.getSortBy().isBlankOrNull()) {
+            query.with(Sort.by("createdAt").descending());
         }
         query.addCriteria(new Criteria().andOperator(criteria));
 
