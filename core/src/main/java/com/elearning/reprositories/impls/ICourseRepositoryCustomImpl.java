@@ -159,10 +159,10 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             }
 
             //sort theo giá PRICE_DESC
-            if (parameterSearchCourse.getSortBy().equals(EnumSortCourse.PRICE_DESC.name())) {
+            if (parameterSearchCourse.getSortBy().equals(EnumSortCourse.PRICE.name()) && !parameterSearchCourse.getSortOrder().isBlankOrNull()) {
                 MatchOperation matchPartyId = Aggregation.match(new Criteria().andOperator(criteria));
-                LookupOperation lookupOperation = Aggregation.lookup("price", "_id", "parentId", "price");
-                UnwindOperation unwindOperation = Aggregation.unwind("price");
+                LookupOperation lookupOperation = Aggregation.lookup("price", "_id", "parentId", "prices");
+                UnwindOperation unwindOperation = Aggregation.unwind("prices");
                 ProjectionOperation projectionOperation = Aggregation.project(Fields.UNDERSCORE_ID)
                         .and("partnerId").as("partnerId")
                         .and("courseType").as("courseType")
@@ -185,7 +185,11 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
                         .and("createdBy").as("createdBy")
                         .and("updatedBy").as("updatedBy")
                         .and("isDeleted").as("isDeleted")
-                        .and("price").as("price");
+                        .and("prices").as("prices")
+                        .and(ConditionalOperators.when(Criteria.where("prices.price").ne(null))
+                                .then("$prices.price")
+                                .otherwise(parameterSearchCourse.getSortOrder().equals("ASC") ? Integer.MAX_VALUE : Integer.MIN_VALUE))
+                        .as("priceSell");
                 GroupOperation groupOperation = Aggregation.group(Fields.UNDERSCORE_ID)
                         .first("partnerId").as("partnerId")
                         .first("courseType").as("courseType")
@@ -208,9 +212,19 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
                         .first("createdBy").as("createdBy")
                         .first("updatedBy").as("updatedBy")
                         .first("isDeleted").as("isDeleted")
-                        .max("price.price").as("priceSell");
-
-                SortOperation sortOperation = Aggregation.sort(Sort.by("priceSell").ascending());
+                        .max("priceSell").as("priceSell");
+                SortOperation sortOperation;
+                if (parameterSearchCourse.getSortOrder().equals("ASC")) {
+                    sortOperation = Aggregation.sort(Sort.by(
+                            Sort.Order.asc("priceSell").nullsLast(),
+                            Sort.Order.desc("createdAt")
+                    ));
+                } else {
+                    sortOperation = Aggregation.sort(Sort.by(
+                            Sort.Order.desc("priceSell").nullsFirst(),
+                            Sort.Order.desc("createdAt")
+                    ));
+                }
                 SkipOperation skipOperation = null;
                 LimitOperation limitOperation = null;
                 if (parameterSearchCourse.getStartIndex() >= 0) {
@@ -219,7 +233,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
                 if (parameterSearchCourse.getMaxResult() > 0) {
                     limitOperation = Aggregation.limit(parameterSearchCourse.getMaxResult());
                 }
-
+                long totalResult = mongoTemplate.count(Query.query(new Criteria().andOperator(criteria)), Course.class);
                 Aggregation aggregation = Aggregation.newAggregation(matchPartyId, lookupOperation, unwindOperation, projectionOperation,
                         groupOperation, sortOperation, skipOperation, limitOperation);
 
@@ -227,8 +241,8 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
                         = mongoTemplate.aggregate(aggregation,  Course.class, Course.class);
 
                 return ListWrapper.<Course>builder()
-                        .total(output.getMappedResults().size())
-                        .totalPage((output.getMappedResults().size() - 1) / parameterSearchCourse.getMaxResult() + 1)
+                        .total(totalResult)
+                        .totalPage((totalResult - 1) / parameterSearchCourse.getMaxResult() + 1)
                         .currentPage(parameterSearchCourse.getStartIndex() / parameterSearchCourse.getMaxResult() + 1)
                         .data(output.getMappedResults())
                         .build();

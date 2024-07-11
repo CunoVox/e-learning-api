@@ -42,6 +42,8 @@ public class ParameterSearchCourse implements Serializable, Cloneable {
 
     private String sortBy;
 
+    private String sortOrder;
+
     private List<String> ids;
 
     private List<String> parentIds;
