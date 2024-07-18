@@ -9,6 +9,7 @@ import com.elearning.handler.ServiceException;
 import com.elearning.models.dtos.CourseDTO;
 import com.elearning.models.dtos.EnrollmentDTO;
 import com.elearning.models.dtos.InvoiceDTO;
+import com.elearning.models.dtos.UserDTO;
 import com.elearning.models.searchs.ParameterSearchInvoice;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepository;
@@ -44,6 +45,8 @@ public class InvoiceController extends BaseController {
     private CourseController courseController;
     @Autowired
     private EnrollmentController enrollmentController;
+    @Autowired
+    private UserController userController;
     @Value("${vnpay.url}")
     private String VNP_PAY_URL;
     @Value("${vnpay.secretKey}")
@@ -165,9 +168,9 @@ public class InvoiceController extends BaseController {
         if (dto == null) return null;
         Course course = courseRepository.findById(dto.getCourseId()).orElse(null);
         if (course == null) return null;
-        User customer = userRepository.findById(dto.getCustomerId()).orElse(null);
+        UserDTO customer = userController.getUserDetail(dto.getCustomerId());
         if (customer == null) return null;
-        User seller = userRepository.findById(course.getCreatedBy()).orElse(null);
+        UserDTO seller = userController.getUserDetail(course.getCreatedBy());
         if (seller == null) return null;
 
         return InvoiceDTO.builder()
@@ -181,8 +184,10 @@ public class InvoiceController extends BaseController {
                 .courseSlug(course.getSlug())
                 .customerName(customer.getFullName())
                 .customerEmail(customer.getEmail())
+                .customerImage(customer.getAvatar())
                 .sellerName(seller.getFullName())
                 .sellerEmail(seller.getEmail())
+                .sellerImage(seller.getAvatar())
                 .status(dto.getStatus())
                 .build();
     }
