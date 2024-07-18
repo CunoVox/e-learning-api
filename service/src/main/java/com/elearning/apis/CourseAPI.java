@@ -48,7 +48,8 @@ public class CourseAPI {
                                             @RequestParam(value = "build_child", required = false) Boolean buildChild,
                                             @RequestParam(value = "is_deleted", required = false) Boolean isDeleted,
                                             @RequestParam(value = "ids", required = false) List<String> ids,
-                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB", "PRICE_DESC"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
+                                            @RequestParam(value = "sort_order", required = false) @ValuesAllowed(values = {"ASC", "DESC"}) @Parameter(description = "Allowed values: ASC | DESC.") String sortOrder,
+                                            @RequestParam(value = "sort_by", required = false) @ValuesAllowed(values = {"HIGHEST_RATING", "HIGHEST_SUB", "PRICE"}) @Parameter(description = "Allowed values: HIGHEST_RATING | HIGHEST_SUB") String sortBy,
                                             @RequestParam(value = "parent_ids", required = false) List<String> parentIds,
                                             @RequestParam(value = "categories_ids", required = false) List<String> categoriesIds) {
         if (currentPage == null || currentPage == 0) {
@@ -72,6 +73,7 @@ public class CourseAPI {
         parameterSearchCourse.setStartIndex(startIndex);
         parameterSearchCourse.setCategoriesIds(categoriesIds);
         parameterSearchCourse.setSortBy(sortBy);
+        parameterSearchCourse.setSortOrder(sortOrder);
         if (fromDate != null) {
             parameterSearchCourse.setFromDate(new Date(fromDate));
         }
