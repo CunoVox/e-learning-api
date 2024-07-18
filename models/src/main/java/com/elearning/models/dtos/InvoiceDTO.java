@@ -26,8 +26,10 @@ public class InvoiceDTO {
     private String courseSlug;
     private String customerName;
     private String customerEmail;
+    private String customerImage;
     private String sellerName;
     private String sellerEmail;
+    private String sellerImage;
     //==================================================================
     private Date createdAt;
     private String createdBy;
