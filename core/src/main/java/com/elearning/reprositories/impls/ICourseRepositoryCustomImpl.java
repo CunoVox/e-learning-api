@@ -2,7 +2,6 @@ package com.elearning.reprositories.impls;
 
 import com.elearning.entities.Category;
 import com.elearning.entities.Course;
-import com.elearning.entities.IBaseEntity;
 import com.elearning.models.searchs.ParameterSearchCourse;
 import com.elearning.models.wrapper.ListWrapper;
 import com.elearning.reprositories.ICourseRepositoryCustom;
@@ -19,7 +18,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 
-import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -257,7 +255,7 @@ public class ICourseRepositoryCustomImpl extends BaseRepositoryCustom implements
             query.with(Sort.by("subscriptions").descending().and(Sort.by("createdAt").descending()));
         }
         if (parameterSearchCourse.getSortBy().isBlankOrNull()) {
-            query.with(Sort.by("createdAt").descending());
+            query.with(Sort.by("updatedAt").descending());
         }
         query.addCriteria(new Criteria().andOperator(criteria));
 

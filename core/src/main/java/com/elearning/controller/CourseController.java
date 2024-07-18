@@ -325,6 +325,7 @@ public class CourseController extends BaseController {
                 .isPreview(inputDTO.getIsPreview())
                 .createdBy(inputDTO.getCreatedBy())
                 .createdAt(new Date())
+                .updatedAt(new Date())
                 .isDeleted(inputDTO.isDeleted())
                 .contentType(inputDTO.getType())
                 .build();
